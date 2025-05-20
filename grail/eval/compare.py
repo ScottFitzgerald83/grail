@@ -4,6 +4,8 @@ from grail.engine.model import run_inference, load_model
 from grail.eval.profiler import profile_run
 from grail.eval.metrics import plot_token_entropy
 from grail.config.settings import load_presets
+import json
+from datetime import datetime
 
 st.set_page_config(page_title="GRAIL Compare", layout="wide")
 st.title("🔁 GRAIL Config Comparison")
@@ -41,6 +43,8 @@ if st.button("Compare"):
         st.subheader(f"🔧 Output from {config_a_name}")
         st.write(out_a)
         st.json(metrics_a)
+        if "tokens_generated" in metrics_a:
+            st.caption(f"🧮 Tokens generated: {metrics_a['tokens_generated']}")
         st.subheader("📈 Entropy (A)")
         if hasattr(trace_a, "scores") and trace_a.scores:
             scores_a = [torch.tensor(s) for s in trace_a.scores]
@@ -52,9 +56,26 @@ if st.button("Compare"):
         st.subheader(f"🧪 Output from {config_b_name}")
         st.write(out_b)
         st.json(metrics_b)
+        if "tokens_generated" in metrics_b:
+            st.caption(f"🧮 Tokens generated: {metrics_b['tokens_generated']}")
         st.subheader("📈 Entropy (B)")
         if hasattr(trace_b, "scores") and trace_b.scores:
             scores_b = [torch.tensor(s) for s in trace_b.scores]
             fig_b = plot_token_entropy(scores_b)
             if fig_b:
                 st.pyplot(fig_b)
+    if st.button("💾 Save Comparison Result"):
+        result = {
+            "prompt": prompt,
+            "config_a_name": config_a_name,
+            "config_b_name": config_b_name,
+            "output_a": out_a,
+            "output_b": out_b,
+            "metrics_a": metrics_a,
+            "metrics_b": metrics_b
+        }
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"grail_comparison_{timestamp}.json"
+        with open(filename, "w") as f:
+            json.dump(result, f, indent=2)
+        st.success(f"Saved to {filename}")
