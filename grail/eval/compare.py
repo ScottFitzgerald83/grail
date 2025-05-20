@@ -44,7 +44,7 @@ if st.button("Compare"):
         st.write(out_a)
         st.json(metrics_a)
         if "tokens_generated" in metrics_a:
-            st.caption(f"🧮 Tokens generated: {metrics_a['tokens_generated']}")
+            st.caption(f"🧮 Tokens generated: {metrics_a['tokens_generated']} / {config_a.get('max_tokens', 2048)}")
         st.subheader("📈 Entropy (A)")
         if hasattr(trace_a, "scores") and trace_a.scores:
             scores_a = [torch.tensor(s) for s in trace_a.scores]
@@ -57,13 +57,14 @@ if st.button("Compare"):
         st.write(out_b)
         st.json(metrics_b)
         if "tokens_generated" in metrics_b:
-            st.caption(f"🧮 Tokens generated: {metrics_b['tokens_generated']}")
+            st.caption(f"🧮 Tokens generated: {metrics_b['tokens_generated']} / {config_b.get('max_tokens', 2048)}")
         st.subheader("📈 Entropy (B)")
         if hasattr(trace_b, "scores") and trace_b.scores:
             scores_b = [torch.tensor(s) for s in trace_b.scores]
             fig_b = plot_token_entropy(scores_b)
             if fig_b:
                 st.pyplot(fig_b)
+
 if st.button("💾 Save Comparison Result"):
     result = {
         "prompt": prompt,
