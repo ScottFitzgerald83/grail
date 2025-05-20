@@ -9,6 +9,7 @@ from grail.eval.metrics import plot_token_entropy  # NEW
 
 # Sidebar: Configuration
 st.sidebar.header("Dial Settings")
+model_name = st.sidebar.selectbox("Model", ["gpt2", "distilgpt2"])
 attention = st.sidebar.selectbox("Attention Type", ["dense", "sparse", "flash"])
 precision = st.sidebar.selectbox("Precision", ["float32", "fp16", "int8"])
 ffn_mode = st.sidebar.selectbox("FFN Mode", ["standard", "lowrank", "fused", "quantized"])
@@ -23,6 +24,7 @@ submit = st.button("Run Inference")
 if submit and prompt:
     payload = {
         "prompt": prompt,
+        "model_name": model_name,
         "attention": attention,
         "precision": precision,
         "ffn_mode": ffn_mode,
@@ -45,7 +47,7 @@ if submit and prompt:
 
             # Display token count if available
             if "tokens_generated" in out["metrics"]:
-                st.caption(f"🧮 Tokens generated: {out['metrics']['tokens_generated']}")
+                st.caption(f"🧮 Tokens generated: {out['metrics']['tokens_generated']} / {payload.get('max_tokens', 2048)}")
 
             st.subheader("📈 Token-Level Entropy")
             if "trace" in out and out["trace"] and "scores" in out["trace"]:
