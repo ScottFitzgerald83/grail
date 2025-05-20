@@ -1,12 +1,9 @@
-# grail/eval/compare.py
-
 import streamlit as st
 import torch
 from grail.engine.model import run_inference, load_model
 from grail.eval.profiler import profile_run
 from grail.eval.metrics import plot_token_entropy
 from grail.config.settings import load_presets
-
 
 st.set_page_config(page_title="GRAIL Compare", layout="wide")
 st.title("🔁 GRAIL Config Comparison")
