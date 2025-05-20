@@ -64,18 +64,18 @@ if st.button("Compare"):
             fig_b = plot_token_entropy(scores_b)
             if fig_b:
                 st.pyplot(fig_b)
-    if st.button("💾 Save Comparison Result"):
-        result = {
-            "prompt": prompt,
-            "config_a_name": config_a_name,
-            "config_b_name": config_b_name,
-            "output_a": out_a,
-            "output_b": out_b,
-            "metrics_a": metrics_a,
-            "metrics_b": metrics_b
-        }
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"grail_comparison_{timestamp}.json"
-        with open(filename, "w") as f:
-            json.dump(result, f, indent=2)
-        st.success(f"Saved to {filename}")
+if st.button("💾 Save Comparison Result"):
+    result = {
+        "prompt": prompt,
+        "config_a_name": config_a_name,
+        "config_b_name": config_b_name,
+        "output_a": out_a,
+        "output_b": out_b,
+        "metrics_a": metrics_a,
+        "metrics_b": metrics_b
+    }
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"grail_comparison_{timestamp}.json"
+    with open(filename, "w") as f:
+        json.dump(result, f, indent=2)
+    st.success(f"Saved to {filename}")
