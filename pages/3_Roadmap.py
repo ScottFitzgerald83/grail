@@ -4,7 +4,7 @@ from pathlib import Path
 st.set_page_config(page_title="GRAIL Roadmap", layout="wide")
 st.title("🗺️ GRAIL Project Roadmap")
 
-roadmap_file = (Path(__file__).resolve().parents[2] / "ROADMAP.md")
+roadmap_file = (Path(__file__).resolve().parents[1] / "ROADMAP.md")
 
 if roadmap_file.exists():
     with open(roadmap_file, "r") as f:

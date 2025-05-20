@@ -3,7 +3,6 @@
 import matplotlib.pyplot as plt
 import torch
 
-
 def plot_token_entropy(scores):
     """
     Visualize the entropy per token based on generation scores.

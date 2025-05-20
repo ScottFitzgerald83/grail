@@ -42,9 +42,16 @@ if st.button("Compare"):
     with col1:
         st.subheader(f"🔧 Output from {config_a_name}")
         st.write(out_a)
+        st.subheader("📊 Metrics")
         st.json(metrics_a)
         if "tokens_generated" in metrics_a:
-            st.caption(f"🧮 Tokens generated: {metrics_a['tokens_generated']} / {config_a.get('max_tokens', 2048)}")
+            used = metrics_a["tokens_generated"]
+            max_tok = config_a.get("max_tokens", 2048)
+            pct = min(used / max_tok, 1.0)
+            st.caption(f"🧮 Tokens generated: {used} / {max_tok}")
+            st.progress(pct, text=f"{int(pct * 100)}% of configured max")
+        else:
+            st.caption("⚠️ Token count not available.")
         st.subheader("📈 Entropy (A)")
         if hasattr(trace_a, "scores") and trace_a.scores:
             scores_a = [torch.tensor(s) for s in trace_a.scores]
@@ -55,9 +62,16 @@ if st.button("Compare"):
     with col2:
         st.subheader(f"🧪 Output from {config_b_name}")
         st.write(out_b)
+        st.subheader("📊 Metrics")
         st.json(metrics_b)
         if "tokens_generated" in metrics_b:
-            st.caption(f"🧮 Tokens generated: {metrics_b['tokens_generated']} / {config_b.get('max_tokens', 2048)}")
+            used = metrics_b["tokens_generated"]
+            max_tok = config_b.get("max_tokens", 2048)
+            pct = min(used / max_tok, 1.0)
+            st.caption(f"🧮 Tokens generated: {used} / {max_tok}")
+            st.progress(pct, text=f"{int(pct * 100)}% of configured max")
+        else:
+            st.caption("⚠️ Token count not available.")
         st.subheader("📈 Entropy (B)")
         if hasattr(trace_b, "scores") and trace_b.scores:
             scores_b = [torch.tensor(s) for s in trace_b.scores]
