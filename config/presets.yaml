@@ -1,0 +1,37 @@
+
+
+dense_fp32:
+  attention: dense
+  precision: float32
+  ffn_mode: standard
+  temperature: 0.7
+  top_k: 50
+  top_p: 0.9
+  max_tokens: 2048
+
+sparse_flash_int8:
+  attention: flash
+  precision: int8
+  ffn_mode: lowrank
+  temperature: 0.6
+  top_k: 40
+  top_p: 0.85
+  max_tokens: 2048
+
+minimal_latency:
+  attention: flash
+  precision: int8
+  ffn_mode: fused
+  temperature: 0.5
+  top_k: 20
+  top_p: 0.95
+  max_tokens: 1024
+
+max_coherence:
+  attention: dense
+  precision: float32
+  ffn_mode: standard
+  temperature: 0.3
+  top_k: 100
+  top_p: 0.95
+  max_tokens: 4096

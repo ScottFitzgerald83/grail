@@ -2,8 +2,10 @@
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
+import time  # NEW
 
 _model_cache = {}
+
 
 def load_model(config):
     model_name = config["model_name"]
@@ -33,6 +35,8 @@ def run_inference(model_bundle, prompt, req):
     model, tokenizer = model_bundle
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
 
+    start_time = time.time()  # NEW
+
     with torch.no_grad():
         output = model.generate(
             **inputs,
@@ -44,5 +48,7 @@ def run_inference(model_bundle, prompt, req):
             output_scores=True
         )
 
+    end_time = time.time()  # NEW
+
     decoded = tokenizer.decode(output.sequences[0], skip_special_tokens=True)
-    return decoded, output
+    return decoded, output, start_time, end_time  # UPDATED
