@@ -43,6 +43,10 @@ if submit and prompt:
             st.subheader("📊 Metrics")
             st.json(out["metrics"])
 
+            # Display token count if available
+            if "tokens_generated" in out["metrics"]:
+                st.caption(f"🧮 Tokens generated: {out['metrics']['tokens_generated']}")
+
             st.subheader("📈 Token-Level Entropy")
             if "trace" in out and out["trace"] and "scores" in out["trace"]:
                 import torch
