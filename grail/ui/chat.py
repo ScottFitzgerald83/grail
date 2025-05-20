@@ -45,9 +45,13 @@ if submit and prompt:
             st.subheader("📊 Metrics")
             st.json(out["metrics"])
 
-            # Display token count if available
+            # Display token count and usage bar if available
             if "tokens_generated" in out["metrics"]:
-                st.caption(f"🧮 Tokens generated: {out['metrics']['tokens_generated']} / {payload.get('max_tokens', 2048)}")
+                max_tok = payload.get("max_tokens", 2048)
+                used = out["metrics"]["tokens_generated"]
+                pct = min(used / max_tok, 1.0)
+                st.caption(f"🧮 Tokens generated: {used} / {max_tok}")
+                st.progress(pct, text=f"{int(pct * 100)}% of configured max")
 
             st.subheader("📈 Token-Level Entropy")
             if "trace" in out and out["trace"] and "scores" in out["trace"]:

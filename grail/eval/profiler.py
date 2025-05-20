@@ -3,6 +3,7 @@
 import torch
 import time
 
+
 def profile_run(trace, start_time=None, end_time=None):
     """
     Profile generation latency and softmax entropy if available.
@@ -22,6 +23,11 @@ def profile_run(trace, start_time=None, end_time=None):
     else:
         metrics["latency_ms"] = -1
 
-    metrics["tokens_generated"] = trace.sequences.shape[-1] if hasattr(trace, 'sequences') else None
+    if hasattr(trace, 'sequences'):
+        token_count = trace.sequences.shape[-1]
+        metrics["tokens_generated"] = token_count
+        print(f"[GRAIL] Tokens generated: {token_count}")
+    else:
+        print("[GRAIL] No sequences found in trace.")
 
     return metrics
