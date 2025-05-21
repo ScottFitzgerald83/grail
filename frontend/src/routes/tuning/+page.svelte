@@ -108,11 +108,6 @@
 </div>
 
 
-<h2 style="margin-top: 2rem;">🪄 Prompt Preview</h2>
-<details>
-  <summary style="cursor:pointer;font-size:1rem;">Show Prompt Preview</summary>
-  <pre class="prompt-preview">{JSON.stringify({ prompt: "Example prompt...", ...config }, null, 2)}</pre>
-</details>
 
 
 <h2 style="margin-top: 2rem;">🔎 Parameter Explanations (ELI5)</h2>
@@ -524,15 +519,6 @@
         font-weight: 600;
     }
 
-    .prompt-preview {
-      background: #f6f8fa;
-      padding: 1rem;
-      font-size: 0.85rem;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
 
 </style>
 
