@@ -15,7 +15,10 @@
     <div class="param-grid">
         {#each parameters.filter(p => section.keys.includes(p.key)) as param}
             <div class="param-tile" title={param.eli5}>
-                <strong>{param.label}</strong>
+                <div class="param-header">
+                  <strong>{param.label}</strong>
+                  <span class="help-icon" title={param.eli5}>❓</span>
+                </div>
                 <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">{param.definition}</p>
                 <div class="param-control">
                     <label>
@@ -55,6 +58,10 @@
                             {/each}
                         </select>
                     {/if}
+                    <button class="reset-btn" on:click={() => updateConfig(param.key, getDefault(param.key))}>
+                      Reset
+                    </button>
+                    <p class="dynamic-desc">{fuzzyLabel(param, config[param.key])} level selected</p>
                 </div>
             </div>
         {/each}
@@ -129,6 +136,19 @@
       if (percent <= 0.33) return levels[0];
       if (percent <= 0.66) return levels[1];
       return levels[2];
+    }
+
+    function getDefault(key) {
+      return {
+        temperature: 0.7,
+        top_k: 50,
+        top_p: 0.9,
+        max_tokens: 256,
+        presence_penalty: 0.0,
+        frequency_penalty: 0.0,
+        stop_sequence: '',
+        response_style: 'Default'
+      }[key];
     }
 
     // Color-coded slider gradient based on parameter key
@@ -361,6 +381,37 @@
 </script>
 
 <style>
+    .param-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .help-icon {
+      font-size: 0.9rem;
+      cursor: help;
+      color: #666;
+    }
+
+    .reset-btn {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      background: transparent;
+      border: none;
+      color: #007acc;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .reset-btn:hover {
+      text-decoration: underline;
+    }
+
+    .dynamic-desc {
+      font-size: 0.8rem;
+      color: #555;
+      margin-top: 0.25rem;
+    }
     .preset-buttons {
         display: flex;
         gap: 1rem;
