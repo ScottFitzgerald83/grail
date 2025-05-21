@@ -28,6 +28,16 @@ def save_to_memory(model_name: str, prompt: str, output: str):
     with open(memory_path, "w") as f:
         json.dump(history, f, indent=2)
 
+def route_model(model_name: str, prompt: str, config: dict) -> str:
+    if model_name.startswith("ollama:"):
+        return f"(Ollama reply from {model_name} to '{prompt}')"
+    elif model_name.startswith("gpt"):
+        return f"(OpenAI reply from {model_name} to '{prompt}')"
+    elif model_name == "mixtral":
+        return f"(Mixtral reply to '{prompt}')"
+    else:
+        return f"(Local model reply to '{prompt}')"
+
 @app.post("/infer")
 async def infer(request: Request):
     try:
@@ -40,10 +50,7 @@ async def infer(request: Request):
         model_name = data.get("public_model_name") if data.get("use_public_model") == "true" else "local"
         config = {k: v for k, v in data.items() if k not in ["prompt", "use_public_model", "public_model_name", "stream", "message_id"]}
 
-        if prompt.strip().lower() == "fail":
-            response_text = None
-        else:
-            response_text = f"(Simulated response to '{prompt}' using model '{model_name}')"
+        response_text = None if prompt.strip().lower() == "fail" else route_model(model_name, prompt, config)
 
         if response_text:
             save_to_memory(model_name, prompt, response_text)
@@ -63,6 +70,18 @@ async def infer(request: Request):
         }
     except Exception as e:
         return {"output": None, "error": str(e)}
+
+@app.get("/memory/{model_name}")
+def load_memory(model_name: str):
+    model_key = model_name.replace(":", "_")
+    memory_path = Path(f"memory/chat_{model_key}.json")
+    if memory_path.exists():
+        try:
+            with open(memory_path, "r") as f:
+                return json.load(f)
+        except Exception as e:
+            return {"error": f"Failed to load history: {str(e)}"}
+    return []
 
 @app.get("/")
 def healthcheck():
