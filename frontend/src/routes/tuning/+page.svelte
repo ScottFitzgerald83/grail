@@ -75,7 +75,9 @@
         temperature: 0.7,
         top_k: 50,
         top_p: 0.9,
-        max_tokens: 256
+        max_tokens: 256,
+        presence_penalty: 0.0,
+        frequency_penalty: 0.0,
     };
 
     let savedStatus = '';
@@ -93,7 +95,9 @@
             temperature: 0.7,
             top_k: 50,
             top_p: 0.9,
-            max_tokens: 256
+            max_tokens: 256,
+            presence_penalty: 0.0,
+            frequency_penalty: 0.0,
         };
         savedStatus = '↩️ Reset to default';
     }
@@ -146,6 +150,30 @@
             min: 16,
             max: 2048,
             step: 1
+        },
+        {
+          key: 'presence_penalty',
+          label: 'How much should it avoid repeating ideas?',
+          definition: 'Encourages introducing new topics and discourages repetition.',
+          eli5: 'Pushes the model to talk about new stuff instead of repeating itself.',
+          lowEffect: 'May echo or repeat earlier ideas',
+          highEffect: 'More diverse, explorative answers',
+          type: 'slider',
+          min: 0,
+          max: 2,
+          step: 0.1
+        },
+        {
+          key: 'frequency_penalty',
+          label: 'How much should it avoid repeating words?',
+          definition: 'Reduces likelihood of repeating the same tokens.',
+          eli5: 'Avoids stuttering or reusing the same words over and over.',
+          lowEffect: 'Risk of looping or phrase repetition',
+          highEffect: 'More concise and varied phrasing',
+          type: 'slider',
+          min: 0,
+          max: 2,
+          step: 0.1
         }
     ];
 
