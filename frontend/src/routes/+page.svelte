@@ -8,12 +8,17 @@
         if (!input.trim()) return;
         const userMsg = { role: 'user', content: input };
         messages = [...messages, userMsg];
+
+
         const response = await fetch('/infer', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ prompt: input })
         });
+
+        console.log('Response status:', response.status);
         const data = await response.json();
+        console.log('Response data:', data);
         const replyMsg = { role: 'assistant', content: data.output };
         messages = [...messages, replyMsg];
         input = '';
@@ -83,8 +88,12 @@
             </div>
         {/each}
     </div>
-    <div class="input-bar">
-        <input type="text" bind:value={input} on:keydown={(e) => e.key === 'Enter' && sendMessage()} placeholder="Type your message..." />
-        <button on:click={sendMessage}>📤</button>
-    </div>
+    <form on:submit|preventDefault={sendMessage} class="input-bar">
+        <input
+                type="text"
+                bind:value={input}
+                placeholder="Type your message..."
+        />
+        <button type="submit">📤</button>
+    </form>
 </div>

@@ -17,8 +17,7 @@ def read_root():
     return {"message": "Hello from the backend"}
 
 # Chat inference endpoint
-@app.post("/infer")
-async def infer(request: Request):
-    data = await request.json()
-    prompt = data.get("prompt", "")
-    return {"output": f"Echo: {prompt}"}
+@app.get("/infer")
+async def catch_get():
+    print("⚠️ Received unexpected GET /infer")
+    return {"error": "GET not allowed. Use POST."}
