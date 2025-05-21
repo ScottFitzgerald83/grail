@@ -6,67 +6,61 @@
     {/each}
 </div>
 
-{#each [
-    {title: '🎨 Creativity & Style', keys: ['temperature', 'top_p', 'response_style']},
-    {title: '🔁 Repetition & Diversity', keys: ['top_k', 'presence_penalty', 'frequency_penalty']},
-    {title: '📏 Length & Structure', keys: ['max_tokens', 'stop_sequence']}
-] as section}
-    <h3 class="section-title">{section.title}</h3>
-    <div class="param-grid">
-        {#each parameters.filter(p => section.keys.includes(p.key)) as param}
-            <div class="param-tile" title={param.eli5}>
-                <div class="param-header">
-                  <strong>{param.label}</strong>
-                  <span class="help-icon" title={param.eli5}>❓</span>
-                </div>
-                <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">{param.definition}</p>
-                <div class="param-control">
-                    <label>
-                        <span class="param-label">{param.label}</span>
-                        <span class="param-value">
-              {#if param.type === 'slider'}
-                {config[param.key].toFixed(2)} ({fuzzyLabel(param, config[param.key])})
-              {:else if param.type === 'number'}
-                {config[param.key]}
-              {:else}
-                {config[param.key]}
-              {/if}
-            </span>
-                    </label>
-                    {#if param.type === 'slider'}
-                        <div class="slider-labels">
-                            <span>{param.lowLabel || 'Low'}</span>
-                            <span>{param.highLabel || 'High'}</span>
-                        </div>
-                        <input type="range" min={param.min} max={param.max} step={param.step}
-                               bind:value={config[param.key]}
-                               on:input={(e) => updateConfig(param.key, +e.target.value)}
-                               style="background: {sliderGradient(param.key)}"/>
-                    {:else if param.type === 'number'}
-                        <input type="number" min={param.min} max={param.max}
-                               bind:value={config[param.key]}
-                               on:input={(e) => updateConfig(param.key, +e.target.value)}/>
-                    {:else if param.type === 'text'}
-                        <input type="text"
-                               bind:value={config[param.key]}
-                               on:input={(e) => updateConfig(param.key, e.target.value)}/>
-                    {:else if param.type === 'select'}
-                        <select bind:value={config[param.key]}
-                                on:change={(e) => updateConfig(param.key, e.target.value)}>
-                            {#each param.options as option}
-                                <option value={option}>{option}</option>
-                            {/each}
-                        </select>
-                    {/if}
-                    <button class="reset-btn" on:click={() => updateConfig(param.key, getDefault(param.key))}>
-                      Reset
-                    </button>
-                    <p class="dynamic-desc">{fuzzyLabel(param, config[param.key])} level selected</p>
-                </div>
-            </div>
-        {/each}
+<div class="param-grid">
+  {#each parameters as param}
+    <div class="param-tile" title={param.eli5}>
+      <div class="param-header">
+        <strong>{param.label}</strong>
+        <span class="help-icon" title={param.eli5}>❓</span>
+      </div>
+      <p class="param-category">{paramCategory(param.key)}</p>
+      <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">{param.definition}</p>
+      <div class="param-control">
+        <label>
+          <span class="param-label">{param.label}</span>
+          <span class="param-value">
+            {#if param.type === 'slider'}
+              {config[param.key].toFixed(2)} ({fuzzyLabel(param, config[param.key])})
+            {:else if param.type === 'number'}
+              {config[param.key]}
+            {:else}
+              {config[param.key]}
+            {/if}
+          </span>
+        </label>
+        {#if param.type === 'slider'}
+          <div class="slider-labels">
+            <span>{param.lowLabel || 'Low'}</span>
+            <span>{param.highLabel || 'High'}</span>
+          </div>
+          <input type="range" min={param.min} max={param.max} step={param.step}
+                 bind:value={config[param.key]}
+                 on:input={(e) => updateConfig(param.key, +e.target.value)}
+                 style="background: {sliderGradient(param.key)}"/>
+        {:else if param.type === 'number'}
+          <input type="number" min={param.min} max={param.max}
+                 bind:value={config[param.key]}
+                 on:input={(e) => updateConfig(param.key, +e.target.value)}/>
+        {:else if param.type === 'text'}
+          <input type="text"
+                 bind:value={config[param.key]}
+                 on:input={(e) => updateConfig(param.key, e.target.value)}/>
+        {:else if param.type === 'select'}
+          <select bind:value={config[param.key]}
+                  on:change={(e) => updateConfig(param.key, e.target.value)}>
+            {#each param.options as option}
+              <option value={option}>{option}</option>
+            {/each}
+          </select>
+        {/if}
+        <button class="reset-btn" on:click={() => updateConfig(param.key, getDefault(param.key))}>
+          Reset
+        </button>
+        <p class="dynamic-desc">{fuzzyLabel(param, config[param.key])} level selected</p>
+      </div>
     </div>
-{/each}
+  {/each}
+</div>
 
 <h2 style="margin-top: 2rem;">🧠 Predicted Model Behavior</h2>
 <table class="performance-table">
@@ -380,6 +374,20 @@
       reader.readAsText(file);
     }
 
+    function paramCategory(key) {
+      const map = {
+        temperature: 'Creativity & Style',
+        top_p: 'Creativity & Style',
+        response_style: 'Creativity & Style',
+        top_k: 'Repetition & Diversity',
+        presence_penalty: 'Repetition & Diversity',
+        frequency_penalty: 'Repetition & Diversity',
+        max_tokens: 'Length & Structure',
+        stop_sequence: 'Length & Structure'
+      };
+      return map[key] || '';
+    }
+
 </script>
 
 <style>
@@ -609,6 +617,14 @@
         font-size: 1.1rem;
         font-weight: 600;
     }
+
+.param-category {
+  font-size: 0.75rem;
+  color: #888;
+  font-style: italic;
+  margin-top: -0.25rem;
+  margin-bottom: 0.25rem;
+}
 
 
 </style>
