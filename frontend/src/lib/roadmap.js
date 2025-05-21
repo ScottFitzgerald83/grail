@@ -1,10 +1,7 @@
 export const roadmapMarkdown = `
 | Priority | Task                             | Category                                  | Description                                                                                           | Value                   |
 |----------|----------------------------------|-------------------------------------------|-------------------------------------------------------------------------------------------------------------------|-------------------------|
-| 🚩P0     | Handle blank or failed responses | Usability & UX                            | Show fallback or retry prompt when output fails.                                                      | User experience         |
-| 🚩P0     | Deduplicate or debounce input    | Usability & UX                            | Prevent double submits from double-click or Enter + click.                                            | Usability               |
 | 🚩P0     | Scroll-to-bottom reliability     | Usability & UX                            | Ensure scrolling always snaps to newest message unless user has scrolled up.                          | Usability               |
-| 🚩P0     | Retry failed messages            | Usability & UX                            | Let users retry failed sends.                                                                         | Resilience              |
 | 🚩P0     | Auto-scroll control              | Usability & UX                            | Pause scroll when user is reviewing; show jump-to-bottom if new messages arrive.                      | UX polish               |
 | ⚠️P1     | Typing indicator                 | Usability & UX                            | Show animated indicator while assistant is generating.                                                | Feedback loop           |
 | ⚠️P1     | Multiline message input          | Usability & UX                            | Allow users to type multi-line messages easily.                                                       | Usability               |
