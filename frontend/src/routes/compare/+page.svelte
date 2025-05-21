@@ -1,5 +1,7 @@
 <script>
     import {fade} from 'svelte/transition';
+    import { marked } from 'marked';
+    import DOMPurify from 'dompurify';
 
     let prompt = '';
     let configA = {public_model_name: 'gpt-4'};
@@ -7,6 +9,10 @@
     let resultA = null;
     let resultB = null;
     let loading = false;
+
+    function renderMarkdown(html) {
+        return DOMPurify.sanitize(marked.parse(html || ''));
+    }
 
     async function runComparison() {
         loading = true;
@@ -116,7 +122,7 @@
                     <div class="fill" style="width: {resultA.tokens / 2}%"></div>
                 </div>
             </div>
-            <pre>{resultA.output}</pre>
+            <div class="markdown-output" {@html renderMarkdown(resultA.output)}></div>
             <details>
                 <summary>🔍 Config A Diff</summary>
                 <pre>{JSON.stringify(resultA.config, null, 2)}</pre>
@@ -154,7 +160,7 @@
                     <div class="fill" style="width: {resultB.tokens / 2}%"></div>
                 </div>
             </div>
-            <pre>{resultB.output}</pre>
+            <div class="markdown-output" {@html renderMarkdown(resultB.output)}></div>
             <details>
                 <summary>🔍 Config B Diff</summary>
                 <pre>{JSON.stringify(resultB.config, null, 2)}</pre>
@@ -402,5 +408,37 @@
       font-size: 0.9rem;
       color: #333;
       font-style: italic;
+    }
+
+    .markdown-output {
+        background: #f6f8fa;
+        padding: 0.75rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        color: #333;
+        overflow-x: auto;
+        flex-grow: 1;
+    }
+
+    .markdown-output code {
+        background: #eee;
+        padding: 0.1rem 0.3rem;
+        border-radius: 3px;
+        font-family: monospace;
+        font-size: 0.85rem;
+    }
+
+    .markdown-output pre {
+        background: #eee;
+        padding: 0.5rem;
+        border-radius: 5px;
+        overflow-x: auto;
+    }
+
+    .markdown-output ul {
+        padding-left: 1.2rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
     }
 </style>
