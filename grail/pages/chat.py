@@ -94,10 +94,24 @@ def run():
         if memory_path.exists():
             memory_path.unlink()
 
-    # Display messages
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    # Display messages with custom styles and headers
+    for i, message in enumerate(st.session_state.messages):
+        if message["role"] == "user":
+            with st.container():
+                st.markdown(f"**🧍‍♂️ You said:**")
+                st.markdown(
+                    f"<div style='background-color:#f0f2f6; padding:10px; border-radius:8px; text-align:right; max-width:70%; margin-left:auto;'>{message['content']}</div>",
+                    unsafe_allow_html=True
+                )
+        else:
+            with st.container():
+                st.markdown(f"**🤖 GRAIL replied:**")
+                st.markdown(
+                    f"<div style='margin-left:20px; padding:5px;'>{message['content']}</div>",
+                    unsafe_allow_html=True
+                )
+        if i < len(st.session_state.messages) - 1:
+            st.markdown("<hr style='opacity:0.1'>", unsafe_allow_html=True)
 
     # Ensure directory exists
     Path("memories").mkdir(exist_ok=True)
