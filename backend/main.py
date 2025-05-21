@@ -54,6 +54,15 @@ async def infer(request: Request):
         config = {k: v for k, v in data.items() if
                   k not in ["prompt", "use_public_model", "public_model_name", "stream", "message_id"]}
 
+        # Persona support: inject system prompt if persona is set and no system_prompt provided
+        persona_map = {
+            "friendly": "You are a helpful, friendly assistant who explains things clearly and kindly.",
+            "creative": "You are a poetic and imaginative assistant who speaks with flair and metaphor.",
+            "concise": "You are a brief, precise assistant who avoids unnecessary elaboration."
+        }
+        if "persona" in config and config["persona"] != "none" and "system_prompt" not in config:
+            config["system_prompt"] = persona_map.get(config["persona"], "")
+
         response_text = None if prompt.strip().lower() == "fail" else route_model(model_name, prompt, config)
 
         if response_text:
