@@ -13,8 +13,35 @@ def run():
         st.session_state.messages = []
     if "run_inference" not in st.session_state:
         st.session_state.run_inference = True
+    if "prompt_input" not in st.session_state:
+        st.session_state.prompt_input = ""
 
     st.toggle("Enable Inference", key="run_inference")
+
+    # Prompt template selectbox above chat input
+    prompt_templates = {
+        "Select a prompt template...": "",
+        "Summarize this text": "Summarize this text",
+        "Explain like I'm five": "Explain like I'm five",
+        "Translate into pirate speak": "Translate into pirate speak",
+        "Give a haiku": "Give a haiku"
+    }
+
+    # Always-visible prompt template selectbox
+    st.selectbox(
+        "Choose a template...",
+        list(prompt_templates.keys()),
+        index=0,
+        key="prompt_template_select"
+    )
+
+    # Immediately apply template to input
+    template_key = st.session_state.prompt_template_select
+    if template_key != "Select a prompt template...":
+        st.session_state.prompt_input = prompt_templates[template_key]
+
+    # Chat input
+    st.text_input("Enter your message", key="prompt_input", value=st.session_state.prompt_input, on_change=submit_prompt)
 
     def submit_prompt():
         prompt = st.session_state.prompt_input.strip()
@@ -58,6 +85,3 @@ def run():
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-
-    # Persistent chat input
-    st.text_input("Enter your message", key="prompt_input", on_change=submit_prompt)
