@@ -13,11 +13,13 @@
         <strong>{param.label}</strong>
         <span class="help-icon-wrapper">
           <span class="help-icon">❓</span>
-          <div class="tooltip-card">{param.eli5}</div>
+          <div class="tooltip-card">
+            <strong>{param.definition}</strong><br /><br />
+            {param.eli5}
+          </div>
         </span>
       </div>
       <p class="param-category">{paramCategory(param.key)}</p>
-      <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">{param.definition}</p>
       <div class="param-control">
         <label>
           <span class="param-label">{param.label}</span>
@@ -416,7 +418,7 @@
       top: 100%;
       left: 0;
       transform: translateY(0.5rem);
-      background: white;
+      background: #ADEBB3;
       border: 1px solid #ccc;
       border-radius: 8px;
       padding: 0.75rem;
