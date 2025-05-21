@@ -12,27 +12,28 @@
                     <span class="param-value">
             {#if param.type === 'slider'}
               {config[param.key].toFixed(2)}
-            {:else}
+            {:else if param.type === 'number'}
+              {config[param.key]}
+            {:else if param.type === 'text' || param.type === 'select'}
               {config[param.key]}
             {/if}
           </span>
                 </label>
                 {#if param.type === 'slider'}
-                    <input
-                            type="range"
-                            min={param.min}
-                            max={param.max}
-                            step={param.step}
-                            bind:value={config[param.key]}
-                            on:input={(e) => updateConfig(param.key, +e.target.value)}/>
-                {:else}
-                    <input
-                            type="range"
-                            min={param.min}
-                            max={param.max}
-                            step={param.step || 1}
-                            bind:value={config[param.key]}
-                            on:input={(e) => updateConfig(param.key, +e.target.value)}/>
+                    <input type="range" min={param.min} max={param.max} step={param.step}
+                           bind:value={config[param.key]} on:input={(e) => updateConfig(param.key, +e.target.value)} />
+                {:else if param.type === 'number'}
+                    <input type="number" min={param.min} max={param.max}
+                           bind:value={config[param.key]} on:input={(e) => updateConfig(param.key, +e.target.value)} />
+                {:else if param.type === 'text'}
+                    <input type="text" bind:value={config[param.key]}
+                           on:input={(e) => updateConfig(param.key, e.target.value)} />
+                {:else if param.type === 'select'}
+                    <select bind:value={config[param.key]} on:change={(e) => updateConfig(param.key, e.target.value)}>
+                        {#each param.options as option}
+                            <option value={option}>{option}</option>
+                        {/each}
+                    </select>
                 {/if}
             </div>
         </div>
@@ -76,6 +77,8 @@
         max_tokens: 256,
         presence_penalty: 0.0,
         frequency_penalty: 0.0,
+        stop_sequence: '',
+        response_style: 'Default',
     };
 
     let savedStatus = '';
@@ -96,6 +99,8 @@
             max_tokens: 256,
             presence_penalty: 0.0,
             frequency_penalty: 0.0,
+            stop_sequence: '',
+            response_style: 'Default',
         };
         savedStatus = '↩️ Reset to default';
     }
@@ -160,6 +165,21 @@
           min: 0,
           max: 2,
           step: 0.1
+        },
+        {
+          key: 'stop_sequence',
+          label: 'Stop when this text appears',
+          definition: 'Ends generation when the model outputs this string.',
+          eli5: 'It’s like saying “stop here” if a specific phrase appears.',
+          type: 'text'
+        },
+        {
+          key: 'response_style',
+          label: 'Response Style',
+          definition: 'Select a general tone or voice for model replies.',
+          eli5: 'Like choosing a personality: concise, creative, or friendly.',
+          type: 'select',
+          options: ['Default', 'Friendly', 'Concise', 'Creative']
         }
     ];
 
@@ -240,6 +260,25 @@
         border-radius: 4px;
         border: 1px solid #ccc;
         margin-top: 0.25rem;
+    }
+
+    .param-control input[type="text"] {
+        width: 100%;
+        padding: 0.4rem;
+        font-size: 0.9rem;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        margin-top: 0.25rem;
+    }
+
+    .param-control select {
+        width: 100%;
+        padding: 0.4rem;
+        font-size: 0.9rem;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        margin-top: 0.25rem;
+        background: white;
     }
 
     .param-label {
