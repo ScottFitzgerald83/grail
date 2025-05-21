@@ -102,6 +102,17 @@
                 </div>
             </div>
         {/each}
+
+        {#if messages.length && messages[messages.length - 1].streaming}
+            <div class="message-row assistant">
+                <span class="avatar">🧠</span>
+                <div class="message-bubble">
+                    <div class="content typing-indicator">
+                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    </div>
+                </div>
+            </div>
+        {/if}
     </div>
 
     {#if showScrollButton}
@@ -111,7 +122,18 @@
     {/if}
 
     <form on:submit|preventDefault={sendMessage}>
-        <input type="text" bind:value={input}/>
+        <textarea
+            bind:value={input}
+            rows="1"
+            placeholder="Type a message..."
+            on:keydown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            }}
+            class="chat-input-textarea"
+        ></textarea>
         <button type="submit">Send</button>
     </form>
 </div>
@@ -178,11 +200,19 @@
         background-color: #f9f9f9;
     }
 
-    input[type="text"] {
+    textarea.chat-input-textarea {
         flex: 1;
         padding: 0.75rem;
         border-radius: 0.5rem;
         border: 1px solid #ccc;
+        font-size: 1rem;
+        resize: none;
+        line-height: 1.4;
+    }
+
+    textarea.chat-input-textarea:focus {
+        outline: none;
+        border-color: #0d6efd;
     }
 
     button {
@@ -214,5 +244,37 @@
 
     .scroll-button:hover {
         background: #0b5ed7;
+    }
+
+    .typing-indicator {
+        display: flex;
+        gap: 4px;
+        height: 1rem;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .typing-indicator .dot {
+        width: 6px;
+        height: 6px;
+        background-color: #666;
+        border-radius: 50%;
+        animation: blink 1.4s infinite ease-in-out both;
+    }
+
+    .typing-indicator .dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    .typing-indicator .dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes blink {
+        0%, 80%, 100% {
+            opacity: 0;
+        }
+        40% {
+            opacity: 1;
+        }
     }
 </style>
