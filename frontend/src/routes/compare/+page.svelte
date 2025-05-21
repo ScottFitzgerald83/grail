@@ -27,7 +27,7 @@
 <h1>🔁 Compare</h1>
 
 <div style="margin-bottom: 1rem;">
-  <textarea bind:value={prompt} rows="3" placeholder="Enter a prompt to test" style="width: 100%; padding: 0.75rem; font-size: 1rem;"></textarea>
+  <textarea bind:value={prompt} rows="3" placeholder="Enter a prompt to test"></textarea>
   <button on:click={runComparison} disabled={loading} style="margin-top: 0.5rem;">
     {loading ? 'Comparing...' : 'Run Comparison'}
   </button>
@@ -78,35 +78,114 @@
 {/if}
 
 <style>
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #2a3b4c;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    resize: vertical;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+
+  button {
+    background: #007acc;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  button:hover:not(:disabled) {
+    background: #005fa3;
+  }
+
   .config-panels {
     display: flex;
     gap: 2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
   }
+
   .config-card {
     flex: 1;
-    background: #f9fafc;
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid #ddd;
+    background: #ffffff;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    border: 1px solid #dde4ea;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
   }
+
+  .config-card h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #2a3b4c;
+  }
+
+  .config-card label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  select {
+    width: 100%;
+    padding: 0.45rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+
   .compare-output {
     display: flex;
     gap: 2rem;
     margin-top: 2rem;
   }
+
   .result-card {
     flex: 1;
-    background: #fff;
+    background: #ffffff;
     border: 1px solid #ccc;
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   }
+
+  .result-card h4 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #2a3b4c;
+  }
+
+  .result-card p {
+    font-size: 0.85rem;
+    margin: 0.2rem 0;
+  }
+
   pre {
     white-space: pre-wrap;
     background: #f6f8fa;
     padding: 0.75rem;
     border-radius: 6px;
     font-size: 0.9rem;
+    line-height: 1.4;
+    margin-top: 0.75rem;
   }
 </style>
