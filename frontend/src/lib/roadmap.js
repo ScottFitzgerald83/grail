@@ -20,19 +20,31 @@ export const roadmap = {
             title: "Prevent broken GET /infer nav",
             detail: "Block accidental browser navigation to `/infer` as a page.",
         },
+        {
+            title: "Persistent memory",
+            detail: "Store chat in localStorage or backend.",
+        },
+        {
+            title: "Retry failed messages",
+            detail: "Let users retry sending a message that caused an error.",
+        },
+        {
+            title: "Auto-scroll control",
+            detail: "Disable auto-scroll if user scrolls up; show jump-to-bottom.",
+        },
     ],
     P1: [
-        {
-            title: "Streaming responses",
-            detail: "Character-by-character reply display like ChatGPT.",
-        },
         {
             title: "Typing indicator",
             detail: "Show loading dots while assistant is 'thinking'.",
         },
         {
-            title: "Persistent memory",
-            detail: "Store chat in localStorage or backend.",
+            title: "Auto-expanding textarea input",
+            detail: "Replace single-line input with multi-line growing textarea.",
+        },
+        {
+            title: "User personas",
+            detail: "Support configurable styles like creative, precise, sarcastic.",
         },
     ]
 };
