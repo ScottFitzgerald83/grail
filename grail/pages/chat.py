@@ -109,3 +109,27 @@ def run():
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
+
+    # Ensure directory exists
+    Path("memories").mkdir(exist_ok=True)
+
+    # Save chat to timestamped file
+    if st.button("💾 Save Chat"):
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        memory_file = Path(f"memories/chat_{timestamp}.json")
+        with open(memory_file, "w") as f:
+            json.dump(st.session_state.messages, f, indent=2)
+        st.success(f"Chat saved as {memory_file.name}")
+
+    # Load saved memory
+    uploaded = st.file_uploader("📂 Load a saved chat", type=["json"])
+    if uploaded:
+        try:
+            loaded = json.load(uploaded)
+            if isinstance(loaded, list):
+                st.session_state.messages = loaded
+                st.success("Memory loaded.")
+            else:
+                st.error("Invalid file format.")
+        except Exception as e:
+            st.error(f"Error loading file: {e}")
