@@ -9,8 +9,20 @@ def run():
 
     st.title("💬 Chat with GRAIL")
 
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
     with st.container():
-        prompt = st.text_area("Enter your prompt:", height=150)
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
+        prompt = st.text_area("Enter your prompt:", height=150, key="input")
+
+        if st.button("Clear Chat"):
+            st.session_state.messages = []
+            st.experimental_rerun()
+
         with st.expander("Advanced Settings (Optional)", expanded=False):
             model_name = st.selectbox("Model", ["gpt2", "distilgpt2"])
             attention = st.selectbox("Attention Type", ["dense", "sparse", "flash"])
@@ -28,6 +40,8 @@ def run():
             }
 
         if st.button("Run Inference") and prompt:
+            st.session_state.messages.append({"role": "user", "content": prompt})
+
             payload = {
                 "prompt": prompt,
                 "model_name": model_name,
@@ -42,8 +56,11 @@ def run():
                 res = requests.post("http://localhost:8000/infer", json=payload)
                 if res.ok:
                     out = res.json()
+                    response_text = out["output"]
+                    st.session_state.messages.append({"role": "assistant", "content": response_text})
+
                     st.subheader("🧠 Response")
-                    st.write(out["output"])
+                    st.write(response_text)
 
                     st.subheader("📊 Metrics")
                     st.json(out["metrics"])
