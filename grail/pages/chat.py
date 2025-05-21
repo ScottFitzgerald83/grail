@@ -58,19 +58,8 @@ def run():
             with open(memory_path, "w") as f:
                 json.dump(st.session_state.messages, f, indent=2)
             if st.session_state.run_inference:
-                payload = {
-                    "prompt": prompt,
-                    "model_name": "gpt2",
-                    "attention": "dense",
-                    "precision": "fp16",
-                    "ffn_mode": "standard",
-                    "sampling": {
-                        "temperature": 0.7,
-                        "top_k": 50,
-                        "top_p": 0.9
-                    },
-                    "max_tokens": 128
-                }
+                payload = st.session_state.get("config", {}).copy()
+                payload["prompt"] = prompt
                 with st.spinner("Invoking the ghost..."):
                     res = requests.post("http://localhost:8000/infer", json=payload)
                     if res.ok:
