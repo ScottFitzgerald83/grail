@@ -50,7 +50,11 @@
     {#each Object.entries(computeMetrics(config)) as [key, value]}
       <tr>
         <td>{key[0].toUpperCase() + key.slice(1)}</td>
-        <td>{'⭐'.repeat(value)}</td>
+        <td>
+          <div class="bar-bg">
+            <div class="bar-fill" style="width: {barWidth(value)}; background: {barColor(key, value)}"></div>
+          </div>
+        </td>
         <td>
           {#if key === 'creativity'}Novelty and stylistic variation{/if}
           {#if key === 'coherence'}Logical flow and focus{/if}
@@ -165,6 +169,19 @@
         cost: score((config.max_tokens * 0.001 + config.temperature) / 2)
       };
     }
+
+    function barWidth(value) {
+      return `${(value / 5) * 100}%`;
+    }
+
+    function barColor(metric, value) {
+      const riskyHigh = ['repetition', 'latency', 'cost']; // higher is worse
+      const score = riskyHigh.includes(metric) ? 6 - value : value;
+
+      if (score <= 2) return '#f44336'; // red
+      if (score === 3) return '#ffeb3b'; // yellow
+      return '#4caf50'; // green
+    }
 </script>
 
 <style>
@@ -240,5 +257,19 @@
     .performance-table td:nth-child(2) {
       font-family: system-ui, sans-serif;
       font-size: 1.1rem;
+    }
+
+    .bar-bg {
+      height: 12px;
+      width: 100%;
+      background: #eee;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: #4caf50;
+      transition: width 0.2s ease;
     }
 </style>
