@@ -28,12 +28,13 @@
 
         messages = [...messages, assistantMessage];
 
-        const config = JSON.parse(localStorage.getItem('grailConfig') || '{}');
 
-        const res = await fetch('/infer', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({prompt: input, ...config})
+        const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+
+        const response = await fetch("/infer", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt, ...config })
         });
         const data = await res.json();
 

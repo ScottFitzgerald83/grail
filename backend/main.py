@@ -13,8 +13,10 @@ app.add_middleware(
 @app.post("/infer")
 async def infer(request: Request):
     data = await request.json()
-    prompt = data.get("prompt", "")
-    return {"output": f"Echo: {prompt}"}
+    prompt = data.get("prompt")
+    config = {k: v for k, v in data.items() if k != "prompt"}
+    output = f"(Simulated response) Prompt: {prompt} | Config: {config}"
+    return {"output": output}
 @app.get("/")
 def healthcheck():
     return {"status": "FastAPI is running"}

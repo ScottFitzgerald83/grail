@@ -1,26 +1,26 @@
 <h1>🎛️ Model Tuning</h1>
 
 <div class="preset-buttons">
-  {#each Object.keys(presets) as preset}
-    <button on:click={() => applyPreset(preset)}>{preset}</button>
-  {/each}
+    {#each Object.keys(presets) as preset}
+        <button on:click={() => applyPreset(preset)}>{preset}</button>
+    {/each}
 </div>
 
 {#each [
-  { title: '🎨 Creativity & Style', keys: ['temperature', 'top_p', 'response_style'] },
-  { title: '🔁 Repetition & Diversity', keys: ['top_k', 'presence_penalty', 'frequency_penalty'] },
-  { title: '📏 Length & Structure', keys: ['max_tokens', 'stop_sequence'] }
+    {title: '🎨 Creativity & Style', keys: ['temperature', 'top_p', 'response_style']},
+    {title: '🔁 Repetition & Diversity', keys: ['top_k', 'presence_penalty', 'frequency_penalty']},
+    {title: '📏 Length & Structure', keys: ['max_tokens', 'stop_sequence']}
 ] as section}
-  <h3 class="section-title">{section.title}</h3>
-  <div class="param-grid">
-    {#each parameters.filter(p => section.keys.includes(p.key)) as param}
-      <div class="param-tile" title={param.eli5}>
-        <strong>{param.label}</strong>
-        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">{param.definition}</p>
-        <div class="param-control">
-          <label>
-            <span class="param-label">{param.label}</span>
-            <span class="param-value">
+    <h3 class="section-title">{section.title}</h3>
+    <div class="param-grid">
+        {#each parameters.filter(p => section.keys.includes(p.key)) as param}
+            <div class="param-tile" title={param.eli5}>
+                <strong>{param.label}</strong>
+                <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">{param.definition}</p>
+                <div class="param-control">
+                    <label>
+                        <span class="param-label">{param.label}</span>
+                        <span class="param-value">
               {#if param.type === 'slider'}
                 {config[param.key].toFixed(2)}
               {:else if param.type === 'number'}
@@ -29,73 +29,100 @@
                 {config[param.key]}
               {/if}
             </span>
-          </label>
-          {#if param.type === 'slider'}
-            <div class="slider-labels">
-              <span>{param.lowLabel || 'Low'}</span>
-              <span>{param.highLabel || 'High'}</span>
+                    </label>
+                    {#if param.type === 'slider'}
+                        <div class="slider-labels">
+                            <span>{param.lowLabel || 'Low'}</span>
+                            <span>{param.highLabel || 'High'}</span>
+                        </div>
+                        <input type="range" min={param.min} max={param.max} step={param.step}
+                               bind:value={config[param.key]}
+                               on:input={(e) => updateConfig(param.key, +e.target.value)}/>
+                    {:else if param.type === 'number'}
+                        <input type="number" min={param.min} max={param.max}
+                               bind:value={config[param.key]}
+                               on:input={(e) => updateConfig(param.key, +e.target.value)}/>
+                    {:else if param.type === 'text'}
+                        <input type="text"
+                               bind:value={config[param.key]}
+                               on:input={(e) => updateConfig(param.key, e.target.value)}/>
+                    {:else if param.type === 'select'}
+                        <select bind:value={config[param.key]}
+                                on:change={(e) => updateConfig(param.key, e.target.value)}>
+                            {#each param.options as option}
+                                <option value={option}>{option}</option>
+                            {/each}
+                        </select>
+                    {/if}
+                </div>
             </div>
-            <input type="range" min={param.min} max={param.max} step={param.step}
-              bind:value={config[param.key]}
-              on:input={(e) => updateConfig(param.key, +e.target.value)} />
-          {:else if param.type === 'number'}
-            <input type="number" min={param.min} max={param.max}
-              bind:value={config[param.key]}
-              on:input={(e) => updateConfig(param.key, +e.target.value)} />
-          {:else if param.type === 'text'}
-            <input type="text"
-              bind:value={config[param.key]}
-              on:input={(e) => updateConfig(param.key, e.target.value)} />
-          {:else if param.type === 'select'}
-            <select bind:value={config[param.key]} on:change={(e) => updateConfig(param.key, e.target.value)}>
-              {#each param.options as option}
-                <option value={option}>{option}</option>
-              {/each}
-            </select>
-          {/if}
-        </div>
-      </div>
-    {/each}
-  </div>
+        {/each}
+    </div>
 {/each}
 
 <h2 style="margin-top: 2rem;">🧠 Predicted Model Behavior</h2>
 <table class="performance-table">
-  <thead>
-    <tr><th>Metric</th><th>Impact</th><th>Description</th></tr>
-  </thead>
-  <tbody>
+    <thead>
+    <tr>
+        <th>Metric</th>
+        <th>Impact</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+    <tbody>
     {#each Object.entries(computeMetrics(config)) as [key, value]}
-      <tr>
-        <td>{key[0].toUpperCase() + key.slice(1)}</td>
-        <td>
-          <div class="bar-bg">
-            <div class="bar-fill" style="width: {barWidth(value)}; background: {barColor(key, value)}"></div>
-          </div>
-        </td>
-        <td>
-          {#if key === 'creativity'}Too low = boring output; too high = chaotic, off-topic, or hallucinated content.{/if}
-          {#if key === 'coherence'}Too low = disjointed or nonsensical replies; higher values improve logical flow.{/if}
-          {#if key === 'repetition'}Higher values increase the chance of word or idea loops; lower is usually better.{/if}
-          {#if key === 'length'}Lower values may feel abrupt; higher values allow more explanation (at a cost).{/if}
-          {#if key === 'latency'}Higher values mean slower response time; may frustrate users or delay feedback.{/if}
-          {#if key === 'cost'}Higher values increase token usage and compute load; affects scalability and billing.{/if}
-        </td>
-      </tr>
+        <tr>
+            <td>{key[0].toUpperCase() + key.slice(1)}</td>
+            <td>
+                <div class="bar-bg">
+                    <div class="bar-fill" style="width: {barWidth(value)}; background: {barColor(key, value)}"></div>
+                </div>
+            </td>
+            <td>
+                {#if key === 'creativity'}Too low = boring output; too high = chaotic, off-topic, or hallucinated
+                    content.
+                {/if}
+                {#if key === 'coherence'}Too low = disjointed or nonsensical replies; higher values improve logical
+                    flow.
+                {/if}
+                {#if key === 'repetition'}Higher values increase the chance of word or idea loops; lower is usually
+                    better.
+                {/if}
+                {#if key === 'length'}Lower values may feel abrupt; higher values allow more explanation (at a cost).
+                {/if}
+                {#if key === 'latency'}Higher values mean slower response time; may frustrate users or delay feedback.
+                {/if}
+                {#if key === 'cost'}Higher values increase token usage and compute load; affects scalability and
+                    billing.
+                {/if}
+            </td>
+        </tr>
     {/each}
-  </tbody>
+    </tbody>
 </table>
+
+<h2 style="margin-top: 2rem;">📤 Export & Import Config</h2>
+<div style="margin-bottom: 1rem;">
+  <button on:click={exportConfig}>Download Config</button>
+  <input type="file" accept=".json" on:change={importConfig} />
+</div>
+
+<h2 style="margin-top: 2rem;">🪄 Prompt Preview</h2>
+<details>
+  <summary style="cursor:pointer;font-size:1rem;">Show Prompt Preview</summary>
+  <pre class="prompt-preview">{JSON.stringify({ prompt: "Example prompt...", ...config }, null, 2)}</pre>
+</details>
 
 <h2 style="margin-top: 2rem;">🔎 Parameter Explanations (ELI5)</h2>
 <ul class="eli5-list">
-  {#each parameters as param}
-    <li><strong>{param.label}:</strong> <span>{param.eli5}</span></li>
-  {/each}
+    {#each parameters as param}
+        <li><strong>{param.label}:</strong> <span>{param.eli5}</span></li>
+    {/each}
 </ul>
 
 <script>
-    import { onMount } from 'svelte';
-    import { browser } from '$app/environment';
+    import {onMount} from 'svelte';
+    import {browser} from '$app/environment';
 
     let config = {
         temperature: 0.7,
@@ -135,39 +162,39 @@
     }
 
     const presets = {
-      Creative: {
-        temperature: 1.2,
-        top_k: 40,
-        top_p: 1,
-        presence_penalty: 1.5,
-        frequency_penalty: 0.7,
-        max_tokens: 256,
-        response_style: 'Creative'
-      },
-      Concise: {
-        temperature: 0.3,
-        top_k: 20,
-        top_p: 0.8,
-        presence_penalty: 0.1,
-        frequency_penalty: 0.2,
-        max_tokens: 100,
-        response_style: 'Concise'
-      },
-      Balanced: {
-        temperature: 0.7,
-        top_k: 50,
-        top_p: 0.9,
-        presence_penalty: 0.5,
-        frequency_penalty: 0.5,
-        max_tokens: 128,
-        response_style: 'Default'
-      }
+        Creative: {
+            temperature: 1.2,
+            top_k: 40,
+            top_p: 1,
+            presence_penalty: 1.5,
+            frequency_penalty: 0.7,
+            max_tokens: 256,
+            response_style: 'Creative'
+        },
+        Concise: {
+            temperature: 0.3,
+            top_k: 20,
+            top_p: 0.8,
+            presence_penalty: 0.1,
+            frequency_penalty: 0.2,
+            max_tokens: 100,
+            response_style: 'Concise'
+        },
+        Balanced: {
+            temperature: 0.7,
+            top_k: 50,
+            top_p: 0.9,
+            presence_penalty: 0.5,
+            frequency_penalty: 0.5,
+            max_tokens: 128,
+            response_style: 'Default'
+        }
     };
 
     function applyPreset(name) {
-      config = { ...config, ...presets[name] };
-      localStorage.setItem('grailConfig', JSON.stringify(config));
-      savedStatus = `🎛️ ${name} preset loaded`;
+        config = {...config, ...presets[name]};
+        localStorage.setItem('grailConfig', JSON.stringify(config));
+        savedStatus = `🎛️ ${name} preset loaded`;
     }
 
     const parameters = [
@@ -216,43 +243,43 @@
             step: 1
         },
         {
-          key: 'presence_penalty',
-          label: 'How much should it avoid repeating ideas?',
-          definition: 'Encourages introducing new topics and discourages repetition.',
-          eli5: 'Pushes the model to talk about new stuff instead of repeating itself.',
-          type: 'slider',
-          min: 0,
-          max: 2,
-          step: 0.1,
-          lowLabel: 'Repeat ♻️',
-          highLabel: 'New Ideas 💡'
+            key: 'presence_penalty',
+            label: 'How much should it avoid repeating ideas?',
+            definition: 'Encourages introducing new topics and discourages repetition.',
+            eli5: 'Pushes the model to talk about new stuff instead of repeating itself.',
+            type: 'slider',
+            min: 0,
+            max: 2,
+            step: 0.1,
+            lowLabel: 'Repeat ♻️',
+            highLabel: 'New Ideas 💡'
         },
         {
-          key: 'frequency_penalty',
-          label: 'How much should it avoid repeating words?',
-          definition: 'Reduces likelihood of repeating the same tokens.',
-          eli5: 'Avoids stuttering or reusing the same words over and over.',
-          type: 'slider',
-          min: 0,
-          max: 2,
-          step: 0.1,
-          lowLabel: 'Repetitive 🔁',
-          highLabel: 'Varied 🆕'
+            key: 'frequency_penalty',
+            label: 'How much should it avoid repeating words?',
+            definition: 'Reduces likelihood of repeating the same tokens.',
+            eli5: 'Avoids stuttering or reusing the same words over and over.',
+            type: 'slider',
+            min: 0,
+            max: 2,
+            step: 0.1,
+            lowLabel: 'Repetitive 🔁',
+            highLabel: 'Varied 🆕'
         },
         {
-          key: 'stop_sequence',
-          label: 'Stop when this text appears',
-          definition: 'Ends generation when the model outputs this string.',
-          eli5: 'It’s like saying “stop here” if a specific phrase appears.',
-          type: 'text'
+            key: 'stop_sequence',
+            label: 'Stop when this text appears',
+            definition: 'Ends generation when the model outputs this string.',
+            eli5: 'It’s like saying “stop here” if a specific phrase appears.',
+            type: 'text'
         },
         {
-          key: 'response_style',
-          label: 'Response Style',
-          definition: 'Select a general tone or voice for model replies.',
-          eli5: 'Like choosing a personality: concise, creative, or friendly.',
-          type: 'select',
-          options: ['Default', 'Friendly', 'Concise', 'Creative']
+            key: 'response_style',
+            label: 'Response Style',
+            definition: 'Select a general tone or voice for model replies.',
+            eli5: 'Like choosing a personality: concise, creative, or friendly.',
+            type: 'select',
+            options: ['Default', 'Friendly', 'Concise', 'Creative']
         }
     ];
 
@@ -263,87 +290,115 @@
     }
 
     function score(x) {
-      return Math.min(5, Math.max(1, Math.round(x)));
+        return Math.min(5, Math.max(1, Math.round(x)));
     }
 
     function computeMetrics(config) {
-      if (!browser) return {};
-      return {
-        creativity: score(config.temperature * 2 + config.top_p * 2 - config.top_k / 100),
-        coherence: score(5 - config.temperature * 2 + config.top_k / 20),
-        repetition: score(3 - config.top_p * 2),
-        length: score(config.max_tokens / 512),
-        latency: score(config.max_tokens / 400),
-        cost: score((config.max_tokens * 0.001 + config.temperature) / 2)
-      };
+        if (!browser) return {};
+        return {
+            creativity: score(config.temperature * 2 + config.top_p * 2 - config.top_k / 100),
+            coherence: score(5 - config.temperature * 2 + config.top_k / 20),
+            repetition: score(3 - config.top_p * 2),
+            length: score(config.max_tokens / 512),
+            latency: score(config.max_tokens / 400),
+            cost: score((config.max_tokens * 0.001 + config.temperature) / 2)
+        };
     }
 
     function barWidth(value) {
-      return `${(value / 5) * 100}%`;
+        return `${(value / 5) * 100}%`;
     }
 
     function barColor(metric, value) {
-      const riskyHigh = ['repetition', 'latency', 'cost']; // higher is worse
-      const score = riskyHigh.includes(metric) ? 6 - value : value;
+        const riskyHigh = ['repetition', 'latency', 'cost']; // higher is worse
+        const score = riskyHigh.includes(metric) ? 6 - value : value;
 
-      if (score <= 2) return '#f44336'; // red
-      if (score === 3) return '#ffeb3b'; // yellow
-      return '#4caf50'; // green
+        if (score <= 2) return '#f44336'; // red
+        if (score === 3) return '#ffeb3b'; // yellow
+        return '#4caf50'; // green
+    }
+
+    function exportConfig() {
+      const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'grail-config.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importConfig(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const newConfig = JSON.parse(e.target.result);
+          config = { ...config, ...newConfig };
+          localStorage.setItem('grailConfig', JSON.stringify(config));
+          savedStatus = '📥 Config loaded';
+        } catch (err) {
+          savedStatus = '❌ Invalid config file';
+        }
+      };
+      reader.readAsText(file);
     }
 </script>
 
 <style>
     .preset-buttons {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
     }
 
     .preset-buttons button {
-      padding: 0.5rem 1rem;
-      background: #efefef;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.2s ease;
+        padding: 0.5rem 1rem;
+        background: #efefef;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s ease;
     }
+
     .preset-buttons button:hover {
-      background: #ddd;
+        background: #ddd;
     }
 
     .slider-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      color: #555;
-      margin-bottom: 0.25rem;
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: #555;
+        margin-bottom: 0.25rem;
     }
 
     .param-control input[type="range"] {
-      width: 100%;
-      appearance: none;
-      height: 6px;
-      border-radius: 4px;
-      background: linear-gradient(to right, #4caf50, #ffeb3b, #f44336);
+        width: 100%;
+        appearance: none;
+        height: 6px;
+        border-radius: 4px;
+        background: linear-gradient(to right, #4caf50, #ffeb3b, #f44336);
     }
 
     .param-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      margin-top: 1.5rem;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-top: 1.5rem;
     }
 
     @media (max-width: 1000px) {
-      .param-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+        .param-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
 
     @media (max-width: 600px) {
-      .param-grid {
-        grid-template-columns: 1fr;
-      }
+        .param-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     .param-tile {
@@ -409,50 +464,70 @@
     }
 
     .performance-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-      font-size: 0.9rem;
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+        font-size: 0.9rem;
     }
+
     .performance-table th, .performance-table td {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
+        border: 1px solid #ccc;
+        padding: 0.5rem;
     }
+
     .performance-table th {
-      background: #f0f0f0;
-      text-align: left;
+        background: #f0f0f0;
+        text-align: left;
     }
+
     .performance-table td:nth-child(2) {
-      font-family: system-ui, sans-serif;
-      font-size: 1.1rem;
+        font-family: system-ui, sans-serif;
+        font-size: 1.1rem;
     }
 
     .bar-bg {
-      height: 12px;
-      width: 100%;
-      background: #eee;
-      border-radius: 4px;
-      overflow: hidden;
+        height: 12px;
+        width: 100%;
+        background: #eee;
+        border-radius: 4px;
+        overflow: hidden;
     }
 
     .bar-fill {
-      height: 100%;
-      background: #4caf50;
-      transition: width 0.2s ease;
+        height: 100%;
+        background: #4caf50;
+        transition: width 0.2s ease;
     }
 
     .eli5-list {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      line-height: 1.4;
-      padding-left: 1.25rem;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        padding-left: 1.25rem;
     }
+
     .eli5-list li {
-      margin-bottom: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .eli5-list li {
+        margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+        margin-top: 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .prompt-preview {
+      background: #f6f8fa;
+      padding: 1rem;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 </style>
-  .section-title {
-    margin-top: 2rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
+
