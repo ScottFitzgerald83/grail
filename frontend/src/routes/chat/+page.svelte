@@ -5,12 +5,31 @@
     let input = '';
     let sending = false;
 
+    // Persona banner state
+    let activePersona = '';
+    let systemPrompt = '';
+
+    onMount(() => {
+        const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+        activePersona = config.persona || '';
+        systemPrompt = config.system_prompt || '';
+    });
+
     let chatWindow;
     let showScrollButton = false;
 
     // Message editing/deletion/export state
     let editingId = null;
     let editedInput = '';
+
+    function personaDescription(key) {
+        const descriptions = {
+            friendly: 'You are a helpful, friendly assistant who explains things clearly and kindly.',
+            creative: 'You are a poetic and imaginative assistant who speaks with flair and metaphor.',
+            concise: 'You are a brief, precise assistant who avoids unnecessary elaboration.'
+        };
+        return descriptions[key] || '(no persona selected)';
+    }
 
     function startEdit(message) {
         editingId = message.id;
@@ -154,6 +173,14 @@
 </script>
 
 <div class="chat-container">
+    {#if activePersona !== 'none' || systemPrompt}
+      <div class="persona-banner">
+        <strong>Active System Prompt:</strong>
+        <div class="prompt-content">
+          {systemPrompt || personaDescription(activePersona)}
+        </div>
+      </div>
+    {/if}
     <div style="text-align: right; padding: 0 1rem 0.5rem;">
         <button class="mini" on:click={() => exportChat('json')}>Export JSON</button>
         <button class="mini" on:click={() => exportChat('txt')}>Export Text</button>
@@ -377,5 +404,18 @@
 
     button.mini:hover {
         background: #ddd;
+    }
+    .persona-banner {
+        background: #f5f8ff;
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+        color: #2a3b4c;
+        border-bottom: 1px solid #d0dae7;
+    }
+
+    .persona-banner .prompt-content {
+        margin-top: 0.25rem;
+        font-style: italic;
+        font-size: 0.82rem;
     }
 </style>
