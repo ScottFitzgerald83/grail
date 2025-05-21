@@ -123,30 +123,6 @@
                 </div>
             </div>
             <div class="markdown-output" {@html renderMarkdown(resultA.output)}></div>
-            <details>
-                <summary>🔍 Config A Diff</summary>
-                <pre>{JSON.stringify(resultA.config, null, 2)}</pre>
-            </details>
-            {#if Object.keys(resultA.config).length > 0}
-            <table class="diff-table" style="margin-top: 1rem;">
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Config A</th>
-                        <th>Config B</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each getDiffTable(resultA.config, resultB.config) as row}
-                        <tr>
-                            <td>{row.key}</td>
-                            <td>{row.a}</td>
-                            <td>{row.b}</td>
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
-            {/if}
         </div>
         <div class="result-card" transition:fade>
             <h4>{resultB.model}</h4>
@@ -161,30 +137,6 @@
                 </div>
             </div>
             <div class="markdown-output" {@html renderMarkdown(resultB.output)}></div>
-            <details>
-                <summary>🔍 Config B Diff</summary>
-                <pre>{JSON.stringify(resultB.config, null, 2)}</pre>
-            </details>
-            {#if Object.keys(resultB.config).length > 0}
-            <table class="diff-table" style="margin-top: 1rem;">
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Config A</th>
-                        <th>Config B</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each getDiffTable(resultA.config, resultB.config) as row}
-                        <tr>
-                            <td>{row.key}</td>
-                            <td>{row.a}</td>
-                            <td>{row.b}</td>
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
-            {/if}
         </div>
     </div>
 {/if}
