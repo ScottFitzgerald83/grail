@@ -490,6 +490,11 @@
       margin-bottom: 0.25rem;
     }
 
+    .param-header strong {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
     .help-icon-wrapper {
       position: relative;
       display: inline-block;
@@ -506,15 +511,15 @@
       top: 100%;
       left: 0;
       transform: translateY(0.5rem);
-      background: #1434A4;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 0.75rem;
-      font-size: 0.8rem;
-      color: white;
-      line-height: 1.3;
-      width: 240px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      width: 280px;
+      background: #1e1e1e;
+      color: #fff;
+      font-size: 0.85rem;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      line-height: 1.4;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s ease;
@@ -552,16 +557,18 @@
     }
 
     .preset-buttons button {
-        padding: 0.5rem 1rem;
-        background: #efefef;
+        background: white;
         border: 1px solid #ccc;
-        border-radius: 6px;
+        border-radius: 8px;
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
         cursor: pointer;
-        transition: background 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        transition: background 0.2s ease, border-color 0.2s ease;
     }
-
     .preset-buttons button:hover {
-        background: #ddd;
+        background: #f3f6fa;
+        border-color: #007acc;
     }
 
     .slider-labels {
@@ -600,15 +607,18 @@
     }
 
     .param-tile {
-        background: #f5f5f5;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        transition: all 0.2s ease;
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .param-tile:hover {
-        background: #f0f4f9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        background: #f9fbff;
     }
 
     .param-tile.active {
@@ -621,32 +631,25 @@
         margin-bottom: 0.5rem;
     }
 
-    .param-control input[type="number"] {
-        width: 100%;
-        padding: 0.4rem;
-        font-size: 0.9rem;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        margin-top: 0.25rem;
-    }
-
-    .param-control input[type="text"] {
-        width: 100%;
-        padding: 0.4rem;
-        font-size: 0.9rem;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        margin-top: 0.25rem;
-    }
-
+    .param-control input[type="range"],
+    .param-control input[type="number"],
+    .param-control input[type="text"],
     .param-control select {
-        width: 100%;
-        padding: 0.4rem;
-        font-size: 0.9rem;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        margin-top: 0.25rem;
-        background: white;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+      padding: 0.45rem;
+      transition: border-color 0.2s ease;
+      width: 100%;
+      margin-top: 0.25rem;
+      background: white;
+      box-sizing: border-box;
+    }
+
+    .param-control input:focus,
+    .param-control select:focus {
+      border-color: #007acc;
+      outline: none;
     }
 
     .param-label {
