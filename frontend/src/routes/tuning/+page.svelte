@@ -382,9 +382,32 @@
     }
 
     .help-icon {
+      position: relative;
       font-size: 0.9rem;
       cursor: help;
       color: #666;
+    }
+
+    .help-icon::after {
+      content: attr(title);
+      position: absolute;
+      left: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #333;
+      color: #fff;
+      padding: 0.4rem 0.6rem;
+      border-radius: 5px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease-in-out;
+      z-index: 999;
+    }
+
+    .help-icon:hover::after {
+      opacity: 1;
     }
 
     .reset-btn {
