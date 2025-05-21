@@ -33,22 +33,34 @@ async def infer(request: Request):
     try:
         data = await request.json()
         prompt = data.get("prompt", "")
+        message_id = data.get("message_id", str(time.time()))
+        if not prompt:
+            return {"output": None, "error": "Empty prompt received."}
         stream = data.get("stream") == "true"
         model_name = data.get("public_model_name") if data.get("use_public_model") == "true" else "local"
-        config = {k: v for k, v in data.items() if k not in ["prompt", "use_public_model", "public_model_name", "stream"]}
+        config = {k: v for k, v in data.items() if k not in ["prompt", "use_public_model", "public_model_name", "stream", "message_id"]}
 
-        response_text = f"(Simulated response to '{prompt}' using model '{model_name}')"
+        if prompt.strip().lower() == "fail":
+            response_text = None
+        else:
+            response_text = f"(Simulated response to '{prompt}' using model '{model_name}')"
 
-        save_to_memory(model_name, prompt, response_text)
+        if response_text:
+            save_to_memory(model_name, prompt, response_text)
 
-        if stream:
+        if stream and response_text is not None:
             async def token_stream():
                 for char in response_text:
                     yield char
                     await asyncio.sleep(0.01)
             return StreamingResponse(token_stream(), media_type="text/plain")
 
-        return {"output": response_text, "config": config}
+        return {
+            "output": response_text,
+            "config": config,
+            "message_id": message_id,
+            "retryable": response_text is None
+        }
     except Exception as e:
         return {"output": None, "error": str(e)}
 
