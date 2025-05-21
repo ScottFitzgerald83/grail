@@ -3,21 +3,18 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# Allow frontend access (adjust origin in prod)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # or "http://localhost:5173"
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
-# Basic test route
+@app.post("/infer")
+async def infer(request: Request):
+    data = await request.json()
+    prompt = data.get("prompt", "")
+    return {"output": f"Echo: {prompt}"}
 @app.get("/")
-def read_root():
-    return {"message": "Hello from the backend"}
-
-# Chat inference endpoint
-@app.get("/infer")
-async def catch_get():
-    print("⚠️ Received unexpected GET /infer")
-    return {"error": "GET not allowed. Use POST."}
+def healthcheck():
+    return {"status": "FastAPI is running"}
