@@ -1,8 +1,3 @@
-<div style="text-align: right; margin-bottom: 0.5rem;">
-    <button on:click={toggleDarkMode}>
-        {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
-    </button>
-</div>
 <h1>🎛️ Model Tuning</h1>
 
 
@@ -30,10 +25,10 @@
                     <p class="param-description">{param.definition}</p>
                     <div class="param-control">
                         <label class="toggle-switch">
-                            <input type="checkbox"
-                                   checked={config.use_public_model === 'true'}
-                                   on:change={(e) => updateConfig('use_public_model', e.target.checked ? 'true' : 'false')}/>
-                            <span class="slider"></span>
+                          <input type="checkbox"
+                                 checked={config.use_public_model === 'true'}
+                                 on:change={(e) => updateConfig('use_public_model', e.target.checked ? 'true' : 'false')} />
+                          <span class="slider"></span>
                         </label>
                         {#if config.use_public_model === 'true'}
                             <label style="margin-top: 0.75rem;">
@@ -242,21 +237,6 @@
     import {onMount} from 'svelte';
     import {browser} from '$app/environment';
 
-    let darkMode = false;
-
-    onMount(() => {
-        if (browser) {
-            darkMode = localStorage.getItem("theme") === "dark";
-            document.body.classList.toggle("dark", darkMode);
-        }
-    });
-
-    function toggleDarkMode() {
-        darkMode = !darkMode;
-        localStorage.setItem("theme", darkMode ? "dark" : "light");
-        document.body.classList.toggle("dark", darkMode);
-    }
-
     // Fuzzy label for slider value
     function fuzzyLabel(param, value) {
         if (param.type !== 'slider') return '';
@@ -398,185 +378,185 @@
     }
 
     const parameters = [
-        {
-            key: 'temperature',
-            label: 'Temperature',
-            definition: 'Controls output randomness. Lower = more deterministic, Higher = more creative.',
-            eli5: `Controls how "creative" or "risky" the model is with its wording.
+      {
+        key: 'temperature',
+        label: 'Temperature',
+        definition: 'Controls output randomness. Lower = more deterministic, Higher = more creative.',
+        eli5: `Controls how "creative" or "risky" the model is with its wording.
 Lower values make answers steady and predictable.
 Higher values increase variety but may lead to off-topic or wild responses.`,
-            type: 'slider',
-            min: 0,
-            max: 1.5,
-            step: 0.05,
-            lowLabel: 'Calm 🧘',
-            highLabel: 'Wild 🌪'
-        },
-        {
-            key: 'top_k',
-            label: 'How many top choices to consider?',
-            definition: 'Restricts sampling to top K tokens. Lower = less randomness.',
-            eli5: `Controls how many of the model's top word choices it considers at each step.
+        type: 'slider',
+        min: 0,
+        max: 1.5,
+        step: 0.05,
+        lowLabel: 'Calm 🧘',
+        highLabel: 'Wild 🌪'
+      },
+      {
+        key: 'top_k',
+        label: 'How many top choices to consider?',
+        definition: 'Restricts sampling to top K tokens. Lower = less randomness.',
+        eli5: `Controls how many of the model's top word choices it considers at each step.
 Small values make it stick to the most likely next words.
 Larger values allow more options, increasing randomness and diversity.`,
-            type: 'number',
-            min: 0,
-            max: 100,
-            step: 1
-        },
-        {
-            key: 'top_p',
-            label: 'Top-P',
-            definition: 'Limits sampling to top P probability mass. Lower = less variation.',
-            eli5: `Selects tokens based on cumulative probability mass.
+        type: 'number',
+        min: 0,
+        max: 100,
+        step: 1
+      },
+      {
+        key: 'top_p',
+        label: 'Top-P',
+        definition: 'Limits sampling to top P probability mass. Lower = less variation.',
+        eli5: `Selects tokens based on cumulative probability mass.
 Lower values make output more focused.
 Higher values allow the model to consider more diverse options.`,
-            type: 'slider',
-            min: 0,
-            max: 1,
-            step: 0.01,
-            lowLabel: 'Tight 🎯',
-            highLabel: 'Expressive 🎉'
-        },
-        {
-            key: 'max_tokens',
-            label: 'How long should responses be?',
-            definition: 'Maximum number of tokens to generate.',
-            eli5: `This sets how long the reply can be.
+        type: 'slider',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        lowLabel: 'Tight 🎯',
+        highLabel: 'Expressive 🎉'
+      },
+      {
+        key: 'max_tokens',
+        label: 'How long should responses be?',
+        definition: 'Maximum number of tokens to generate.',
+        eli5: `This sets how long the reply can be.
 Shorter values limit verbosity.
 Longer values allow more detail, but may be slower or cost more.`,
-            type: 'number',
-            min: 16,
-            max: 2048,
-            step: 1
-        },
-        {
-            key: 'presence_penalty',
-            label: 'How much should it avoid repeating ideas?',
-            definition: 'Encourages introducing new topics and discourages repetition.',
-            eli5: `Discourages talking about the same topics repeatedly.
+        type: 'number',
+        min: 16,
+        max: 2048,
+        step: 1
+      },
+      {
+        key: 'presence_penalty',
+        label: 'How much should it avoid repeating ideas?',
+        definition: 'Encourages introducing new topics and discourages repetition.',
+        eli5: `Discourages talking about the same topics repeatedly.
 Higher values push novelty.
 Lower values let the model stay focused on one topic.`,
-            type: 'slider',
-            min: 0,
-            max: 2,
-            step: 0.1,
-            lowLabel: 'Repeat ♻️',
-            highLabel: 'New Ideas 💡'
-        },
-        {
-            key: 'frequency_penalty',
-            label: 'How much should it avoid repeating words?',
-            definition: 'Reduces likelihood of repeating the same tokens.',
-            eli5: `Discourages repeating exact words.
+        type: 'slider',
+        min: 0,
+        max: 2,
+        step: 0.1,
+        lowLabel: 'Repeat ♻️',
+        highLabel: 'New Ideas 💡'
+      },
+      {
+        key: 'frequency_penalty',
+        label: 'How much should it avoid repeating words?',
+        definition: 'Reduces likelihood of repeating the same tokens.',
+        eli5: `Discourages repeating exact words.
 Helps avoid stuttering or loops.
 Higher values produce more diverse phrasing.`,
-            type: 'slider',
-            min: 0,
-            max: 2,
-            step: 0.1,
-            lowLabel: 'Repetitive 🔁',
-            highLabel: 'Varied 🆕'
-        },
-        {
-            key: 'stop_sequence',
-            label: 'Stop when this text appears',
-            definition: 'Ends generation when the model outputs this string.',
-            eli5: `This tells the model to stop replying when it sees a certain phrase.
+        type: 'slider',
+        min: 0,
+        max: 2,
+        step: 0.1,
+        lowLabel: 'Repetitive 🔁',
+        highLabel: 'Varied 🆕'
+      },
+      {
+        key: 'stop_sequence',
+        label: 'Stop when this text appears',
+        definition: 'Ends generation when the model outputs this string.',
+        eli5: `This tells the model to stop replying when it sees a certain phrase.
 It helps enforce boundaries in structured outputs.`,
-            type: 'text'
-        },
-        {
-            key: 'system_prompt',
-            label: 'System Prompt',
-            definition: 'Custom instruction given before any user input.',
-            eli5: `This sets the tone and behavior of the assistant.
+        type: 'text'
+      },
+      {
+        key: 'system_prompt',
+        label: 'System Prompt',
+        definition: 'Custom instruction given before any user input.',
+        eli5: `This sets the tone and behavior of the assistant.
 It's like a backstage cue for the model to act a certain way.`,
-            type: 'text'
-        },
-        {
-            key: 'truncate_prompt',
-            label: 'Prompt Truncation Limit',
-            definition: 'If the prompt exceeds this many tokens, truncate older messages.',
-            eli5: `Helps manage long chat history by dropping old messages.
+        type: 'text'
+      },
+      {
+        key: 'truncate_prompt',
+        label: 'Prompt Truncation Limit',
+        definition: 'If the prompt exceeds this many tokens, truncate older messages.',
+        eli5: `Helps manage long chat history by dropping old messages.
 Keeps token count under control.`,
-            type: 'number',
-            min: 0,
-            max: 8192,
-            step: 1
-        },
-        {
-            key: 'use_public_model',
-            label: 'Use Public Model?',
-            definition: 'Enable this to override local settings with a public model like GPT-4.',
-            eli5: `Turn this on to test your prompt with a known hosted model.
+        type: 'number',
+        min: 0,
+        max: 8192,
+        step: 1
+      },
+      {
+        key: 'use_public_model',
+        label: 'Use Public Model?',
+        definition: 'Enable this to override local settings with a public model like GPT-4.',
+        eli5: `Turn this on to test your prompt with a known hosted model.
 Leave it off to use your local configuration.`,
-            type: 'select',
-            options: ['false', 'true']
-        },
-        {
-            key: 'public_model_name',
-            label: 'Select Public Model',
-            definition: 'Choose the public model to use when enabled.',
-            eli5: `Pick a specific model like GPT-4 or Mistral to run your prompt on.
+        type: 'select',
+        options: ['false', 'true']
+      },
+      {
+        key: 'public_model_name',
+        label: 'Select Public Model',
+        definition: 'Choose the public model to use when enabled.',
+        eli5: `Pick a specific model like GPT-4 or Mistral to run your prompt on.
 Useful for benchmarking or testing responses.`,
-            type: 'select',
-            options: ['gpt-4', 'gpt-3.5', 'ollama:llama2', 'ollama:mistral', 'mixtral']
-        },
-        {
-            key: 'tools_enabled',
-            label: 'Enable Tools',
-            definition: 'Allow access to tools, functions, or APIs during generation.',
-            eli5: `Lets the model call tools like calculators or plugins if available.
+        type: 'select',
+        options: ['gpt-4', 'gpt-3.5', 'ollama:llama2', 'ollama:mistral', 'mixtral']
+      },
+      {
+        key: 'tools_enabled',
+        label: 'Enable Tools',
+        definition: 'Allow access to tools, functions, or APIs during generation.',
+        eli5: `Lets the model call tools like calculators or plugins if available.
 Useful for extending its capabilities beyond text generation.`,
-            type: 'select',
-            options: ['false', 'true']
-        },
-        {
-            key: 'json_mode',
-            label: 'Force JSON',
-            definition: 'Model must return a valid JSON object.',
-            eli5: `Instructs the model to respond only with JSON-formatted output.
+        type: 'select',
+        options: ['false', 'true']
+      },
+      {
+        key: 'json_mode',
+        label: 'Force JSON',
+        definition: 'Model must return a valid JSON object.',
+        eli5: `Instructs the model to respond only with JSON-formatted output.
 Best for structured applications.`,
-            type: 'select',
-            options: ['false', 'true']
-        },
-        {
-            key: 'stream',
-            label: 'Stream Response',
-            definition: 'Send back results as the model writes them.',
-            eli5: `Streams the output live so users can see it as it generates.
+        type: 'select',
+        options: ['false', 'true']
+      },
+      {
+        key: 'stream',
+        label: 'Stream Response',
+        definition: 'Send back results as the model writes them.',
+        eli5: `Streams the output live so users can see it as it generates.
 Feels more responsive and interactive.`,
-            type: 'select',
-            options: ['false', 'true']
-        },
-        {
-            key: 'logit_bias',
-            label: 'Logit Bias',
-            definition: 'Overrides probability of specific tokens.',
-            eli5: `Advanced control that lets you nudge the model to avoid or prefer specific words.
+        type: 'select',
+        options: ['false', 'true']
+      },
+      {
+        key: 'logit_bias',
+        label: 'Logit Bias',
+        definition: 'Overrides probability of specific tokens.',
+        eli5: `Advanced control that lets you nudge the model to avoid or prefer specific words.
 Requires token-level knowledge.`,
-            type: 'text'
-        },
-        {
-            key: 'sampling_seed',
-            label: 'Sampling Seed',
-            definition: 'Fixes randomness for consistent output.',
-            eli5: `Using a fixed seed makes responses repeatable.
+        type: 'text'
+      },
+      {
+        key: 'sampling_seed',
+        label: 'Sampling Seed',
+        definition: 'Fixes randomness for consistent output.',
+        eli5: `Using a fixed seed makes responses repeatable.
 Great for testing or debugging.`,
-            type: 'number',
-            min: 0,
-            max: 999999,
-            step: 1
-        },
-        {
-            key: 'stop_tokens',
-            label: 'Stop Tokens',
-            definition: 'Stops generation when one of these strings appears.',
-            eli5: `Lets you define multiple phrases that cut off generation.
+        type: 'number',
+        min: 0,
+        max: 999999,
+        step: 1
+      },
+      {
+        key: 'stop_tokens',
+        label: 'Stop Tokens',
+        definition: 'Stops generation when one of these strings appears.',
+        eli5: `Lets you define multiple phrases that cut off generation.
 Useful for strict response limits.`,
-            type: 'text'
-        }
+        type: 'text'
+      }
     ];
 
     function updateConfig(key, value) {
