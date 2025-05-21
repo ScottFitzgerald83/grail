@@ -1,5 +1,11 @@
 <h1>🎛️ Model Tuning</h1>
 
+<div class="preset-buttons">
+  {#each Object.keys(presets) as preset}
+    <button on:click={() => applyPreset(preset)}>{preset}</button>
+  {/each}
+</div>
+
 <div class="param-grid">
     {#each parameters as param}
         <div class="param-tile">
@@ -19,8 +25,12 @@
           </span>
                 </label>
                 {#if param.type === 'slider'}
+                    <div class="slider-labels">
+                      <span>{param.lowLabel || 'Low'}</span>
+                      <span>{param.highLabel || 'High'}</span>
+                    </div>
                     <input type="range" min={param.min} max={param.max} step={param.step}
-                           bind:value={config[param.key]} on:input={(e) => updateConfig(param.key, +e.target.value)} />
+                           bind:value={config[param.key]} on:input={(e) => updateConfig(param.key, +e.target.value)} class={`tune-${param.key}`} />
                 {:else if param.type === 'number'}
                     <input type="number" min={param.min} max={param.max}
                            bind:value={config[param.key]} on:input={(e) => updateConfig(param.key, +e.target.value)} />
@@ -111,6 +121,42 @@
         savedStatus = '↩️ Reset to default';
     }
 
+    const presets = {
+      Creative: {
+        temperature: 1.2,
+        top_k: 40,
+        top_p: 1,
+        presence_penalty: 1.5,
+        frequency_penalty: 0.7,
+        max_tokens: 256,
+        response_style: 'Creative'
+      },
+      Concise: {
+        temperature: 0.3,
+        top_k: 20,
+        top_p: 0.8,
+        presence_penalty: 0.1,
+        frequency_penalty: 0.2,
+        max_tokens: 100,
+        response_style: 'Concise'
+      },
+      Balanced: {
+        temperature: 0.7,
+        top_k: 50,
+        top_p: 0.9,
+        presence_penalty: 0.5,
+        frequency_penalty: 0.5,
+        max_tokens: 128,
+        response_style: 'Default'
+      }
+    };
+
+    function applyPreset(name) {
+      config = { ...config, ...presets[name] };
+      localStorage.setItem('grailConfig', JSON.stringify(config));
+      savedStatus = `🎛️ ${name} preset loaded`;
+    }
+
     const parameters = [
         {
             key: 'temperature',
@@ -120,7 +166,9 @@
             type: 'slider',
             min: 0,
             max: 1.5,
-            step: 0.05
+            step: 0.05,
+            lowLabel: 'Calm 🧘',
+            highLabel: 'Wild 🌪'
         },
         {
             key: 'top_k',
@@ -140,7 +188,9 @@
             type: 'slider',
             min: 0,
             max: 1,
-            step: 0.01
+            step: 0.01,
+            lowLabel: 'Tight 🎯',
+            highLabel: 'Expressive 🎉'
         },
         {
             key: 'max_tokens',
@@ -160,7 +210,9 @@
           type: 'slider',
           min: 0,
           max: 2,
-          step: 0.1
+          step: 0.1,
+          lowLabel: 'Repeat ♻️',
+          highLabel: 'New Ideas 💡'
         },
         {
           key: 'frequency_penalty',
@@ -170,7 +222,9 @@
           type: 'slider',
           min: 0,
           max: 2,
-          step: 0.1
+          step: 0.1,
+          lowLabel: 'Repetitive 🔁',
+          highLabel: 'Varied 🆕'
         },
         {
           key: 'stop_sequence',
@@ -225,6 +279,40 @@
 </script>
 
 <style>
+    .preset-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .preset-buttons button {
+      padding: 0.5rem 1rem;
+      background: #efefef;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .preset-buttons button:hover {
+      background: #ddd;
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #555;
+      margin-bottom: 0.25rem;
+    }
+
+    .param-control input[type="range"] {
+      width: 100%;
+      appearance: none;
+      height: 6px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #4caf50, #ffeb3b, #f44336);
+    }
+
     .param-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -264,11 +352,6 @@
 
     .param-control {
         margin: 1rem 0;
-    }
-
-    .param-control input[type="range"] {
-        width: 100%;
-        margin-top: 0.25rem;
     }
 
     .param-control input[type="number"] {
