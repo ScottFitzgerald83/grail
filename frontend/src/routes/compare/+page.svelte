@@ -122,7 +122,7 @@
                     <div class="fill" style="width: {resultA.tokens / 2}%"></div>
                 </div>
             </div>
-            <div class="markdown-output" {@html renderMarkdown(resultA.output)}></div>
+            {@html `<div class="markdown-output">${renderMarkdown(resultA.output)}</div>`}
         </div>
         <div class="result-card" transition:fade>
             <h4>{resultB.model}</h4>
@@ -136,7 +136,7 @@
                     <div class="fill" style="width: {resultB.tokens / 2}%"></div>
                 </div>
             </div>
-            <div class="markdown-output" {@html renderMarkdown(resultB.output)}></div>
+            {@html `<div class="markdown-output">${renderMarkdown(resultB.output)}</div>`}
         </div>
     </div>
 {/if}
