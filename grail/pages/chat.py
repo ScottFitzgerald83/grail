@@ -1,5 +1,5 @@
-# grail/ui/chat.py
-
+from pathlib import Path
+import json
 
 def run():
     import streamlit as st
@@ -11,6 +11,17 @@ def run():
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
+        memory_path = Path("memory.json")
+
+        if memory_path.exists():
+            with open(memory_path, "r") as f:
+                try:
+                    st.session_state.messages = json.load(f)
+                except json.JSONDecodeError:
+                    st.session_state.messages = []
+    else:
+        memory_path = Path("memory.json")
+
     if "run_inference" not in st.session_state:
         st.session_state.run_inference = True
     if "prompt_input" not in st.session_state:
@@ -40,13 +51,12 @@ def run():
     if template_key != "Select a prompt template...":
         st.session_state.prompt_input = prompt_templates[template_key]
 
-    # Chat input
-    st.text_input("Enter your message", key="prompt_input", value=st.session_state.prompt_input, on_change=submit_prompt)
-
     def submit_prompt():
         prompt = st.session_state.prompt_input.strip()
         if prompt:
             st.session_state.messages.append({"role": "user", "content": prompt})
+            with open(memory_path, "w") as f:
+                json.dump(st.session_state.messages, f, indent=2)
             if st.session_state.run_inference:
                 payload = {
                     "prompt": prompt,
@@ -75,11 +85,25 @@ def run():
                                 st.chat_message("assistant").markdown(displayed_text)
                             time.sleep(0.02)
                         st.session_state.messages.append({"role": "assistant", "content": response_text})
+                        with open(memory_path, "w") as f:
+                            json.dump(st.session_state.messages, f, indent=2)
                     else:
                         st.session_state.messages.append({"role": "assistant", "content": "⚠️ Error from model API."})
+                        with open(memory_path, "w") as f:
+                            json.dump(st.session_state.messages, f, indent=2)
             else:
                 st.session_state.messages.append({"role": "assistant", "content": "💬 Okay. Message received."})
+                with open(memory_path, "w") as f:
+                    json.dump(st.session_state.messages, f, indent=2)
             st.session_state.prompt_input = ""  # clear input
+
+    # Chat input
+    st.text_input("Enter your message", key="prompt_input", value=st.session_state.prompt_input, on_change=submit_prompt)
+
+    if st.button("🧹 Clear Memory"):
+        st.session_state.messages = []
+        if memory_path.exists():
+            memory_path.unlink()
 
     # Display messages
     for message in st.session_state.messages:
