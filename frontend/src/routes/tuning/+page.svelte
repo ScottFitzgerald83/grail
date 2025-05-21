@@ -7,65 +7,68 @@
 </div>
 
 <div class="dashboard-container">
-  <div class="param-grid">
-    {#each parameters as param}
-      <div class="param-tile" data-category={paramCategory(param.key)}>
-        <div class="param-header">
-          <strong>{param.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>
-          <span class="help-icon-wrapper">
-            <span class="help-icon">❓</span>
-            <div class="tooltip-card">
-              <strong>{param.definition}</strong><br /><br />
-              {param.eli5}
-            </div>
-          </span>
-        </div>
-        <p class="param-category">{paramCategory(param.key)}</p>
-        <div class="param-control">
-          <label>
-            <span class="param-value">
-              {#if param.type === 'slider'}
-                {config[param.key].toFixed(2)} ({fuzzyLabel(param, config[param.key])})
-              {:else if param.type === 'number'}
-                {config[param.key]}
-              {:else}
-                {config[param.key]}
-              {/if}
+  {#each Array.from(new Set(parameters.map(p => paramCategory(p.key)))) as category}
+    <h3 class="section-title">{category}</h3>
+    <div class="param-grid">
+      {#each parameters.filter(p => paramCategory(p.key) === category) as param}
+        <div class="param-tile" data-category={paramCategory(param.key)}>
+          <div class="param-header">
+            <strong>{param.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>
+            <span class="help-icon-wrapper">
+              <span class="help-icon">❓</span>
+              <div class="tooltip-card">
+                <strong>{param.definition}</strong><br /><br />
+                {param.eli5}
+              </div>
             </span>
-          </label>
-          {#if param.type === 'slider'}
-            <div class="slider-labels">
-              <span>{param.lowLabel || 'Low'}</span>
-              <span>{param.highLabel || 'High'}</span>
-            </div>
-            <input type="range" min={param.min} max={param.max} step={param.step}
-                   bind:value={config[param.key]}
-                   on:input={(e) => updateConfig(param.key, +e.target.value)}
-                   style="background: {sliderGradient(param.key)}"/>
-          {:else if param.type === 'number'}
-            <input type="number" min={param.min} max={param.max}
-                   bind:value={config[param.key]}
-                   on:input={(e) => updateConfig(param.key, +e.target.value)}/>
-          {:else if param.type === 'text'}
-            <input type="text"
-                   bind:value={config[param.key]}
-                   on:input={(e) => updateConfig(param.key, e.target.value)}/>
-          {:else if param.type === 'select'}
-            <select bind:value={config[param.key]}
-                    on:change={(e) => updateConfig(param.key, e.target.value)}>
-              {#each param.options as option}
-                <option value={option}>{option}</option>
-              {/each}
-            </select>
-          {/if}
-          <button class="reset-btn" on:click={() => updateConfig(param.key, getDefault(param.key))}>
-            Reset
-          </button>
-          <p class="dynamic-desc">{fuzzyLabel(param, config[param.key])} level selected</p>
+          </div>
+          <p class="param-category">{paramCategory(param.key)}</p>
+          <div class="param-control">
+            <label>
+              <span class="param-value">
+                {#if param.type === 'slider'}
+                  {config[param.key].toFixed(2)} ({fuzzyLabel(param, config[param.key])})
+                {:else if param.type === 'number'}
+                  {config[param.key]}
+                {:else}
+                  {config[param.key]}
+                {/if}
+              </span>
+            </label>
+            {#if param.type === 'slider'}
+              <div class="slider-labels">
+                <span>{param.lowLabel || 'Low'}</span>
+                <span>{param.highLabel || 'High'}</span>
+              </div>
+              <input type="range" min={param.min} max={param.max} step={param.step}
+                     bind:value={config[param.key]}
+                     on:input={(e) => updateConfig(param.key, +e.target.value)}
+                     style="background: {sliderGradient(param.key)}"/>
+            {:else if param.type === 'number'}
+              <input type="number" min={param.min} max={param.max}
+                     bind:value={config[param.key]}
+                     on:input={(e) => updateConfig(param.key, +e.target.value)}/>
+            {:else if param.type === 'text'}
+              <input type="text"
+                     bind:value={config[param.key]}
+                     on:input={(e) => updateConfig(param.key, e.target.value)}/>
+            {:else if param.type === 'select'}
+              <select bind:value={config[param.key]}
+                      on:change={(e) => updateConfig(param.key, e.target.value)}>
+                {#each param.options as option}
+                  <option value={option}>{option}</option>
+                {/each}
+              </select>
+            {/if}
+            <button class="reset-btn" on:click={() => updateConfig(param.key, getDefault(param.key))}>
+              Reset
+            </button>
+            <p class="dynamic-desc">{fuzzyLabel(param, config[param.key])} level selected</p>
+          </div>
         </div>
-      </div>
-    {/each}
-  </div>
+      {/each}
+    </div>
+  {/each}
 </div>
 
 <h2 style="margin-top: 2rem;">🧠 Predicted Model Behavior</h2>
@@ -669,25 +672,25 @@
   }
 
   .param-tile[data-category='Creativity & Style'] {
-    background: #f0f7ff;
+    background: #e1f0ff;
   }
   .param-tile[data-category='Repetition & Diversity'] {
-    background: #f3fcf5;
+    background: #dffbe6;
   }
   .param-tile[data-category='Length & Structure'] {
-    background: #fef9f3;
+    background: #fff4e5;
   }
   .param-tile[data-category='Prompt Control'] {
-    background: #f9f4fd;
+    background: #f5e9ff;
   }
   .param-tile[data-category='Tool Use'] {
-    background: #f5faff;
+    background: #e6f4ff;
   }
   .param-tile[data-category='Output Format'] {
-    background: #fdfdf2;
+    background: #fffbe6;
   }
   .param-tile[data-category='Advanced'] {
-    background: #f8f9fa;
+    background: #f0f1f3;
   }
 
   .param-tile:hover {
