@@ -24,11 +24,12 @@
                     <p class="param-category">{paramCategory(param.key)}</p>
                     <p class="param-description">{param.definition}</p>
                     <div class="param-control">
-                        <select bind:value={config.use_public_model}
-                                on:change={(e) => updateConfig('use_public_model', e.target.value)}>
-                            <option value="false">Off</option>
-                            <option value="true">On</option>
-                        </select>
+                        <label class="toggle-switch">
+                          <input type="checkbox"
+                                 checked={config.use_public_model === 'true'}
+                                 on:change={(e) => updateConfig('use_public_model', e.target.checked ? 'true' : 'false')} />
+                          <span class="slider"></span>
+                        </label>
                         {#if config.use_public_model === 'true'}
                             <label style="margin-top: 0.75rem;">
                                 <span style="font-weight: 500; font-size: 0.85rem;">Select Public Model</span>
@@ -969,6 +970,51 @@ Useful for strict response limits.`,
         font-size: 0.85rem;
         color: #333;
         margin-bottom: 0.5rem;
+    }
+    /* Toggle Switch Styles */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-switch .slider {
+      position: absolute;
+      cursor: pointer;
+      background-color: #ccc;
+      border-radius: 24px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transition: 0.4s;
+    }
+
+    .toggle-switch .slider:before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 0.4s;
+    }
+
+    .toggle-switch input:checked + .slider {
+      background-color: #007acc;
+    }
+
+    .toggle-switch input:checked + .slider:before {
+      transform: translateX(20px);
     }
 </style>
 
