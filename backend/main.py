@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse, PlainTextResponse
 import asyncio, time, json
 from pathlib import Path
 
@@ -87,16 +87,24 @@ async def infer(request: Request):
 
 
 @app.get("/memory/{model_name}")
-def load_memory(model_name: str):
+def load_memory(model_name: str, format: str = "json"):
     model_key = model_name.replace(":", "_")
     memory_path = Path(f"memory/chat_{model_key}.json")
     if memory_path.exists():
         try:
             with open(memory_path, "r") as f:
-                return json.load(f)
+                history = json.load(f)
+            if format == "txt":
+                lines = []
+                for item in history:
+                    lines.append(f"[{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(item['timestamp']))}]")
+                    lines.append(f"User: {item['prompt']}")
+                    lines.append(f"Assistant: {item['output']}\n")
+                return PlainTextResponse("\n".join(lines))
+            return JSONResponse(content=history)
         except Exception as e:
             return {"error": f"Failed to load history: {str(e)}"}
-    return []
+    return JSONResponse(content=[])
 
 
 @app.patch("/memory/{model_name}")
@@ -195,5 +203,42 @@ async def compare(request: Request):
             "prompt": prompt
         }
 
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.post("/compare/batch")
+async def compare_batch(request: Request):
+    try:
+        data = await request.json()
+        prompts = data.get("prompts", [])
+        config_a = data.get("config_a", {})
+        config_b = data.get("config_b", {})
+
+        model_a = config_a.get("public_model_name", "local")
+        model_b = config_b.get("public_model_name", "local")
+
+        def simulate(prompt, model, config):
+            output = route_model(model, prompt, config)
+            latency = len(output) * 0.5
+            tokens = len(output.split())
+            return {
+                "output": output,
+                "latency_ms": round(latency),
+                "tokens": tokens,
+                "model": model,
+                "config": config
+            }
+
+        results = []
+        for prompt in prompts:
+            result_a = simulate(prompt, model_a, config_a)
+            result_b = simulate(prompt, model_b, config_b)
+            results.append({
+                "prompt": prompt,
+                "result_a": result_a,
+                "result_b": result_b
+            })
+
+        return results
     except Exception as e:
         return {"error": str(e)}

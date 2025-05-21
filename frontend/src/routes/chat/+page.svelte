@@ -8,6 +8,68 @@
     let chatWindow;
     let showScrollButton = false;
 
+    // Message editing/deletion/export state
+    let editingId = null;
+    let editedInput = '';
+
+    function startEdit(message) {
+        editingId = message.id;
+        editedInput = message.content;
+    }
+
+    function cancelEdit() {
+        editingId = null;
+        editedInput = '';
+    }
+
+    async function applyEdit(id) {
+        const updatedMessage = messages.find(m => m.id === id);
+        if (!updatedMessage) return;
+        const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+        const payload = {
+            message_id: updatedMessage.id,
+            new_prompt: editedInput,
+            config
+        };
+
+        const res = await fetch(`/memory/${config.public_model_name || 'local'}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        if (result.status === 'updated') {
+            messages = messages.map(m =>
+                m.id === id
+                    ? { ...m, content: editedInput }
+                    : m
+            );
+            cancelEdit();
+        }
+    }
+
+    async function deleteMessage(id) {
+        const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+        const res = await fetch(`/memory/${config.public_model_name || 'local'}/${id}`, {
+            method: 'DELETE'
+        });
+        const result = await res.json();
+        if (result.status === 'deleted') {
+            messages = messages.filter(m => m.id !== id);
+        }
+    }
+
+    function exportChat(format = 'json') {
+        const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+        const model = config.public_model_name || 'local';
+        const url = `/memory/${model}?format=${format}`;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `chat_${model}.${format === 'json' ? 'json' : 'txt'}`;
+        a.click();
+    }
+
     function formatTimestamp(date) {
         return date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
     }
@@ -92,13 +154,33 @@
 </script>
 
 <div class="chat-container">
+    <div style="text-align: right; padding: 0 1rem 0.5rem;">
+        <button class="mini" on:click={() => exportChat('json')}>Export JSON</button>
+        <button class="mini" on:click={() => exportChat('txt')}>Export Text</button>
+    </div>
     <div class="messages" bind:this={chatWindow}>
         {#each messages as m (m.id)}
             <div class="message-row {m.role}">
                 <span class="avatar">{m.role === 'user' ? '🙋' : '🧠'}</span>
                 <div class="message-bubble">
-                    <div class="content">{@html m.content}</div>
+                    <div class="content">
+                        {#if editingId === m.id}
+                            <textarea bind:value={editedInput} rows="2" style="width: 100%; font-size: 0.9rem;"></textarea>
+                            <div style="margin-top: 0.25rem;">
+                                <button on:click={() => applyEdit(m.id)} style="margin-right: 0.5rem;">Save</button>
+                                <button on:click={cancelEdit}>Cancel</button>
+                            </div>
+                        {:else}
+                            {@html m.content}
+                        {/if}
+                    </div>
                     <div class="timestamp">{m.timestamp}</div>
+                    {#if m.role === 'user' && editingId !== m.id}
+                        <div class="controls">
+                            <button class="mini" title="Edit" on:click={() => startEdit(m)}>📝</button>
+                            <button class="mini" title="Delete" on:click={() => deleteMessage(m.id)}>❌</button>
+                        </div>
+                    {/if}
                 </div>
             </div>
         {/each}
@@ -276,5 +358,24 @@
         40% {
             opacity: 1;
         }
+    }
+    .controls {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.25rem;
+        font-size: 0.8rem;
+    }
+
+    button.mini {
+        background: #eee;
+        border: none;
+        border-radius: 4px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+
+    button.mini:hover {
+        background: #ddd;
     }
 </style>
