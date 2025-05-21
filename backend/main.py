@@ -13,6 +13,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+
 def save_to_memory(model_name: str, prompt: str, output: str):
     model_key = model_name.replace(":", "_") if model_name else "local"
     memory_path = Path(f"memory/chat_{model_key}.json")
@@ -28,6 +29,7 @@ def save_to_memory(model_name: str, prompt: str, output: str):
     with open(memory_path, "w") as f:
         json.dump(history, f, indent=2)
 
+
 def route_model(model_name: str, prompt: str, config: dict) -> str:
     if model_name.startswith("ollama:"):
         return f"(Ollama reply from {model_name} to '{prompt}')"
@@ -37,6 +39,7 @@ def route_model(model_name: str, prompt: str, config: dict) -> str:
         return f"(Mixtral reply to '{prompt}')"
     else:
         return f"(Local model reply to '{prompt}')"
+
 
 @app.post("/infer")
 async def infer(request: Request):
@@ -48,7 +51,8 @@ async def infer(request: Request):
             return {"output": None, "error": "Empty prompt received."}
         stream = data.get("stream") == "true"
         model_name = data.get("public_model_name") if data.get("use_public_model") == "true" else "local"
-        config = {k: v for k, v in data.items() if k not in ["prompt", "use_public_model", "public_model_name", "stream", "message_id"]}
+        config = {k: v for k, v in data.items() if
+                  k not in ["prompt", "use_public_model", "public_model_name", "stream", "message_id"]}
 
         response_text = None if prompt.strip().lower() == "fail" else route_model(model_name, prompt, config)
 
@@ -60,6 +64,7 @@ async def infer(request: Request):
                 for char in response_text:
                     yield char
                     await asyncio.sleep(0.01)
+
             return StreamingResponse(token_stream(), media_type="text/plain")
 
         return {
@@ -70,6 +75,7 @@ async def infer(request: Request):
         }
     except Exception as e:
         return {"output": None, "error": str(e)}
+
 
 @app.get("/memory/{model_name}")
 def load_memory(model_name: str):
@@ -83,6 +89,43 @@ def load_memory(model_name: str):
             return {"error": f"Failed to load history: {str(e)}"}
     return []
 
+
 @app.get("/")
 def healthcheck():
     return {"status": "FastAPI is running"}
+
+
+@app.post("/compare")
+async def compare(request: Request):
+    try:
+        data = await request.json()
+        prompt = data.get("prompt", "")
+        config_a = data.get("config_a", {})
+        config_b = data.get("config_b", {})
+
+        model_a = config_a.get("public_model_name", "local")
+        model_b = config_b.get("public_model_name", "local")
+
+        def simulate(prompt, model, config):
+            output = route_model(model, prompt, config)
+            latency = len(output) * 0.5  # simulate latency in ms
+            tokens = len(output.split())
+            return {
+                "output": output,
+                "latency_ms": round(latency),
+                "tokens": tokens,
+                "model": model,
+                "config": config
+            }
+
+        result_a = simulate(prompt, model_a, config_a)
+        result_b = simulate(prompt, model_b, config_b)
+
+        return {
+            "result_a": result_a,
+            "result_b": result_b,
+            "prompt": prompt
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
