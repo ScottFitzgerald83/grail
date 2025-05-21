@@ -25,5 +25,3 @@
   </button>
 </nav>
 <slot />
-
-<slot />
