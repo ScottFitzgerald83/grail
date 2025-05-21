@@ -6,48 +6,58 @@
   {/each}
 </div>
 
-<div class="param-grid">
-    {#each parameters as param}
-        <div class="param-tile">
-            <strong>{param.label}</strong>
-            <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">{param.definition}</p>
-            <div class="param-control">
-                <label>
-                    <span class="param-label">{param.label}</span>
-                    <span class="param-value">
-            {#if param.type === 'slider'}
-              {config[param.key].toFixed(2)}
-            {:else if param.type === 'number'}
-              {config[param.key]}
-            {:else if param.type === 'text' || param.type === 'select'}
-              {config[param.key]}
-            {/if}
-          </span>
-                </label>
-                {#if param.type === 'slider'}
-                    <div class="slider-labels">
-                      <span>{param.lowLabel || 'Low'}</span>
-                      <span>{param.highLabel || 'High'}</span>
-                    </div>
-                    <input type="range" min={param.min} max={param.max} step={param.step}
-                           bind:value={config[param.key]} on:input={(e) => updateConfig(param.key, +e.target.value)} class={`tune-${param.key}`} />
-                {:else if param.type === 'number'}
-                    <input type="number" min={param.min} max={param.max}
-                           bind:value={config[param.key]} on:input={(e) => updateConfig(param.key, +e.target.value)} />
-                {:else if param.type === 'text'}
-                    <input type="text" bind:value={config[param.key]}
-                           on:input={(e) => updateConfig(param.key, e.target.value)} />
-                {:else if param.type === 'select'}
-                    <select bind:value={config[param.key]} on:change={(e) => updateConfig(param.key, e.target.value)}>
-                        {#each param.options as option}
-                            <option value={option}>{option}</option>
-                        {/each}
-                    </select>
-                {/if}
+{#each [
+  { title: '🎨 Creativity & Style', keys: ['temperature', 'top_p', 'response_style'] },
+  { title: '🔁 Repetition & Diversity', keys: ['top_k', 'presence_penalty', 'frequency_penalty'] },
+  { title: '📏 Length & Structure', keys: ['max_tokens', 'stop_sequence'] }
+] as section}
+  <h3 class="section-title">{section.title}</h3>
+  <div class="param-grid">
+    {#each parameters.filter(p => section.keys.includes(p.key)) as param}
+      <div class="param-tile" title={param.eli5}>
+        <strong>{param.label}</strong>
+        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">{param.definition}</p>
+        <div class="param-control">
+          <label>
+            <span class="param-label">{param.label}</span>
+            <span class="param-value">
+              {#if param.type === 'slider'}
+                {config[param.key].toFixed(2)}
+              {:else if param.type === 'number'}
+                {config[param.key]}
+              {:else}
+                {config[param.key]}
+              {/if}
+            </span>
+          </label>
+          {#if param.type === 'slider'}
+            <div class="slider-labels">
+              <span>{param.lowLabel || 'Low'}</span>
+              <span>{param.highLabel || 'High'}</span>
             </div>
+            <input type="range" min={param.min} max={param.max} step={param.step}
+              bind:value={config[param.key]}
+              on:input={(e) => updateConfig(param.key, +e.target.value)} />
+          {:else if param.type === 'number'}
+            <input type="number" min={param.min} max={param.max}
+              bind:value={config[param.key]}
+              on:input={(e) => updateConfig(param.key, +e.target.value)} />
+          {:else if param.type === 'text'}
+            <input type="text"
+              bind:value={config[param.key]}
+              on:input={(e) => updateConfig(param.key, e.target.value)} />
+          {:else if param.type === 'select'}
+            <select bind:value={config[param.key]} on:change={(e) => updateConfig(param.key, e.target.value)}>
+              {#each param.options as option}
+                <option value={option}>{option}</option>
+              {/each}
+            </select>
+          {/if}
         </div>
+      </div>
     {/each}
-</div>
+  </div>
+{/each}
 
 <h2 style="margin-top: 2rem;">🧠 Predicted Model Behavior</h2>
 <table class="performance-table">
@@ -437,3 +447,8 @@
       margin-bottom: 0.5rem;
     }
 </style>
+  .section-title {
+    margin-top: 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
