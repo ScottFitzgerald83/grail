@@ -10,18 +10,30 @@
 
     async function runComparison() {
         loading = true;
-        const response = await fetch('/compare', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                prompt,
-                config_a: configA,
-                config_b: configB
-            })
-        });
-        const data = await response.json();
-        resultA = data.result_a;
-        resultB = data.result_b;
+        const prompts = prompt.split('\n').filter(p => p.trim());
+        if (prompts.length === 1) {
+            const response = await fetch('/compare', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    prompt,
+                    config_a: configA,
+                    config_b: configB
+                })
+            });
+            const data = await response.json();
+            resultA = data.result_a;
+            resultB = data.result_b;
+        } else {
+            const response = await fetch('/compare/batch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompts, config_a: configA, config_b: configB })
+            });
+            const data = await response.json();
+            resultA = data[0].result_a;
+            resultB = data[0].result_b;
+        }
         loading = false;
     }
 
@@ -32,12 +44,26 @@
             .sort()
             .map(key => ({key, a: configA[key], b: configB[key]}));
     }
+
+    function exportResults(format = 'json') {
+        const blob = new Blob([
+          format === 'json'
+            ? JSON.stringify({ prompt, configA, configB, resultA, resultB }, null, 2)
+            : `### Prompt:\n${prompt}\n\n### Config A (${resultA.model}):\n${resultA.output}\n\n### Config B (${resultB.model}):\n${resultB.output}`
+        ], { type: format === 'json' ? 'application/json' : 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `compare_result.${format}`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
 </script>
 
 <h1>🔁 Compare</h1>
 
 <div style="margin-bottom: 1rem;">
-    <textarea bind:value={prompt} rows="3" placeholder="Enter a prompt to test"></textarea>
+    <textarea bind:value={prompt} rows="4" placeholder="Enter one or more prompts, separated by line breaks"></textarea>
     <button on:click={runComparison} disabled={loading} style="margin-top: 0.5rem;">
         {loading ? 'Comparing...' : 'Run Comparison'}
     </button>
@@ -69,6 +95,12 @@
         </label>
     </div>
 </div>
+
+{#if resultA && resultB}
+  <p class="summary-box">
+    {resultA.model} was {resultA.latency_ms < resultB.latency_ms ? 'faster' : 'slower'} and used {resultA.tokens < resultB.tokens ? 'fewer' : 'more'} tokens than {resultB.model}.
+  </p>
+{/if}
 
 {#if resultA && resultB}
     <div class="compare-output">
@@ -152,6 +184,14 @@
 {/if}
 
 {#if resultA && resultB}
+    <div style="margin-top: 2rem;">
+      <button on:click={runComparison}>🔁 Retry Comparison</button>
+      <button on:click={() => exportResults('json')}>📤 Export JSON</button>
+      <button on:click={() => exportResults('md')}>📝 Export Markdown</button>
+    </div>
+{/if}
+
+{#if resultA && resultB}
     <h2 style="margin-top: 2rem;">🔍 Config Differences</h2>
     <table class="diff-table">
         <thead>
@@ -201,6 +241,7 @@
         cursor: pointer;
         font-size: 0.95rem;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        margin-right: 0.5rem;
     }
 
     button:disabled {
@@ -356,4 +397,10 @@
         background: #fafbfc;
     }
 
+    .summary-box {
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: #333;
+      font-style: italic;
+    }
 </style>
