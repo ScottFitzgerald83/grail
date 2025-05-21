@@ -9,7 +9,13 @@
       <div class="param-control">
         <label>
           <span class="param-label">{param.label}</span>
-          <span class="param-value">{config[param.key]}</span>
+          <span class="param-value">
+            {#if param.type === 'slider'}
+              {config[param.key].toFixed(2)}
+            {:else}
+              {config[param.key]}
+            {/if}
+          </span>
         </label>
         {#if param.type === 'slider'}
           <input
@@ -21,9 +27,10 @@
             on:input={(e) => updateConfig(param.key, +e.target.value)} />
         {:else}
           <input
-            type="number"
+            type="range"
             min={param.min}
             max={param.max}
+            step={param.step || 1}
             bind:value={config[param.key]}
             on:input={(e) => updateConfig(param.key, +e.target.value)} />
         {/if}
@@ -79,14 +86,15 @@
     },
     {
       key: 'top_k',
-      label: 'Top-K',
+      label: 'How many top choices to consider?',
       definition: 'Restricts sampling to top K tokens. Lower = less randomness.',
       eli5: 'Imagine choosing from only the top few options instead of all. Lower means fewer choices, making answers more predictable.',
       lowEffect: 'Conservative, predictable output',
       highEffect: 'Expansive, less filtered output',
       type: 'number',
       min: 0,
-      max: 100
+      max: 100,
+      step: 1
     },
     {
       key: 'top_p',
@@ -102,14 +110,15 @@
     },
     {
       key: 'max_tokens',
-      label: 'Max Tokens',
+      label: 'How long should responses be?',
       definition: 'Maximum number of tokens to generate.',
       eli5: 'This is like setting a word limit for the answer. Lower means short answers, higher means longer ones.',
       lowEffect: 'Shorter, punchy replies',
       highEffect: 'Longer, detailed completions',
       type: 'number',
       min: 16,
-      max: 2048
+      max: 2048,
+      step: 1
     }
   ];
 
