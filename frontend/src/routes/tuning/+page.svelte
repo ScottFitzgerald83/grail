@@ -23,12 +23,12 @@
           <span class="help-icon-wrapper">
             <span class="help-icon">❓</span>
             <div class="tooltip-card">
-              <strong>{param.definition}</strong><br /><br />
               {param.eli5}
             </div>
           </span>
         </div>
         <p class="param-category">{paramCategory(param.key)}</p>
+        <p class="param-description">{param.definition}</p>
         <div class="param-control">
           <label>
             <span class="param-value">
@@ -90,12 +90,12 @@
             <span class="help-icon-wrapper">
               <span class="help-icon">❓</span>
               <div class="tooltip-card">
-                <strong>{param.definition}</strong><br /><br />
                 {param.eli5}
               </div>
             </span>
           </div>
           <p class="param-category">{paramCategory(param.key)}</p>
+          <p class="param-description">{param.definition}</p>
           <div class="param-control">
             <label>
               <span class="param-value">
@@ -337,14 +337,18 @@
             key: 'system_prompt',
             label: 'System Prompt',
             definition: 'Custom instruction given before any user input.',
-            eli5: 'This sets the mood or role for the assistant. Like saying “act like a helpful teacher.”',
+            eli5: `This sets the mood or role for the assistant, like saying "act like a helpful teacher."
+It shapes the model's behavior before any user asks a question.
+Great for customizing tone, expertise, or persona for each session.`,
             type: 'text'
         },
         {
             key: 'tools_enabled',
             label: 'Enable Tools',
             definition: 'Allow access to tools, functions, or APIs during generation.',
-            eli5: 'Lets the model use tools like calculators or search if available.',
+            eli5: `Lets the model use external helpers like calculators, web search, or plugins if available.
+Enabling this can improve answers for complex or factual queries.
+Disable for pure text generation or to avoid external calls.`,
             type: 'select',
             options: ['false', 'true']
         },
@@ -352,7 +356,9 @@
             key: 'json_mode',
             label: 'Force JSON',
             definition: 'Model must return a valid JSON object.',
-            eli5: 'Forces the model to speak only JSON. Good for code or structured output.',
+            eli5: `Forces the model to reply only in JSON format, not plain text.
+Useful for coding, structured data, or when integrating with other software.
+Helps ensure responses are easy to parse and process automatically.`,
             type: 'select',
             options: ['false', 'true']
         },
@@ -360,7 +366,9 @@
             key: 'truncate_prompt',
             label: 'Prompt Truncation Limit',
             definition: 'If the prompt exceeds this many tokens, truncate older messages.',
-            eli5: 'Limits how much history the model sees. Keeps it focused and under budget.',
+            eli5: `Limits how much conversation history the model can see at once.
+Older messages are dropped if the total exceeds this number of tokens.
+Keeps responses relevant and helps manage cost or memory usage.`,
             type: 'number',
             min: 0,
             max: 8192,
@@ -370,7 +378,9 @@
             key: 'stream',
             label: 'Stream Response',
             definition: 'Send back results as the model writes them.',
-            eli5: 'Shows the reply live, word by word. Feels faster for the user.',
+            eli5: `Shows the reply live, word by word, as the model generates it.
+Feels faster and more interactive for users, especially with long answers.
+Turn off to wait for the full response before displaying anything.`,
             type: 'select',
             options: ['false', 'true']
         },
@@ -378,7 +388,9 @@
             key: 'temperature',
             label: 'Temperature',
             definition: 'Controls output randomness. Lower = more deterministic, Higher = more creative.',
-            eli5: 'Controls randomness. Lower values produce safe, predictable answers. Higher values increase creativity but risk hallucination or off-topic responses.',
+            eli5: `Controls how "creative" or "risky" the model is with its wording.
+Lower values (e.g., 0.2) make answers steady and predictable.
+Higher values (e.g., 1.0+) increase variety but may lead to off-topic or wild responses.`,
             type: 'slider',
             min: 0,
             max: 1.5,
@@ -390,7 +402,9 @@
             key: 'top_k',
             label: 'How many top choices to consider?',
             definition: 'Restricts sampling to top K tokens. Lower = less randomness.',
-            eli5: 'Limits token selection to the top K most likely options. Smaller values force the model to stay focused. Larger values let it roam, but may lose coherence.',
+            eli5: `Controls how many of the model's top word choices it considers at each step.
+Small values (like 10) make it stick to the most likely next words.
+Larger values (like 80) allow more options, increasing randomness and diversity.`,
             type: 'number',
             min: 0,
             max: 100,
@@ -400,7 +414,9 @@
             key: 'top_p',
             label: 'Top-P',
             definition: 'Limits sampling to top P probability mass. Lower = less variation.',
-            eli5: 'Limits selection to a dynamic group of tokens that collectively reach P probability. Lower values reduce variety. Higher values allow more diverse phrasing.',
+            eli5: `Instead of a fixed number, looks at the smallest set of words whose probabilities add up to P.
+Lower values (e.g., 0.8) make the output more focused and predictable.
+Higher values (e.g., 1.0) allow more creative or surprising word choices.`,
             type: 'slider',
             min: 0,
             max: 1,
@@ -412,7 +428,9 @@
             key: 'max_tokens',
             label: 'How long should responses be?',
             definition: 'Maximum number of tokens to generate.',
-            eli5: 'Sets a cap on response length. Short responses are punchy but may lack depth. Long responses offer more detail but take more time and tokens.',
+            eli5: `Sets a hard cap on how much the model can say in one reply.
+Shorter limits (like 50) give quick, concise answers.
+Higher limits (like 512) allow detailed or multi-part explanations, but take longer to generate.`,
             type: 'number',
             min: 16,
             max: 2048,
@@ -422,7 +440,9 @@
             key: 'presence_penalty',
             label: 'How much should it avoid repeating ideas?',
             definition: 'Encourages introducing new topics and discourages repetition.',
-            eli5: 'Discourages the model from repeating the same ideas. Higher values increase topic variety. Lower values make it more likely to stay on the same subject.',
+            eli5: `Discourages the model from talking about the same ideas over and over.
+Higher values push it to introduce new topics or concepts in the reply.
+Lower values let it stay on a single subject, which can be useful for focused answers.`,
             type: 'slider',
             min: 0,
             max: 2,
@@ -434,7 +454,9 @@
             key: 'frequency_penalty',
             label: 'How much should it avoid repeating words?',
             definition: 'Reduces likelihood of repeating the same tokens.',
-            eli5: 'Reduces word repetition. Higher values make phrasing more varied. Lower values may repeat or stutter if the model gets stuck.',
+            eli5: `Reduces how often the model repeats the same exact words in its answer.
+Higher values make the phrasing more varied and less "stuck."
+Lower values may cause more repetition, which can sometimes sound unnatural.`,
             type: 'slider',
             min: 0,
             max: 2,
@@ -446,21 +468,27 @@
             key: 'stop_sequence',
             label: 'Stop when this text appears',
             definition: 'Ends generation when the model outputs this string.',
-            eli5: 'Defines where the model should stop. Useful to prevent it from rambling or continuing too far past a logical stopping point.',
+            eli5: `Tells the model to stop generating more text if it hits a specific phrase or sequence.
+Useful for cutting off rambling or for structured output (like stopping at "###").
+Leave blank if you want the model to decide when to stop on its own.`,
             type: 'text'
         },
         {
             key: 'logit_bias',
             label: 'Logit Bias',
             definition: 'Overrides probability of specific tokens.',
-            eli5: 'Manually boosts or suppresses certain words. For example, you could reduce the chance it says “sorry.”',
+            eli5: `Lets you nudge the model to use (or avoid) certain words or phrases.
+For example, you can reduce the chance of "sorry" or boost technical terms.
+Advanced setting: requires knowing token IDs and their effects.`,
             type: 'text'
         },
         {
             key: 'sampling_seed',
             label: 'Sampling Seed',
             definition: 'Fixes randomness for consistent output.',
-            eli5: 'Same prompt + same config = same reply. Useful for testing or debugging.',
+            eli5: `Makes the model give the same reply every time for the same prompt and config.
+Great for testing, debugging, or comparing results across runs.
+Leave blank for natural randomness in each response.`,
             type: 'number',
             min: 0,
             max: 999999,
@@ -470,14 +498,18 @@
             key: 'stop_tokens',
             label: 'Stop Tokens',
             definition: 'Stops generation when one of these strings appears.',
-            eli5: 'The model will stop if it hits *any* of the listed phrases.',
+            eli5: `Lets you provide a list of phrases that will immediately stop the model's reply.
+If any of these appear, the answer ends right there.
+Useful for structured output, safety, or multi-part workflows.`,
             type: 'text'
         },
         {
             key: 'model_name',
             label: 'Model Name',
             definition: 'Chooses which model backend to use for generation.',
-            eli5: 'This tells the app which brain to talk to. Choose from local (Ollama) or cloud (OpenAI) models.',
+            eli5: `This tells the app which "brain" to use for generating answers.
+Pick from local models (like Ollama) or cloud ones (like OpenAI's GPT-4).
+Useful for testing speed, quality, or customizing persona across backends.`,
             type: 'select',
             options: ['gpt-4', 'gpt-3.5', 'ollama:llama2', 'ollama:mistral', 'mixtral']
         }
@@ -881,6 +913,12 @@
     font-style: italic;
     margin-top: -0.25rem;
     margin-bottom: 0.25rem;
+  }
+
+  .param-description {
+    font-size: 0.85rem;
+    color: #333;
+    margin-bottom: 0.5rem;
   }
 </style>
 
