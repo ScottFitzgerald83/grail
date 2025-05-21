@@ -139,7 +139,11 @@
         presence_penalty: 0.0,
         frequency_penalty: 0.0,
         stop_sequence: '',
-        response_style: 'Default'
+        response_style: 'Default',
+        logit_bias: '',
+        sampling_seed: '',
+        stop_tokens: '',
+        model_variant: 'default'
       }[key];
     }
 
@@ -166,6 +170,10 @@
         frequency_penalty: 0.0,
         stop_sequence: '',
         response_style: 'Default',
+        logit_bias: '',
+        sampling_seed: '',
+        stop_tokens: '',
+        model_variant: 'default',
     };
 
     let savedStatus = '';
@@ -190,6 +198,10 @@
             frequency_penalty: 0.0,
             stop_sequence: '',
             response_style: 'Default',
+            logit_bias: '',
+            sampling_seed: '',
+            stop_tokens: '',
+            model_variant: 'default',
         };
         savedStatus = '↩️ Reset to default';
     }
@@ -305,6 +317,38 @@
             definition: 'Ends generation when the model outputs this string.',
             eli5: 'Defines where the model should stop. Useful to prevent it from rambling or continuing too far past a logical stopping point.',
             type: 'text'
+        },
+        {
+            key: 'logit_bias',
+            label: 'Logit Bias',
+            definition: 'Overrides probability of specific tokens.',
+            eli5: 'Manually boosts or suppresses certain words. For example, you could reduce the chance it says “sorry.”',
+            type: 'text'
+        },
+        {
+            key: 'sampling_seed',
+            label: 'Sampling Seed',
+            definition: 'Fixes randomness for consistent output.',
+            eli5: 'Same prompt + same config = same reply. Useful for testing or debugging.',
+            type: 'number',
+            min: 0,
+            max: 999999,
+            step: 1
+        },
+        {
+            key: 'stop_tokens',
+            label: 'Stop Tokens',
+            definition: 'Stops generation when one of these strings appears.',
+            eli5: 'The model will stop if it hits *any* of the listed phrases.',
+            type: 'text'
+        },
+        {
+            key: 'model_variant',
+            label: 'Model Variant',
+            definition: 'Selects the tuned behavior or personality of the model.',
+            eli5: 'Switches how the model responds — like “chat” mode or “instructional” mode.',
+            type: 'select',
+            options: ['default', 'instructional', 'chat']
         },
         {
             key: 'response_style',
