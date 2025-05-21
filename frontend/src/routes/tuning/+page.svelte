@@ -7,68 +7,69 @@
 </div>
 
 <div class="dashboard-container">
-  {#each Array.from(new Set(parameters.map(p => paramCategory(p.key)))) as category}
-    <h3 class="section-title">{category}</h3>
-    <div class="param-grid">
-      {#each parameters.filter(p => paramCategory(p.key) === category) as param}
-        <div class="param-tile" data-category={paramCategory(param.key)}>
-          <div class="param-header">
-            <strong>{param.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>
-            <span class="help-icon-wrapper">
-              <span class="help-icon">❓</span>
-              <div class="tooltip-card">
-                <strong>{param.definition}</strong><br /><br />
-                {param.eli5}
-              </div>
-            </span>
-          </div>
-          <p class="param-category">{paramCategory(param.key)}</p>
-          <div class="param-control">
-            <label>
-              <span class="param-value">
-                {#if param.type === 'slider'}
-                  {config[param.key].toFixed(2)} ({fuzzyLabel(param, config[param.key])})
-                {:else if param.type === 'number'}
-                  {config[param.key]}
-                {:else}
-                  {config[param.key]}
-                {/if}
-              </span>
-            </label>
-            {#if param.type === 'slider'}
-              <div class="slider-labels">
-                <span>{param.lowLabel || 'Low'}</span>
-                <span>{param.highLabel || 'High'}</span>
-              </div>
-              <input type="range" min={param.min} max={param.max} step={param.step}
-                     bind:value={config[param.key]}
-                     on:input={(e) => updateConfig(param.key, +e.target.value)}
-                     style="background: {sliderGradient(param.key)}"/>
-            {:else if param.type === 'number'}
-              <input type="number" min={param.min} max={param.max}
-                     bind:value={config[param.key]}
-                     on:input={(e) => updateConfig(param.key, +e.target.value)}/>
-            {:else if param.type === 'text'}
-              <input type="text"
-                     bind:value={config[param.key]}
-                     on:input={(e) => updateConfig(param.key, e.target.value)}/>
-            {:else if param.type === 'select'}
-              <select bind:value={config[param.key]}
-                      on:change={(e) => updateConfig(param.key, e.target.value)}>
-                {#each param.options as option}
-                  <option value={option}>{option}</option>
-                {/each}
-              </select>
-            {/if}
-            <button class="reset-btn" on:click={() => updateConfig(param.key, getDefault(param.key))}>
-              Reset
-            </button>
-            <p class="dynamic-desc">{fuzzyLabel(param, config[param.key])} level selected</p>
-          </div>
+  <div class="param-grid">
+    {#each [...parameters].sort((a, b) => {
+      const ca = paramCategory(a.key);
+      const cb = paramCategory(b.key);
+      return ca === cb ? a.key.localeCompare(b.key) : ca.localeCompare(cb);
+    }) as param}
+      <div class="param-tile" data-category={paramCategory(param.key)}>
+        <div class="param-header">
+          <strong>{param.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>
+          <span class="help-icon-wrapper">
+            <span class="help-icon">❓</span>
+            <div class="tooltip-card">
+              <strong>{param.definition}</strong><br /><br />
+              {param.eli5}
+            </div>
+          </span>
         </div>
-      {/each}
-    </div>
-  {/each}
+        <p class="param-category">{paramCategory(param.key)}</p>
+        <div class="param-control">
+          <label>
+            <span class="param-value">
+              {#if param.type === 'slider'}
+                {config[param.key].toFixed(2)} ({fuzzyLabel(param, config[param.key])})
+              {:else if param.type === 'number'}
+                {config[param.key]}
+              {:else}
+                {config[param.key]}
+              {/if}
+            </span>
+          </label>
+          {#if param.type === 'slider'}
+            <div class="slider-labels">
+              <span>{param.lowLabel || 'Low'}</span>
+              <span>{param.highLabel || 'High'}</span>
+            </div>
+            <input type="range" min={param.min} max={param.max} step={param.step}
+                   bind:value={config[param.key]}
+                   on:input={(e) => updateConfig(param.key, +e.target.value)}
+                   style="background: {sliderGradient(param.key)}"/>
+          {:else if param.type === 'number'}
+            <input type="number" min={param.min} max={param.max}
+                   bind:value={config[param.key]}
+                   on:input={(e) => updateConfig(param.key, +e.target.value)}/>
+          {:else if param.type === 'text'}
+            <input type="text"
+                   bind:value={config[param.key]}
+                   on:input={(e) => updateConfig(param.key, e.target.value)}/>
+          {:else if param.type === 'select'}
+            <select bind:value={config[param.key]}
+                    on:change={(e) => updateConfig(param.key, e.target.value)}>
+              {#each param.options as option}
+                <option value={option}>{option}</option>
+              {/each}
+            </select>
+          {/if}
+          <button class="reset-btn" on:click={() => updateConfig(param.key, getDefault(param.key))}>
+            Reset
+          </button>
+          <p class="dynamic-desc">{fuzzyLabel(param, config[param.key])} level selected</p>
+        </div>
+      </div>
+    {/each}
+  </div>
 </div>
 
 <h2 style="margin-top: 2rem;">🧠 Predicted Model Behavior</h2>
