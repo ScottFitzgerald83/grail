@@ -2,9 +2,30 @@
 
 <div class="param-grid">
   {#each parameters as param}
-    <div class="param-tile {selectedParam && selectedParam.key === param.key ? 'active' : ''}" on:click={() => openPanel(param.key)}>
+    <div class="param-tile">
       <strong>{param.label}</strong>
-      <p style="font-size: 0.9rem;">{config[param.key]}</p>
+      <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">{param.definition}</p>
+      <p><em style="font-size: 0.85rem;">{param.eli5}</em></p>
+      <div style="margin: 0.75rem 0;">
+        {#if param.type === 'slider'}
+          <input
+            type="range"
+            min={param.min}
+            max={param.max}
+            step={param.step}
+            bind:value={config[param.key]}
+            on:input={(e) => updateConfig(param.key, +e.target.value)} />
+        {:else}
+          <input
+            type="number"
+            min={param.min}
+            max={param.max}
+            bind:value={config[param.key]}
+            on:input={(e) => updateConfig(param.key, +e.target.value)} />
+        {/if}
+      </div>
+      <p><strong>Low:</strong> {param.lowEffect}</p>
+      <p><strong>High:</strong> {param.highEffect}</p>
     </div>
   {/each}
 </div>
@@ -38,8 +59,6 @@
     };
     savedStatus = '↩️ Reset to default';
   }
-
-  let selectedParam = null;
 
   const parameters = [
     {
@@ -90,49 +109,12 @@
     }
   ];
 
-  function openPanel(key) {
-    if (selectedParam && selectedParam.key === key) {
-      selectedParam = null;
-    } else {
-      selectedParam = parameters.find(p => p.key === key);
-    }
-  }
-
   function updateConfig(key, value) {
     config[key] = value;
     localStorage.setItem('grailConfig', JSON.stringify(config));
     savedStatus = '💾 Config saved';
   }
 </script>
-
-{#if selectedParam}
-  <div class="param-drawer">
-    <button class="drawer-toggle" on:click={() => selectedParam = null}>▶</button>
-    <h2>{selectedParam.label}</h2>
-    <p>{selectedParam.definition}</p>
-    <p><em>{selectedParam.eli5}</em></p>
-    <div style="margin: 1rem 0;">
-      {#if selectedParam.type === 'slider'}
-        <input
-          type="range"
-          min={selectedParam.min}
-          max={selectedParam.max}
-          step={selectedParam.step}
-          bind:value={config[selectedParam.key]}
-          on:input={(e) => updateConfig(selectedParam.key, +e.target.value)} />
-      {:else}
-        <input
-          type="number"
-          min={selectedParam.min}
-          max={selectedParam.max}
-          bind:value={config[selectedParam.key]}
-          on:input={(e) => updateConfig(selectedParam.key, +e.target.value)} />
-      {/if}
-    </div>
-    <p><strong>Low:</strong> {selectedParam.lowEffect}</p>
-    <p><strong>High:</strong> {selectedParam.highEffect}</p>
-  </div>
-{/if}
 
 <style>
   .param-grid {
@@ -158,31 +140,5 @@
   .param-tile.active {
     border-color: #007acc;
     background: #d0e7ff;
-  }
-
-  .param-drawer {
-    position: fixed;
-    top: 0;
-    right: 360px;
-    width: 320px;
-    height: 100vh;
-    padding: 2rem;
-    background: white;
-    border-left: 1px solid #ddd;
-    box-shadow: -2px 0 8px rgba(0,0,0,0.1);
-    overflow-y: auto;
-    z-index: 100;
-  }
-
-  .drawer-toggle {
-    position: absolute;
-    left: -1.75rem;
-    top: 1rem;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-    padding: 0.25rem 0.5rem;
-    transform: rotate(180deg);
   }
 </style>
