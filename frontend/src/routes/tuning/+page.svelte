@@ -114,16 +114,6 @@
   <pre class="prompt-preview">{JSON.stringify({ prompt: "Example prompt...", ...config }, null, 2)}</pre>
 </details>
 
-<h2 style="margin-top: 2rem;">🚀 Live Test Prompt</h2>
-<textarea bind:value={testPrompt} rows="3" placeholder="Try a real prompt..." class="live-test-input"></textarea>
-<button on:click={sendTestPrompt} style="margin-top: 0.5rem;">Generate</button>
-
-{#if testResponse}
-  <div class="live-test-result">
-    <strong>Response:</strong>
-    <p>{testResponse}</p>
-  </div>
-{/if}
 
 <h2 style="margin-top: 2rem;">🔎 Parameter Explanations (ELI5)</h2>
 <ul class="eli5-list">
@@ -136,8 +126,6 @@
     import {onMount} from 'svelte';
     import {browser} from '$app/environment';
 
-    let testPrompt = '';
-    let testResponse = '';
 
     let config = {
         temperature: 0.7,
@@ -360,16 +348,6 @@
       reader.readAsText(file);
     }
 
-    async function sendTestPrompt() {
-      const payload = { prompt: testPrompt, ...config };
-      const res = await fetch('/infer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      testResponse = data.output || '⚠️ No response received.';
-    }
 </script>
 
 <style>
@@ -556,21 +534,5 @@
       word-break: break-word;
     }
 
-    .live-test-input {
-      width: 100%;
-      padding: 0.75rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 0.95rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .live-test-result {
-      margin-top: 1rem;
-      background: #f6f6f6;
-      padding: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-    }
 </style>
 
