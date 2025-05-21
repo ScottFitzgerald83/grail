@@ -487,6 +487,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 0.25rem;
     }
 
     .help-icon-wrapper {
@@ -568,7 +569,7 @@
         justify-content: space-between;
         font-size: 0.8rem;
         color: #555;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.4rem;
     }
 
     .param-control input[type="range"] {
@@ -602,13 +603,12 @@
         background: #f5f5f5;
         border: 1px solid #ccc;
         border-radius: 8px;
-        padding: 1rem;
-        cursor: pointer;
+        padding: 0.75rem 1rem;
         transition: all 0.2s ease;
     }
 
     .param-tile:hover {
-        background: #eef2f7;
+        background: #f0f4f9;
     }
 
     .param-tile.active {
@@ -617,7 +617,8 @@
     }
 
     .param-control {
-        margin: 1rem 0;
+        margin-top: 0.75rem;
+        margin-bottom: 0.5rem;
     }
 
     .param-control input[type="number"] {
@@ -656,8 +657,9 @@
 
     .param-value {
         float: right;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         color: #444;
+        margin-left: 0.5rem;
     }
 
     .performance-table {
