@@ -142,7 +142,12 @@
         logit_bias: '',
         sampling_seed: '',
         stop_tokens: '',
-        model_name: 'gpt-4'
+        model_name: 'gpt-4',
+        system_prompt: '',
+        tools_enabled: 'false',
+        json_mode: 'false',
+        truncate_prompt: 0,
+        stream: 'false'
       }[key];
     }
 
@@ -172,6 +177,11 @@
         sampling_seed: '',
         stop_tokens: '',
         model_name: 'gpt-4',
+        system_prompt: '',
+        tools_enabled: 'false',
+        json_mode: 'false',
+        truncate_prompt: 0,
+        stream: 'false'
     };
 
     let savedStatus = '';
@@ -199,6 +209,11 @@
             sampling_seed: '',
             stop_tokens: '',
             model_name: 'gpt-4',
+            system_prompt: '',
+            tools_enabled: 'false',
+            json_mode: 'false',
+            truncate_prompt: 0,
+            stream: 'false'
         };
         savedStatus = '↩️ Reset to default';
     }
@@ -240,6 +255,47 @@
     }
 
     const parameters = [
+        {
+            key: 'system_prompt',
+            label: 'System Prompt',
+            definition: 'Custom instruction given before any user input.',
+            eli5: 'This sets the mood or role for the assistant. Like saying “act like a helpful teacher.”',
+            type: 'text'
+        },
+        {
+            key: 'tools_enabled',
+            label: 'Enable Tools',
+            definition: 'Allow access to tools, functions, or APIs during generation.',
+            eli5: 'Lets the model use tools like calculators or search if available.',
+            type: 'select',
+            options: ['false', 'true']
+        },
+        {
+            key: 'json_mode',
+            label: 'Force JSON',
+            definition: 'Model must return a valid JSON object.',
+            eli5: 'Forces the model to speak only JSON. Good for code or structured output.',
+            type: 'select',
+            options: ['false', 'true']
+        },
+        {
+            key: 'truncate_prompt',
+            label: 'Prompt Truncation Limit',
+            definition: 'If the prompt exceeds this many tokens, truncate older messages.',
+            eli5: 'Limits how much history the model sees. Keeps it focused and under budget.',
+            type: 'number',
+            min: 0,
+            max: 8192,
+            step: 1
+        },
+        {
+            key: 'stream',
+            label: 'Stream Response',
+            definition: 'Send back results as the model writes them.',
+            eli5: 'Shows the reply live, word by word. Feels faster for the user.',
+            type: 'select',
+            options: ['false', 'true']
+        },
         {
             key: 'temperature',
             label: 'Temperature',
