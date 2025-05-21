@@ -214,27 +214,29 @@
     line-height: 1.4;
     margin-top: 0.75rem;
   }
-</style>
+
   .metric-bar {
-    font-size: 0.75rem;
-    margin: 0.4rem 0;
+      font-size: 0.75rem;
+      margin: 0.4rem 0;
   }
 
   .metric-bar span {
-    display: inline-block;
-    margin-bottom: 0.15rem;
-    color: #333;
+      display: inline-block;
+      margin-bottom: 0.15rem;
+      color: #333;
   }
 
   .bar {
-    height: 8px;
-    background: #eee;
-    border-radius: 4px;
-    overflow: hidden;
+      height: 8px;
+      background: #eee;
+      border-radius: 4px;
+      overflow: hidden;
   }
 
   .fill {
-    height: 100%;
-    background: #007acc;
-    transition: width 0.4s ease;
+      height: 100%;
+      background: #007acc;
+      transition: width 0.4s ease;
   }
+
+</style>
