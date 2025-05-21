@@ -94,7 +94,8 @@
 </ul>
 
 <script>
-    import {onMount} from 'svelte';
+    import { onMount } from 'svelte';
+    import { browser } from '$app/environment';
 
     let config = {
         temperature: 0.7,
@@ -110,10 +111,12 @@
     let savedStatus = '';
 
     onMount(() => {
-        const saved = localStorage.getItem('grailConfig');
-        if (saved) {
-            config = JSON.parse(saved);
-            savedStatus = '✅ Loaded saved config';
+        if (browser) {
+            const saved = localStorage.getItem('grailConfig');
+            if (saved) {
+                config = JSON.parse(saved);
+                savedStatus = '✅ Loaded saved config';
+            }
         }
     });
 
@@ -264,6 +267,7 @@
     }
 
     function computeMetrics(config) {
+      if (!browser) return {};
       return {
         creativity: score(config.temperature * 2 + config.top_p * 2 - config.top_k / 100),
         coherence: score(5 - config.temperature * 2 + config.top_k / 20),
