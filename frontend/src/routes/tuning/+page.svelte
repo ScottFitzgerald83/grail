@@ -8,9 +8,9 @@
 
 <div class="param-grid">
   {#each parameters as param}
-    <div class="param-tile" title={param.eli5}>
+    <div class="param-tile">
       <div class="param-header">
-        <strong>{param.label}</strong>
+        <strong>{param.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>
         <span class="help-icon-wrapper">
           <span class="help-icon">❓</span>
           <div class="tooltip-card">
@@ -22,7 +22,6 @@
       <p class="param-category">{paramCategory(param.key)}</p>
       <div class="param-control">
         <label>
-          <span class="param-label">{param.label}</span>
           <span class="param-value">
             {#if param.type === 'slider'}
               {config[param.key].toFixed(2)} ({fuzzyLabel(param, config[param.key])})
@@ -418,11 +417,12 @@
       top: 100%;
       left: 0;
       transform: translateY(0.5rem);
-      background: #ADEBB3;
+      background: #1434A4;
       border: 1px solid #ccc;
       border-radius: 8px;
       padding: 0.75rem;
       font-size: 0.8rem;
+      color: white;
       line-height: 1.3;
       width: 240px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
