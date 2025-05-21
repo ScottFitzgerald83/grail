@@ -16,7 +16,7 @@ st.set_page_config(
 # Clean layout without suppressing sidebar (fully enabled now)
 
 # Replace sidebar with horizontal tabs
-tabs = st.tabs(["Home", "Chat", "Compare", "Roadmap", "Glossary", "Tuning"])
+tabs = st.tabs(["Home", "Chat", "Tuning", "Compare", "Roadmap", "Glossary"])
 
 with tabs[0]:
     st.title("🧠 GRAIL — Ghost-Refined Architecture for Interpretable Language")
@@ -36,13 +36,13 @@ with tabs[1]:
     chat_run()
 
 with tabs[2]:
-    compare_run()
+    tuning_run()
 
 with tabs[3]:
-    roadmap_run()
+    compare_run()
 
 with tabs[4]:
-    glossary_run()
+    roadmap_run()
 
 with tabs[5]:
-    tuning_run()
+    glossary_run()
