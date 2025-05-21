@@ -5,7 +5,6 @@
         <div class="param-tile">
             <strong>{param.label}</strong>
             <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">{param.definition}</p>
-            <p><em style="font-size: 0.85rem;">{param.eli5}</em></p>
             <div class="param-control">
                 <label>
                     <span class="param-label">{param.label}</span>
@@ -66,6 +65,13 @@
     {/each}
   </tbody>
 </table>
+
+<h2 style="margin-top: 2rem;">🔎 Parameter Explanations (ELI5)</h2>
+<ul class="eli5-list">
+  {#each parameters as param}
+    <li><strong>{param.label}:</strong> <span>{param.eli5}</span></li>
+  {/each}
+</ul>
 
 <script>
     import {onMount} from 'svelte';
@@ -336,5 +342,15 @@
       height: 100%;
       background: #4caf50;
       transition: width 0.2s ease;
+    }
+
+    .eli5-list {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      padding-left: 1.25rem;
+    }
+    .eli5-list li {
+      margin-bottom: 0.5rem;
     }
 </style>
