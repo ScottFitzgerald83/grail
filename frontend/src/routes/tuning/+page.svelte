@@ -9,7 +9,7 @@
 <div class="dashboard-container">
   <div class="param-grid">
     {#each parameters as param}
-      <div class="param-tile">
+      <div class="param-tile" data-category={paramCategory(param.key)}>
         <div class="param-header">
           <strong>{param.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>
           <span class="help-icon-wrapper">
@@ -469,17 +469,40 @@
       reader.readAsText(file);
     }
 
+    // Returns a category label for each parameter key
     function paramCategory(key) {
       const map = {
+        // Creativity & Style
         temperature: 'Creativity & Style',
         top_p: 'Creativity & Style',
+        model_name: 'Creativity & Style',
+
+        // Repetition & Diversity
         top_k: 'Repetition & Diversity',
         presence_penalty: 'Repetition & Diversity',
         frequency_penalty: 'Repetition & Diversity',
+
+        // Length & Structure
         max_tokens: 'Length & Structure',
-        stop_sequence: 'Length & Structure'
+        stop_sequence: 'Length & Structure',
+        truncate_prompt: 'Length & Structure',
+
+        // Prompt Control
+        system_prompt: 'Prompt Control',
+
+        // Tool Use
+        tools_enabled: 'Tool Use',
+
+        // Advanced
+        logit_bias: 'Advanced',
+        sampling_seed: 'Advanced',
+        stop_tokens: 'Advanced',
+
+        // Output Format
+        json_mode: 'Output Format',
+        stream: 'Output Format'
       };
-      return map[key] || '';
+      return map[key] || 'General';
     }
 
 </script>
@@ -490,7 +513,7 @@
   }
 
   .dashboard-container {
-    background: #f4f7fb;
+    background: #eef3f9;
     min-height: 100vh;
     padding-bottom: 2rem;
   }
@@ -645,10 +668,32 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
+  .param-tile[data-category='Creativity & Style'] {
+    background: #f0f7ff;
+  }
+  .param-tile[data-category='Repetition & Diversity'] {
+    background: #f3fcf5;
+  }
+  .param-tile[data-category='Length & Structure'] {
+    background: #fef9f3;
+  }
+  .param-tile[data-category='Prompt Control'] {
+    background: #f9f4fd;
+  }
+  .param-tile[data-category='Tool Use'] {
+    background: #f5faff;
+  }
+  .param-tile[data-category='Output Format'] {
+    background: #fdfdf2;
+  }
+  .param-tile[data-category='Advanced'] {
+    background: #f8f9fa;
+  }
+
   .param-tile:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-    background: #f9fbff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    background: inherit;
   }
 
   .param-tile.active {
