@@ -139,11 +139,10 @@
         presence_penalty: 0.0,
         frequency_penalty: 0.0,
         stop_sequence: '',
-        response_style: 'Default',
         logit_bias: '',
         sampling_seed: '',
         stop_tokens: '',
-        model_variant: 'default'
+        model_name: 'gpt-4'
       }[key];
     }
 
@@ -169,11 +168,10 @@
         presence_penalty: 0.0,
         frequency_penalty: 0.0,
         stop_sequence: '',
-        response_style: 'Default',
         logit_bias: '',
         sampling_seed: '',
         stop_tokens: '',
-        model_variant: 'default',
+        model_name: 'gpt-4',
     };
 
     let savedStatus = '';
@@ -197,11 +195,10 @@
             presence_penalty: 0.0,
             frequency_penalty: 0.0,
             stop_sequence: '',
-            response_style: 'Default',
             logit_bias: '',
             sampling_seed: '',
             stop_tokens: '',
-            model_variant: 'default',
+            model_name: 'gpt-4',
         };
         savedStatus = '↩️ Reset to default';
     }
@@ -343,20 +340,12 @@
             type: 'text'
         },
         {
-            key: 'model_variant',
-            label: 'Model Variant',
-            definition: 'Selects the tuned behavior or personality of the model.',
-            eli5: 'Switches how the model responds — like “chat” mode or “instructional” mode.',
+            key: 'model_name',
+            label: 'Model Name',
+            definition: 'Chooses which model backend to use for generation.',
+            eli5: 'This tells the app which brain to talk to. Choose from local (Ollama) or cloud (OpenAI) models.',
             type: 'select',
-            options: ['default', 'instructional', 'chat']
-        },
-        {
-            key: 'response_style',
-            label: 'Response Style',
-            definition: 'Controls the overall tone or formatting of the output.',
-            eli5: 'Applies a general tone or formatting style. Useful for controlling personality or structure in the reply.',
-            type: 'select',
-            options: ['Default', 'Creative', 'Concise']
+            options: ['gpt-4', 'gpt-3.5', 'ollama:llama2', 'ollama:mistral', 'mixtral']
         }
     ];
 
@@ -426,7 +415,6 @@
       const map = {
         temperature: 'Creativity & Style',
         top_p: 'Creativity & Style',
-        response_style: 'Creativity & Style',
         top_k: 'Repetition & Diversity',
         presence_penalty: 'Repetition & Diversity',
         frequency_penalty: 'Repetition & Diversity',
