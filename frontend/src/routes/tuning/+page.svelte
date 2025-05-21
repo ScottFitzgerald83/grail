@@ -118,12 +118,6 @@
 
 
 
-<h2 style="margin-top: 2rem;">🔎 Parameter Explanations (ELI5)</h2>
-<ul class="eli5-list">
-    {#each parameters as param}
-        <li><strong>{param.label}:</strong> <span>{param.eli5}</span></li>
-    {/each}
-</ul>
 
 <script>
     import {onMount} from 'svelte';
