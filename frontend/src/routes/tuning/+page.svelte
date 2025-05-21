@@ -11,7 +11,10 @@
     <div class="param-tile" title={param.eli5}>
       <div class="param-header">
         <strong>{param.label}</strong>
-        <span class="help-icon" title={param.eli5}>❓</span>
+        <span class="help-icon-wrapper">
+          <span class="help-icon">❓</span>
+          <div class="tooltip-card">{param.eli5}</div>
+        </span>
       </div>
       <p class="param-category">{paramCategory(param.key)}</p>
       <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">{param.definition}</p>
@@ -397,33 +400,39 @@
       align-items: center;
     }
 
-    .help-icon {
+    .help-icon-wrapper {
       position: relative;
+      display: inline-block;
+    }
+
+    .help-icon {
       font-size: 0.9rem;
       cursor: help;
       color: #666;
     }
 
-    .help-icon::after {
-      content: attr(title);
+    .tooltip-card {
       position: absolute;
-      left: 1.25rem;
-      top: 50%;
-      transform: translateY(-50%);
-      background: #333;
-      color: #fff;
-      padding: 0.4rem 0.6rem;
-      border-radius: 5px;
-      font-size: 0.75rem;
-      white-space: nowrap;
+      top: 100%;
+      left: 0;
+      transform: translateY(0.5rem);
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-size: 0.8rem;
+      line-height: 1.3;
+      width: 240px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.2s ease-in-out;
+      transition: opacity 0.2s ease;
       z-index: 999;
     }
 
-    .help-icon:hover::after {
+    .help-icon-wrapper:hover .tooltip-card {
       opacity: 1;
+      pointer-events: auto;
     }
 
     .reset-btn {
