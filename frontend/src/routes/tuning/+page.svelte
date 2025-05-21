@@ -6,64 +6,66 @@
     {/each}
 </div>
 
-<div class="param-grid">
-  {#each parameters as param}
-    <div class="param-tile">
-      <div class="param-header">
-        <strong>{param.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>
-        <span class="help-icon-wrapper">
-          <span class="help-icon">❓</span>
-          <div class="tooltip-card">
-            <strong>{param.definition}</strong><br /><br />
-            {param.eli5}
-          </div>
-        </span>
-      </div>
-      <p class="param-category">{paramCategory(param.key)}</p>
-      <div class="param-control">
-        <label>
-          <span class="param-value">
-            {#if param.type === 'slider'}
-              {config[param.key].toFixed(2)} ({fuzzyLabel(param, config[param.key])})
-            {:else if param.type === 'number'}
-              {config[param.key]}
-            {:else}
-              {config[param.key]}
-            {/if}
+<div class="dashboard-container">
+  <div class="param-grid">
+    {#each parameters as param}
+      <div class="param-tile">
+        <div class="param-header">
+          <strong>{param.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>
+          <span class="help-icon-wrapper">
+            <span class="help-icon">❓</span>
+            <div class="tooltip-card">
+              <strong>{param.definition}</strong><br /><br />
+              {param.eli5}
+            </div>
           </span>
-        </label>
-        {#if param.type === 'slider'}
-          <div class="slider-labels">
-            <span>{param.lowLabel || 'Low'}</span>
-            <span>{param.highLabel || 'High'}</span>
-          </div>
-          <input type="range" min={param.min} max={param.max} step={param.step}
-                 bind:value={config[param.key]}
-                 on:input={(e) => updateConfig(param.key, +e.target.value)}
-                 style="background: {sliderGradient(param.key)}"/>
-        {:else if param.type === 'number'}
-          <input type="number" min={param.min} max={param.max}
-                 bind:value={config[param.key]}
-                 on:input={(e) => updateConfig(param.key, +e.target.value)}/>
-        {:else if param.type === 'text'}
-          <input type="text"
-                 bind:value={config[param.key]}
-                 on:input={(e) => updateConfig(param.key, e.target.value)}/>
-        {:else if param.type === 'select'}
-          <select bind:value={config[param.key]}
-                  on:change={(e) => updateConfig(param.key, e.target.value)}>
-            {#each param.options as option}
-              <option value={option}>{option}</option>
-            {/each}
-          </select>
-        {/if}
-        <button class="reset-btn" on:click={() => updateConfig(param.key, getDefault(param.key))}>
-          Reset
-        </button>
-        <p class="dynamic-desc">{fuzzyLabel(param, config[param.key])} level selected</p>
+        </div>
+        <p class="param-category">{paramCategory(param.key)}</p>
+        <div class="param-control">
+          <label>
+            <span class="param-value">
+              {#if param.type === 'slider'}
+                {config[param.key].toFixed(2)} ({fuzzyLabel(param, config[param.key])})
+              {:else if param.type === 'number'}
+                {config[param.key]}
+              {:else}
+                {config[param.key]}
+              {/if}
+            </span>
+          </label>
+          {#if param.type === 'slider'}
+            <div class="slider-labels">
+              <span>{param.lowLabel || 'Low'}</span>
+              <span>{param.highLabel || 'High'}</span>
+            </div>
+            <input type="range" min={param.min} max={param.max} step={param.step}
+                   bind:value={config[param.key]}
+                   on:input={(e) => updateConfig(param.key, +e.target.value)}
+                   style="background: {sliderGradient(param.key)}"/>
+          {:else if param.type === 'number'}
+            <input type="number" min={param.min} max={param.max}
+                   bind:value={config[param.key]}
+                   on:input={(e) => updateConfig(param.key, +e.target.value)}/>
+          {:else if param.type === 'text'}
+            <input type="text"
+                   bind:value={config[param.key]}
+                   on:input={(e) => updateConfig(param.key, e.target.value)}/>
+          {:else if param.type === 'select'}
+            <select bind:value={config[param.key]}
+                    on:change={(e) => updateConfig(param.key, e.target.value)}>
+              {#each param.options as option}
+                <option value={option}>{option}</option>
+              {/each}
+            </select>
+          {/if}
+          <button class="reset-btn" on:click={() => updateConfig(param.key, getDefault(param.key))}>
+            Reset
+          </button>
+          <p class="dynamic-desc">{fuzzyLabel(param, config[param.key])} level selected</p>
+        </div>
       </div>
-    </div>
-  {/each}
+    {/each}
+  </div>
 </div>
 
 <h2 style="margin-top: 2rem;">🧠 Predicted Model Behavior</h2>
@@ -483,253 +485,281 @@
 </script>
 
 <style>
-    .param-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.25rem;
-    }
+  body {
+    background: #f4f7fb;
+  }
 
-    .param-header strong {
-      font-size: 1rem;
-      font-weight: 600;
-    }
+  .dashboard-container {
+    background: #f4f7fb;
+    min-height: 100vh;
+    padding-bottom: 2rem;
+  }
 
-    .help-icon-wrapper {
-      position: relative;
-      display: inline-block;
-    }
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #2a3b4c;
+  }
 
-    .help-icon {
-      font-size: 0.9rem;
-      cursor: help;
-      color: #666;
-    }
+  .param-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+  }
 
-    .tooltip-card {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      transform: translateY(0.5rem);
-      width: 280px;
-      background: #1e1e1e;
-      color: #fff;
-      font-size: 0.85rem;
-      border: none;
-      padding: 0.75rem 1rem;
-      border-radius: 10px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-      line-height: 1.4;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
-      z-index: 999;
-    }
+  .param-header strong {
+    font-size: 1.1rem;
+    color: #2a3b4c;
+    font-weight: 700;
+  }
 
-    .help-icon-wrapper:hover .tooltip-card {
-      opacity: 1;
-      pointer-events: auto;
-    }
+  .help-icon-wrapper {
+    position: relative;
+    display: inline-block;
+  }
 
-    .reset-btn {
-      margin-top: 0.5rem;
-      font-size: 0.75rem;
-      background: transparent;
-      border: none;
-      color: #007acc;
-      cursor: pointer;
-      padding: 0;
-    }
+  .help-icon {
+    font-size: 0.9rem;
+    cursor: help;
+    color: #007acc;
+    transition: color 0.2s;
+  }
 
-    .reset-btn:hover {
-      text-decoration: underline;
-    }
+  .help-icon-wrapper:hover .help-icon {
+    color: #005c99;
+  }
 
-    .dynamic-desc {
-      font-size: 0.8rem;
-      color: #555;
-      margin-top: 0.25rem;
-    }
-    .preset-buttons {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
+  .tooltip-card {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    transform: translateY(0.5rem);
+    width: 280px;
+    background: #ffffff;
+    color: #333;
+    border: 1px solid #ccd5e0;
+    font-size: 0.85rem;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    line-height: 1.4;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 999;
+  }
 
-    .preset-buttons button {
-        background: white;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 0.4rem 1rem;
-        font-size: 0.9rem;
-        cursor: pointer;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-        transition: background 0.2s ease, border-color 0.2s ease;
-    }
-    .preset-buttons button:hover {
-        background: #f3f6fa;
-        border-color: #007acc;
-    }
+  .help-icon-wrapper:hover .tooltip-card {
+    opacity: 1;
+    pointer-events: auto;
+  }
 
-    .slider-labels {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.8rem;
-        color: #555;
-        margin-bottom: 0.4rem;
-    }
+  .reset-btn {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    background: transparent;
+    border: none;
+    color: #007acc;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s;
+  }
 
-    .param-control input[type="range"] {
-        width: 100%;
-        appearance: none;
-        height: 6px;
-        border-radius: 4px;
-        /* background is set inline for color-coding */
-    }
+  .reset-btn:hover {
+    text-decoration: underline;
+    color: #005c99;
+  }
 
+  .dynamic-desc {
+    font-size: 0.8rem;
+    color: #555;
+    margin-top: 0.25rem;
+  }
+
+  .preset-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .preset-buttons button {
+    background: #ffffff;
+    border: 1px solid #cfd8e3;
+    border-radius: 8px;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.9rem;
+    color: #2a3b4c;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+  }
+  .preset-buttons button:hover {
+    background: #e8f2fc;
+    border-color: #007acc;
+    color: #007acc;
+  }
+
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #555;
+    margin-bottom: 0.4rem;
+  }
+
+  .param-control input[type="range"] {
+    width: 100%;
+    appearance: none;
+    height: 6px;
+    border-radius: 4px;
+    /* background is set inline for color-coding */
+  }
+
+  .param-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  @media (max-width: 1000px) {
     .param-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1rem;
-        margin-top: 1.5rem;
+      grid-template-columns: repeat(2, 1fr);
     }
+  }
 
-    @media (max-width: 1000px) {
-        .param-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
+  @media (max-width: 600px) {
+    .param-grid {
+      grid-template-columns: 1fr;
     }
+  }
 
-    @media (max-width: 600px) {
-        .param-grid {
-            grid-template-columns: 1fr;
-        }
-    }
+  .param-tile {
+    background: #ffffff;
+    border: 1px solid #dde4ea;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
 
-    .param-tile {
-        background: #ffffff;
-        border: 1px solid #e0e0e0;
-        border-radius: 12px;
-        padding: 1rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+  .param-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    background: #f9fbff;
+  }
 
-    .param-tile:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        background: #f9fbff;
-    }
+  .param-tile.active {
+    border-color: #007acc;
+    background: #e8f2fc;
+  }
 
-    .param-tile.active {
-        border-color: #007acc;
-        background: #d0e7ff;
-    }
+  .param-control {
+    margin-top: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
 
-    .param-control {
-        margin-top: 0.75rem;
-        margin-bottom: 0.5rem;
-    }
+  .param-control input[type="range"],
+  .param-control input[type="number"],
+  .param-control input[type="text"],
+  .param-control select {
+    border-radius: 6px;
+    border: 1px solid #cfd8e3;
+    font-size: 0.9rem;
+    padding: 0.45rem;
+    transition: border-color 0.2s ease;
+    width: 100%;
+    margin-top: 0.25rem;
+    background: #ffffff;
+    box-sizing: border-box;
+  }
 
-    .param-control input[type="range"],
-    .param-control input[type="number"],
-    .param-control input[type="text"],
-    .param-control select {
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 0.9rem;
-      padding: 0.45rem;
-      transition: border-color 0.2s ease;
-      width: 100%;
-      margin-top: 0.25rem;
-      background: white;
-      box-sizing: border-box;
-    }
+  .param-control input:focus,
+  .param-control select:focus {
+    border-color: #007acc;
+    outline: none;
+  }
 
-    .param-control input:focus,
-    .param-control select:focus {
-      border-color: #007acc;
-      outline: none;
-    }
+  .param-label {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
 
-    .param-label {
-        display: inline-block;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
+  .param-value {
+    float: right;
+    font-size: 0.8rem;
+    color: #444;
+    margin-left: 0.5rem;
+  }
 
-    .param-value {
-        float: right;
-        font-size: 0.8rem;
-        color: #444;
-        margin-left: 0.5rem;
-    }
+  .performance-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
 
-    .performance-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
-        font-size: 0.9rem;
-    }
+  .performance-table th, .performance-table td {
+    border: 1px solid #dde4ea;
+    padding: 0.5rem;
+  }
 
-    .performance-table th, .performance-table td {
-        border: 1px solid #ccc;
-        padding: 0.5rem;
-    }
+  .performance-table th {
+    background: #f4f7fb;
+    text-align: left;
+    color: #2a3b4c;
+  }
 
-    .performance-table th {
-        background: #f0f0f0;
-        text-align: left;
-    }
+  .performance-table td:nth-child(2) {
+    font-family: system-ui, sans-serif;
+    font-size: 1.1rem;
+  }
 
-    .performance-table td:nth-child(2) {
-        font-family: system-ui, sans-serif;
-        font-size: 1.1rem;
-    }
+  .bar-bg {
+    height: 12px;
+    width: 100%;
+    background: #eaf0f7;
+    border-radius: 4px;
+    overflow: hidden;
+  }
 
-    .bar-bg {
-        height: 12px;
-        width: 100%;
-        background: #eee;
-        border-radius: 4px;
-        overflow: hidden;
-    }
+  .bar-fill {
+    height: 100%;
+    background: #4caf50;
+    transition: width 0.2s ease;
+    border-radius: 4px;
+  }
 
-    .bar-fill {
-        height: 100%;
-        background: #4caf50;
-        transition: width 0.2s ease;
-    }
+  .eli5-list {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    padding-left: 1.25rem;
+  }
 
-    .eli5-list {
-        margin-top: 1rem;
-        font-size: 0.9rem;
-        line-height: 1.4;
-        padding-left: 1.25rem;
-    }
+  .eli5-list li {
+    margin-bottom: 0.5rem;
+  }
 
-    .eli5-list li {
-        margin-bottom: 0.5rem;
-    }
+  .section-title {
+    margin-top: 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
 
-    .eli5-list li {
-        margin-bottom: 0.5rem;
-    }
-
-    .section-title {
-        margin-top: 2rem;
-        font-size: 1.1rem;
-        font-weight: 600;
-    }
-
-.param-category {
-  font-size: 0.75rem;
-  color: #888;
-  font-style: italic;
-  margin-top: -0.25rem;
-  margin-bottom: 0.25rem;
-}
-
-
+  .param-category {
+    font-size: 0.75rem;
+    color: #888;
+    font-style: italic;
+    margin-top: -0.25rem;
+    margin-bottom: 0.25rem;
+  }
 </style>
 
