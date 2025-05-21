@@ -35,8 +35,6 @@
                             on:input={(e) => updateConfig(param.key, +e.target.value)}/>
                 {/if}
             </div>
-            <p><strong>Low:</strong> {param.lowEffect}</p>
-            <p><strong>High:</strong> {param.highEffect}</p>
         </div>
     {/each}
 </div>
@@ -108,8 +106,6 @@
             label: 'Temperature',
             definition: 'Controls output randomness. Lower = more deterministic, Higher = more creative.',
             eli5: 'Think of this like how wild or calm your story is. Low means very calm and predictable, high means wild and surprising.',
-            lowEffect: 'Safe, factual completions',
-            highEffect: 'Diverse, surprising completions',
             type: 'slider',
             min: 0,
             max: 1.5,
@@ -120,8 +116,6 @@
             label: 'How many top choices to consider?',
             definition: 'Restricts sampling to top K tokens. Lower = less randomness.',
             eli5: 'Imagine choosing from only the top few options instead of all. Lower means fewer choices, making answers more predictable.',
-            lowEffect: 'Conservative, predictable output',
-            highEffect: 'Expansive, less filtered output',
             type: 'number',
             min: 0,
             max: 100,
@@ -132,8 +126,6 @@
             label: 'Top-P',
             definition: 'Limits sampling to top P probability mass. Lower = less variation.',
             eli5: 'Think of this as picking words from a basket until you reach a certain chance. Lower means fewer words, so answers are simpler.',
-            lowEffect: 'Tight, repetitive phrasing',
-            highEffect: 'Fluent, expressive variation',
             type: 'slider',
             min: 0,
             max: 1,
@@ -144,8 +136,6 @@
             label: 'How long should responses be?',
             definition: 'Maximum number of tokens to generate.',
             eli5: 'This is like setting a word limit for the answer. Lower means short answers, higher means longer ones.',
-            lowEffect: 'Shorter, punchy replies',
-            highEffect: 'Longer, detailed completions',
             type: 'number',
             min: 16,
             max: 2048,
@@ -156,8 +146,6 @@
           label: 'How much should it avoid repeating ideas?',
           definition: 'Encourages introducing new topics and discourages repetition.',
           eli5: 'Pushes the model to talk about new stuff instead of repeating itself.',
-          lowEffect: 'May echo or repeat earlier ideas',
-          highEffect: 'More diverse, explorative answers',
           type: 'slider',
           min: 0,
           max: 2,
@@ -168,8 +156,6 @@
           label: 'How much should it avoid repeating words?',
           definition: 'Reduces likelihood of repeating the same tokens.',
           eli5: 'Avoids stuttering or reusing the same words over and over.',
-          lowEffect: 'Risk of looping or phrase repetition',
-          highEffect: 'More concise and varied phrasing',
           type: 'slider',
           min: 0,
           max: 2,
