@@ -6,7 +6,11 @@
       <strong>{param.label}</strong>
       <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">{param.definition}</p>
       <p><em style="font-size: 0.85rem;">{param.eli5}</em></p>
-      <div style="margin: 0.75rem 0;">
+      <div class="param-control">
+        <label>
+          <span class="param-label">{param.label}</span>
+          <span class="param-value">{config[param.key]}</span>
+        </label>
         {#if param.type === 'slider'}
           <input
             type="range"
@@ -140,5 +144,35 @@
   .param-tile.active {
     border-color: #007acc;
     background: #d0e7ff;
+  }
+
+  .param-control {
+    margin: 1rem 0;
+  }
+
+  .param-control input[type="range"] {
+    width: 100%;
+    margin-top: 0.25rem;
+  }
+
+  .param-control input[type="number"] {
+    width: 100%;
+    padding: 0.4rem;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    margin-top: 0.25rem;
+  }
+
+  .param-label {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .param-value {
+    float: right;
+    font-size: 0.85rem;
+    color: #444;
   }
 </style>
