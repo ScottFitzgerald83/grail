@@ -1,110 +1,14 @@
 <script>
-    import {onMount, afterUpdate} from 'svelte';
-
-    let messages = [];
-    let input = '';
-    let chatWindow;
-
-    async function sendMessage() {
-        if (!input.trim()) return;
-
-        // Show user message
-        const userMsg = {role: 'user', content: input};
-        console.log("Sending prompt:", input);
-        messages = [...messages, userMsg];
-
-        try {
-            const response = await fetch('/infer', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({prompt: input})
-            });
-
-            const data = await response.json();
-            console.log("Received response:", data);
-
-            // Show assistant response
-            const assistantMsg = {role: 'assistant', content: data.output};
-            messages = [...messages, assistantMsg];
-        } catch (err) {
-            messages = [...messages, {role: 'assistant', content: '⚠️ Error contacting backend.'}];
-        }
-
-        input = '';
-    }
-
-    afterUpdate(() => {
-        if (chatWindow) {
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
-    });
+    import { goto } from '$app/navigation';
 </script>
 
-<style>
-    .chat-container {
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-    }
+<h1>Welcome to GRAIL</h1>
+<p>This is your AI research assistant. Choose a section below:</p>
 
-    .messages {
-        flex: 1;
-        overflow-y: auto;
-        padding: 1rem;
-    }
-
-    .message {
-        max-width: 75%;
-        margin-bottom: 1rem;
-        padding: 0.75rem 1rem;
-        border-radius: 1rem;
-        word-wrap: break-word;
-    }
-
-    .user {
-        align-self: flex-end;
-        background-color: #0d6efd;
-        color: white;
-    }
-
-    .assistant {
-        align-self: flex-start;
-        background-color: #e9ecef;
-        color: #212529;
-    }
-
-    .input-bar {
-        display: flex;
-        padding: 1rem;
-        border-top: 1px solid #ccc;
-        background-color: #f9f9f9;
-    }
-
-    .input-bar input {
-        flex: 1;
-        padding: 0.75rem;
-        margin-right: 0.5rem;
-    }
-
-    .input-bar button {
-        padding: 0.75rem 1rem;
-    }
-</style>
-
-<div class="chat-container">
-    <div class="messages" bind:this={chatWindow}>
-        {#each messages as message}
-            <div class="message {message.role}">
-                {message.content}
-            </div>
-        {/each}
-    </div>
-    <form on:submit|preventDefault={sendMessage} class="input-bar">
-        <input
-                type="text"
-                bind:value={input}
-                placeholder="Type your message..."
-        />
-        <button type="submit">📤</button>
-    </form>
-</div>
+<nav>
+    <button on:click={() => goto('/chat')}>💬 Chat</button>
+    <button on:click={() => goto('/compare')}>🔁 Compare</button>
+    <button on:click={() => goto('/glossary')}>📘 Glossary</button>
+    <button on:click={() => goto('/roadmap')}>🗺️ Roadmap</button>
+    <button on:click={() => goto('/tuning')}>🎛️ Tuning</button>
+</nav>
