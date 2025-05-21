@@ -189,7 +189,7 @@
         {#each messages as m (m.id)}
             <div class="message-row {m.role}">
                 <span class="avatar">{m.role === 'user' ? '🙋' : '🧠'}</span>
-                <div class="message-bubble">
+                <div class="message-bubble" title="{m.role.toUpperCase()} • {m.timestamp}">
                     <div class="content">
                         {#if editingId === m.id}
                             <textarea bind:value={editedInput} rows="2" style="width: 100%; font-size: 0.9rem;"></textarea>
