@@ -98,16 +98,16 @@ def run():
     for i, message in enumerate(st.session_state.messages):
         if message["role"] == "user":
             with st.container():
-                st.markdown(f"**🧍‍♂️ You said:**")
+                st.markdown("**🧍‍♂️ You said:**")
                 st.markdown(
-                    f"<div style='background-color:#f0f2f6; padding:10px; border-radius:8px; text-align:right; max-width:70%; margin-left:auto;'>{message['content']}</div>",
+                    f"<div style='background-color:#cfe2ff; padding:10px; border-radius:10px; text-align:right; max-width:75%; margin-left:auto;'>{message['content']}</div>",
                     unsafe_allow_html=True
                 )
         else:
             with st.container():
-                st.markdown(f"**🤖 GRAIL replied:**")
+                st.markdown("**🤖 GRAIL replied:**")
                 st.markdown(
-                    f"<div style='margin-left:20px; padding:5px;'>{message['content']}</div>",
+                    f"<div style='background-color:#f8f9fa; padding:10px; border-radius:10px; text-align:left; max-width:75%;'>{message['content']}</div>",
                     unsafe_allow_html=True
                 )
         if i < len(st.session_state.messages) - 1:
