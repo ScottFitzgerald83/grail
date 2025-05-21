@@ -23,7 +23,7 @@ def run():
         memory_path = Path("memory.json")
 
     if "run_inference" not in st.session_state:
-        st.session_state.run_inference = True
+        st.session_state.run_inference = False
     if "prompt_input" not in st.session_state:
         st.session_state.prompt_input = ""
 
