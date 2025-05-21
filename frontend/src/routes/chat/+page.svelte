@@ -1,11 +1,31 @@
 <script>
+    import { afterUpdate, onMount } from 'svelte';
+
     let messages = [];
     let input = '';
     let sending = false;
 
+    let chatWindow;
+    let showScrollButton = false;
+
     function formatTimestamp(date) {
         return date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
     }
+
+    function scrollToBottom(force = false) {
+        if (!chatWindow) return;
+        const nearBottom = chatWindow.scrollHeight - chatWindow.scrollTop - chatWindow.clientHeight < 120;
+        if (force || nearBottom) {
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            showScrollButton = false;
+        } else {
+            showScrollButton = true;
+        }
+    }
+
+    afterUpdate(() => {
+        scrollToBottom();
+    });
 
     async function sendMessage() {
         if (!input.trim() || sending) return;
@@ -72,7 +92,7 @@
 </script>
 
 <div class="chat-container">
-    <div class="messages">
+    <div class="messages" bind:this={chatWindow}>
         {#each messages as m (m.id)}
             <div class="message-row {m.role}">
                 <span class="avatar">{m.role === 'user' ? '🙋' : '🧠'}</span>
@@ -83,6 +103,12 @@
             </div>
         {/each}
     </div>
+
+    {#if showScrollButton}
+        <button class="scroll-button" on:click={() => scrollToBottom(true)}>
+            ⬇️ Jump to Bottom
+        </button>
+    {/if}
 
     <form on:submit|preventDefault={sendMessage}>
         <input type="text" bind:value={input}/>
@@ -96,6 +122,7 @@
         flex-direction: column;
         height: 100vh;
         background-color: #fdfdfd;
+        position: relative;
     }
 
     .messages {
@@ -169,5 +196,23 @@
 
     button:hover {
         background-color: #0b5ed7;
+    }
+
+    .scroll-button {
+        position: absolute;
+        bottom: 5rem;
+        right: 1rem;
+        background: #0d6efd;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.85rem;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .scroll-button:hover {
+        background: #0b5ed7;
     }
 </style>
