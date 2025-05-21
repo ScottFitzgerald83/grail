@@ -1,4 +1,4 @@
-# grail/eval/metrics.py
+# backend/eval/metrics.py
 
 import matplotlib.pyplot as plt
 import torch

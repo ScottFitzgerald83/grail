@@ -1,4 +1,4 @@
-# grail/config/settings.py
+# backend/config/settings.py
 
 from typing import Dict
 import yaml

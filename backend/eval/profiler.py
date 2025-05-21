@@ -1,4 +1,4 @@
-# grail/eval/profiler.py
+# backend/eval/profiler.py
 
 import torch
 import time
