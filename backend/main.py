@@ -99,6 +99,65 @@ def load_memory(model_name: str):
     return []
 
 
+@app.patch("/memory/{model_name}")
+async def edit_memory(model_name: str, request: Request):
+    try:
+        model_key = model_name.replace(":", "_")
+        memory_path = Path(f"memory/chat_{model_key}.json")
+        data = await request.json()
+        message_id = data.get("message_id")
+        new_prompt = data.get("new_prompt", "")
+        config = data.get("config", {})
+
+        if not message_id or not new_prompt:
+            return {"error": "Missing message_id or new_prompt"}
+
+        if not memory_path.exists():
+            return {"error": "No history found for model"}
+
+        with open(memory_path, "r") as f:
+            history = json.load(f)
+
+        found = False
+        for msg in history:
+            if str(msg.get("timestamp")) == str(message_id):
+                msg["prompt"] = new_prompt
+                msg["output"] = route_model(model_name, new_prompt, config)
+                found = True
+                break
+
+        if not found:
+            return {"error": "Message not found"}
+
+        with open(memory_path, "w") as f:
+            json.dump(history, f, indent=2)
+
+        return {"status": "updated", "message_id": message_id}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.delete("/memory/{model_name}/{message_id}")
+def delete_message(model_name: str, message_id: str):
+    model_key = model_name.replace(":", "_")
+    memory_path = Path(f"memory/chat_{model_key}.json")
+    if not memory_path.exists():
+        return {"error": "No history for model"}
+
+    try:
+        with open(memory_path, "r") as f:
+            history = json.load(f)
+
+        new_history = [msg for msg in history if str(msg.get("timestamp")) != str(message_id)]
+
+        with open(memory_path, "w") as f:
+            json.dump(new_history, f, indent=2)
+
+        return {"status": "deleted", "message_id": message_id}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 @app.get("/")
 def healthcheck():
     return {"status": "FastAPI is running"}
