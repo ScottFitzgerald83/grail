@@ -23,6 +23,14 @@
     resultB = data.result_b;
     loading = false;
   }
+
+  function getDiffTable(configA, configB) {
+    const keys = new Set([...Object.keys(configA), ...Object.keys(configB)]);
+    return Array.from(keys)
+      .filter(key => configA[key] !== configB[key])
+      .sort()
+      .map(key => ({ key, a: configA[key], b: configB[key] }));
+  }
 </script>
 
 <h1>🔁 Compare</h1>
@@ -100,6 +108,24 @@
       </details>
     </div>
   </div>
+{/if}
+
+{#if resultA && resultB}
+<h2 style="margin-top: 2rem;">🔍 Config Differences</h2>
+<table class="diff-table">
+  <thead>
+    <tr><th>Parameter</th><th>Config A</th><th>Config B</th></tr>
+  </thead>
+  <tbody>
+    {#each getDiffTable(resultA.config, resultB.config) as row}
+      <tr>
+        <td>{row.key}</td>
+        <td>{row.a}</td>
+        <td>{row.b}</td>
+      </tr>
+    {/each}
+  </tbody>
+</table>
 {/if}
 
 <style>
@@ -239,4 +265,25 @@
       transition: width 0.4s ease;
   }
 
+  .diff-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .diff-table th,
+  .diff-table td {
+    border: 1px solid #ccc;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+
+  .diff-table th {
+    background: #f3f4f6;
+  }
+
+  .diff-table tr:nth-child(even) {
+    background: #fafbfc;
+  }
 </style>
