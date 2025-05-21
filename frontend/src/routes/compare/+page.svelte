@@ -1,6 +1,21 @@
 <script>
+    import {onMount} from 'svelte';
+
+    let darkMode = false;
+
+    onMount(() => {
+        darkMode = localStorage.getItem("theme") === "dark";
+        document.body.classList.toggle("dark", darkMode);
+    });
+
+    function toggleDarkMode() {
+        darkMode = !darkMode;
+        localStorage.setItem("theme", darkMode ? "dark" : "light");
+        document.body.classList.toggle("dark", darkMode);
+    }
+
     import {fade} from 'svelte/transition';
-    import { marked } from 'marked';
+    import {marked} from 'marked';
     import DOMPurify from 'dompurify';
 
     let prompt = '';
@@ -33,8 +48,8 @@
         } else {
             const response = await fetch('/compare/batch', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompts, config_a: configA, config_b: configB })
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({prompts, config_a: configA, config_b: configB})
             });
             const data = await response.json();
             resultA = data[0].result_a;
@@ -53,10 +68,10 @@
 
     function exportResults(format = 'json') {
         const blob = new Blob([
-          format === 'json'
-            ? JSON.stringify({ prompt, configA, configB, resultA, resultB }, null, 2)
-            : `### Prompt:\n${prompt}\n\n### Config A (${resultA.model}):\n${resultA.output}\n\n### Config B (${resultB.model}):\n${resultB.output}`
-        ], { type: format === 'json' ? 'application/json' : 'text/markdown' });
+            format === 'json'
+                ? JSON.stringify({prompt, configA, configB, resultA, resultB}, null, 2)
+                : `### Prompt:\n${prompt}\n\n### Config A (${resultA.model}):\n${resultA.output}\n\n### Config B (${resultB.model}):\n${resultB.output}`
+        ], {type: format === 'json' ? 'application/json' : 'text/markdown'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -65,7 +80,11 @@
         URL.revokeObjectURL(url);
     }
 </script>
-
+<div style="text-align: right; margin-bottom: 0.5rem;">
+    <button on:click={toggleDarkMode}>
+        {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+    </button>
+</div>
 <h1>🔁 Compare</h1>
 
 <div style="margin-bottom: 1rem;">
@@ -103,9 +122,10 @@
 </div>
 
 {#if resultA && resultB}
-  <p class="summary-box">
-    {resultA.model} was {resultA.latency_ms < resultB.latency_ms ? 'faster' : 'slower'} and used {resultA.tokens < resultB.tokens ? 'fewer' : 'more'} tokens than {resultB.model}.
-  </p>
+    <p class="summary-box">
+        {resultA.model} was {resultA.latency_ms < resultB.latency_ms ? 'faster' : 'slower'} and
+        used {resultA.tokens < resultB.tokens ? 'fewer' : 'more'} tokens than {resultB.model}.
+    </p>
 {/if}
 
 {#if resultA && resultB}
@@ -143,9 +163,9 @@
 
 {#if resultA && resultB}
     <div style="margin-top: 2rem;">
-      <button on:click={runComparison}>🔁 Retry Comparison</button>
-      <button on:click={() => exportResults('json')}>📤 Export JSON</button>
-      <button on:click={() => exportResults('md')}>📝 Export Markdown</button>
+        <button on:click={runComparison}>🔁 Retry Comparison</button>
+        <button on:click={() => exportResults('json')}>📤 Export JSON</button>
+        <button on:click={() => exportResults('md')}>📝 Export Markdown</button>
     </div>
 {/if}
 
@@ -170,227 +190,3 @@
         </tbody>
     </table>
 {/if}
-
-<style>
-    h1 {
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        color: #2a3b4c;
-    }
-
-    textarea {
-        width: 100%;
-        padding: 0.75rem;
-        font-size: 1rem;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        resize: vertical;
-        background: #fff;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-    }
-
-    button {
-        background: #007acc;
-        color: white;
-        border: none;
-        padding: 0.6rem 1.25rem;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 0.95rem;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        margin-right: 0.5rem;
-    }
-
-    button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    button:hover:not(:disabled) {
-        background: #005fa3;
-    }
-
-    .config-panels {
-        display: flex;
-        gap: 2rem;
-        margin-bottom: 2rem;
-    }
-
-    .config-card {
-        flex: 1;
-        background: #ffffff;
-        padding: 1rem 1.25rem;
-        border-radius: 12px;
-        border: 1px solid #dde4ea;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .config-card h3 {
-        margin-bottom: 0.5rem;
-        font-size: 1rem;
-        font-weight: 500;
-        color: #2a3b4c;
-    }
-
-    .config-card label {
-        display: block;
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-    }
-
-    select {
-        width: 100%;
-        padding: 0.45rem;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 0.9rem;
-    }
-
-    .compare-output {
-        display: flex;
-        gap: 2rem;
-        margin-top: 2rem;
-    }
-
-    .result-card {
-        flex: 1;
-        background: #ffffff;
-        border: 1px solid #ccc;
-        padding: 1rem 1.25rem;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        display: flex;
-        flex-direction: column;
-    }
-
-    .result-card h4 {
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-        color: #2a3b4c;
-    }
-
-    .result-card p {
-        font-size: 0.85rem;
-        margin: 0.2rem 0;
-    }
-
-    pre {
-        white-space: pre-wrap;
-        background: #f6f8fa;
-        padding: 0.75rem;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        line-height: 1.4;
-        margin-top: 0.75rem;
-        flex-grow: 1;
-        overflow: auto;
-    }
-
-    .metric-bar {
-        font-size: 0.75rem;
-        margin: 0.4rem 0;
-    }
-
-    .metric-bar span {
-        display: inline-block;
-        margin-bottom: 0.15rem;
-        color: #333;
-    }
-
-    .bar {
-        height: 10px;
-        background: #e0e0e0;
-        border-radius: 5px;
-        overflow: hidden;
-        box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6);
-    }
-
-    .fill {
-        height: 100%;
-        background: #007acc;
-        transition: width 0.5s ease-in-out;
-        border-radius: 5px 0 0 5px;
-        box-shadow: 0 0 6px #007accaa;
-    }
-
-    details {
-        margin-top: 1rem;
-        font-size: 0.85rem;
-        color: #444;
-    }
-
-    details summary {
-        cursor: pointer;
-        font-weight: 600;
-        user-select: none;
-    }
-
-    .diff-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
-        font-size: 0.9rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-    .diff-table th,
-    .diff-table td {
-        border: 1px solid #ddd;
-        padding: 0.5rem 0.75rem;
-        text-align: left;
-        background: #fff;
-    }
-
-    .diff-table th {
-        background: #f3f4f6;
-        font-weight: 600;
-        color: #2a3b4c;
-    }
-
-    .diff-table tr:nth-child(even) td {
-        background: #fafbfc;
-    }
-
-    .summary-box {
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
-      color: #333;
-      font-style: italic;
-    }
-
-    .markdown-output {
-        background: #f6f8fa;
-        padding: 0.75rem;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        line-height: 1.5;
-        color: #333;
-        overflow-x: auto;
-        flex-grow: 1;
-    }
-
-    .markdown-output code {
-        background: #eee;
-        padding: 0.1rem 0.3rem;
-        border-radius: 3px;
-        font-family: monospace;
-        font-size: 0.85rem;
-    }
-
-    .markdown-output pre {
-        background: #eee;
-        padding: 0.5rem;
-        border-radius: 5px;
-        overflow-x: auto;
-    }
-
-    .markdown-output ul {
-        padding-left: 1.2rem;
-        margin-top: 0.5rem;
-        margin-bottom: 0.5rem;
-    }
-</style>

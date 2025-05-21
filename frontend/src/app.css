@@ -1,4 +1,212 @@
+:root {
+    --bg: #ffffff;
+    --text: #1a1a1a;
+    --primary: #007acc;
+    --card: #f9f9fb;
+}
+
+body.dark {
+    --bg: #1c1f26;
+    --text: #f0f0f0;
+    --primary: #4ea2ff;
+    --card: #2a2e39;
+}
+
 body {
-    margin: 0;
+    background: var(--bg);
+    color: var(--text);
     font-family: system-ui, sans-serif;
+    margin: 0;
+}
+
+/* Base Typography */
+h1, h2, h3, h4 {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+h1 {
+    font-size: 1.6rem;
+}
+
+h2 {
+    font-size: 1.3rem;
+}
+
+h3 {
+    font-size: 1.1rem;
+}
+
+/* Navigation */
+.top-nav {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #0e1117;
+    color: white;
+}
+
+.top-nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.top-nav a:hover {
+    text-decoration: underline;
+}
+
+/* Layout Containers */
+.dashboard-container,
+.config-panels,
+.compare-output,
+.param-grid {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* Card Components */
+.param-tile,
+.config-card,
+.result-card,
+.tooltip-card {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+th, td {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ccc;
+}
+
+th {
+    background: #f3f4f6;
+    text-align: left;
+}
+
+/* Forms and Inputs */
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+    font-size: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+/* Buttons */
+button {
+    font-size: 0.95rem;
+    padding: 0.5rem 1.25rem;
+    border: none;
+    border-radius: 6px;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+button:hover {
+    background: #005fa3;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #bbb;
+    border-radius: 4px;
+}
+
+body.dark ::-webkit-scrollbar-thumb {
+    background-color: #555;
+}
+
+/* Markdown Styling */
+.markdown-output {
+    background: #f6f8fa;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    overflow-x: auto;
+}
+
+.markdown-output code {
+    background: #eee;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+.markdown-output pre {
+    background: #eee;
+    padding: 0.5rem;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+.markdown-output ul {
+    padding-left: 1.2rem;
+    margin-top: 0.5rem;
+}
+
+/* Performance Bars */
+.bar {
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.fill {
+    height: 100%;
+    background: var(--primary);
+    transition: width 0.4s ease;
+}
+
+/* Theme-Specific Adjustments */
+body.dark th {
+    background-color: #333848;
+    color: var(--text);
+}
+
 }
