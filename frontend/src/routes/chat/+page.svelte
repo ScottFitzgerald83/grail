@@ -1,19 +1,21 @@
 <script>
     let messages = [];
     let input = '';
+    let sending = false;
 
     function formatTimestamp(date) {
         return date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
     }
 
     async function sendMessage() {
-        if (!input.trim()) return;
+        if (!input.trim() || sending) return;
+        sending = true;
 
         const userMessage = {
             id: Date.now() + Math.random(),
             role: 'user',
             content: input,
-            timestamp: formatTimestamp(new Date()),
+            timestamp: formatTimestamp(new Date())
         };
 
         messages = [...messages, userMessage];
@@ -23,38 +25,49 @@
             role: 'assistant',
             content: '',
             timestamp: formatTimestamp(new Date()),
-            streaming: true,
+            streaming: true
         };
 
         messages = [...messages, assistantMessage];
 
-
         const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+        const payload = { prompt: input, message_id: assistantMessage.id, ...config };
 
-        const response = await fetch("/infer", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt, ...config })
-        });
-        const data = await res.json();
+        try {
+            const response = await fetch("/infer", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
 
-        // Simulate streaming character-by-character
-        const fullText = data.output;
-        let currentText = '';
-        for (let i = 0; i < fullText.length; i++) {
-            currentText += fullText[i];
+            const data = await response.json();
+
+            if (!data.output) {
+                messages = messages.map(m =>
+                    m.id === assistantMessage.id ? { ...m, content: "⚠️ Assistant didn’t respond.", streaming: false } : m
+                );
+            } else {
+                let currentText = '';
+                for (let i = 0; i < data.output.length; i++) {
+                    currentText += data.output[i];
+                    messages = messages.map(m =>
+                        m.id === assistantMessage.id ? { ...m, content: currentText } : m
+                    );
+                    await new Promise(r => setTimeout(r, 30));
+                }
+
+                messages = messages.map(m =>
+                    m.id === assistantMessage.id ? { ...m, streaming: false } : m
+                );
+            }
+        } catch (err) {
             messages = messages.map(m =>
-                m.id === assistantMessage.id ? {...m, content: currentText} : m
+                m.id === assistantMessage.id ? { ...m, content: "⚠️ Error contacting backend.", streaming: false } : m
             );
-            await new Promise(r => setTimeout(r, 30));
         }
 
-        // Mark streaming as finished
-        messages = messages.map(m =>
-            m.id === assistantMessage.id ? {...m, streaming: false} : m
-        );
-
         input = '';
+        sending = false;
     }
 </script>
 
