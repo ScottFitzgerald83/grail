@@ -1,4 +1,5 @@
 <script>
+  import { fade } from 'svelte/transition';
   let prompt = '';
   let configA = { public_model_name: 'gpt-4' };
   let configB = { public_model_name: 'ollama:llama2' };
@@ -62,17 +63,41 @@
 
 {#if resultA && resultB}
   <div class="compare-output">
-    <div class="result-card">
+    <div class="result-card" transition:fade>
       <h4>{resultA.model}</h4>
-      <p><strong>Latency:</strong> {resultA.latency_ms} ms</p>
-      <p><strong>Tokens:</strong> {resultA.tokens}</p>
+      <div class="metric-bar"><span>Latency</span>
+        <div class="bar">
+          <div class="fill" style="width: {resultA.latency_ms / 10}%"></div>
+        </div>
+      </div>
+      <div class="metric-bar"><span>Tokens</span>
+        <div class="bar">
+          <div class="fill" style="width: {resultA.tokens / 2}%"></div>
+        </div>
+      </div>
       <pre>{resultA.output}</pre>
+      <details>
+        <summary>🔍 Config A Diff</summary>
+        <pre>{JSON.stringify(resultA.config, null, 2)}</pre>
+      </details>
     </div>
-    <div class="result-card">
+    <div class="result-card" transition:fade>
       <h4>{resultB.model}</h4>
-      <p><strong>Latency:</strong> {resultB.latency_ms} ms</p>
-      <p><strong>Tokens:</strong> {resultB.tokens}</p>
+      <div class="metric-bar"><span>Latency</span>
+        <div class="bar">
+          <div class="fill" style="width: {resultB.latency_ms / 10}%"></div>
+        </div>
+      </div>
+      <div class="metric-bar"><span>Tokens</span>
+        <div class="bar">
+          <div class="fill" style="width: {resultB.tokens / 2}%"></div>
+        </div>
+      </div>
       <pre>{resultB.output}</pre>
+      <details>
+        <summary>🔍 Config B Diff</summary>
+        <pre>{JSON.stringify(resultB.config, null, 2)}</pre>
+      </details>
     </div>
   </div>
 {/if}
@@ -166,6 +191,7 @@
     padding: 1rem;
     border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    /* for fade-in, svelte handles opacity */
   }
 
   .result-card h4 {
@@ -189,3 +215,26 @@
     margin-top: 0.75rem;
   }
 </style>
+  .metric-bar {
+    font-size: 0.75rem;
+    margin: 0.4rem 0;
+  }
+
+  .metric-bar span {
+    display: inline-block;
+    margin-bottom: 0.15rem;
+    color: #333;
+  }
+
+  .bar {
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .fill {
+    height: 100%;
+    background: #007acc;
+    transition: width 0.4s ease;
+  }
