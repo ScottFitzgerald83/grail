@@ -1,9 +1,8 @@
 #!/bin/bash
 
-# run.sh — Launch GRAIL backend and frontend in two terminals
+echo "🔮 Starting GRAIL backend..."
+# Start backend in background
+uvicorn grail.app:app --reload --port 8000 &
 
-echo "🔮 Launching GRAIL backend..."
-gnome-terminal -- bash -c "uvicorn grail.app:app --reload --port 8000; exec bash"
-
-echo "🧠 Launching GRAIL UI..."
+echo "🧠 Launching GRAIL frontend..."
 streamlit run Main.py
