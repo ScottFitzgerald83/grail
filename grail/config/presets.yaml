@@ -1,6 +1,7 @@
 
 
 dense_fp32:
+  model_name: gpt2
   attention: dense
   precision: float32
   ffn_mode: standard
@@ -10,6 +11,7 @@ dense_fp32:
   max_tokens: 2048
 
 sparse_flash_int8:
+  model_name: gpt2
   attention: flash
   precision: int8
   ffn_mode: lowrank
@@ -19,6 +21,7 @@ sparse_flash_int8:
   max_tokens: 2048
 
 minimal_latency:
+  model_name: gpt2
   attention: flash
   precision: int8
   ffn_mode: fused
@@ -28,6 +31,7 @@ minimal_latency:
   max_tokens: 1024
 
 max_coherence:
+  model_name: gpt2
   attention: dense
   precision: float32
   ffn_mode: standard

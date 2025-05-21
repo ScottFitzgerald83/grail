@@ -46,22 +46,23 @@ def run_inference(model_bundle, prompt, req):
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
     print("[GRAIL] Inputs shape:", inputs["input_ids"].shape)
 
-    logger.debug("[GRAIL] Starting inference...")
+    max_new_tokens = req.get("max_new_tokens", 128) if isinstance(req, dict) else getattr(req, "max_new_tokens", 128)
+    sampling = req.get("sampling", {}) if isinstance(req, dict) else getattr(req, "sampling", {})
+
     start_time = time.time()
 
     with torch.no_grad():
         output = model.generate(
             **inputs,
-            max_new_tokens=req.max_new_tokens,
-            temperature=req.sampling.get("temperature", 0.7),
-            top_k=req.sampling.get("top_k", 50),
-            top_p=req.sampling.get("top_p", 0.9),
+            max_new_tokens=max_new_tokens,
+            temperature=sampling.get("temperature", 0.7),
+            top_k=sampling.get("top_k", 50),
+            top_p=sampling.get("top_p", 0.9),
             return_dict_in_generate=True,
             output_scores=True
         )
 
     end_time = time.time()
-    logger.debug("[GRAIL] Inference complete.")
 
     decoded = tokenizer.decode(output.sequences[0], skip_special_tokens=True)
     print("[GRAIL] Decoded output:", decoded)
