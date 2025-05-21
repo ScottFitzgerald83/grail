@@ -1,2 +1,17 @@
+<script>
+  import { roadmapMarkdown } from '$lib/roadmap.js';
+  import { onMount } from 'svelte';
+  import { marked } from 'marked';
+
+  let htmlContent;
+
+  onMount(() => {
+    if (htmlContent) {
+      htmlContent.innerHTML = marked.parse(roadmapMarkdown);
+    }
+  });
+</script>
+
 <h1>🗺️ Roadmap</h1>
-<p>All P0s and P1s tracked here. Coming soon.</p>
+
+<div class="roadmap-table" bind:this={htmlContent}></div>
