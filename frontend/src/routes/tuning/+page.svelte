@@ -22,7 +22,7 @@
                         <span class="param-label">{param.label}</span>
                         <span class="param-value">
               {#if param.type === 'slider'}
-                {config[param.key].toFixed(2)}
+                {config[param.key].toFixed(2)} ({fuzzyLabel(param, config[param.key])})
               {:else if param.type === 'number'}
                 {config[param.key]}
               {:else}
@@ -37,7 +37,8 @@
                         </div>
                         <input type="range" min={param.min} max={param.max} step={param.step}
                                bind:value={config[param.key]}
-                               on:input={(e) => updateConfig(param.key, +e.target.value)}/>
+                               on:input={(e) => updateConfig(param.key, +e.target.value)}
+                               style="background: {sliderGradient(param.key)}"/>
                     {:else if param.type === 'number'}
                         <input type="number" min={param.min} max={param.max}
                                bind:value={config[param.key]}
@@ -120,6 +121,28 @@
 <script>
     import {onMount} from 'svelte';
     import {browser} from '$app/environment';
+    // Fuzzy label for slider value
+    function fuzzyLabel(param, value) {
+      if (param.type !== 'slider') return '';
+      const levels = ['Low', 'Medium', 'High'];
+      const percent = (value - param.min) / (param.max - param.min);
+      if (percent <= 0.33) return levels[0];
+      if (percent <= 0.66) return levels[1];
+      return levels[2];
+    }
+
+    // Color-coded slider gradient based on parameter key
+    function sliderGradient(key) {
+      const themes = {
+        temperature: 'linear-gradient(to right, #b3e5fc, #03a9f4)',
+        top_p: 'linear-gradient(to right, #e1bee7, #9c27b0)',
+        top_k: 'linear-gradient(to right, #fff59d, #fbc02d)',
+        presence_penalty: 'linear-gradient(to right, #c8e6c9, #4caf50)',
+        frequency_penalty: 'linear-gradient(to right, #ffcdd2, #f44336)',
+        max_tokens: 'linear-gradient(to right, #b0bec5, #607d8b)'
+      };
+      return themes[key] || 'linear-gradient(to right, #4caf50, #ffeb3b, #f44336)';
+    }
 
 
     let config = {
@@ -270,14 +293,6 @@
             definition: 'Ends generation when the model outputs this string.',
             eli5: 'It’s like saying “stop here” if a specific phrase appears.',
             type: 'text'
-        },
-        {
-            key: 'response_style',
-            label: 'Response Style',
-            definition: 'Select a general tone or voice for model replies.',
-            eli5: 'Like choosing a personality: concise, creative, or friendly.',
-            type: 'select',
-            options: ['Default', 'Friendly', 'Concise', 'Creative']
         }
     ];
 
@@ -378,7 +393,7 @@
         appearance: none;
         height: 6px;
         border-radius: 4px;
-        background: linear-gradient(to right, #4caf50, #ffeb3b, #f44336);
+        /* background is set inline for color-coding */
     }
 
     .param-grid {
