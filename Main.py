@@ -5,6 +5,7 @@ from grail.pages.chat import run as chat_run
 from grail.pages.compare import run as compare_run
 from grail.pages.roadmap import run as roadmap_run
 from grail.pages.glossary import run as glossary_run
+from grail.pages.tuning import run as tuning_run
 
 st.set_page_config(
     page_title="GRAIL",
@@ -15,7 +16,7 @@ st.set_page_config(
 # Clean layout without suppressing sidebar (fully enabled now)
 
 # Replace sidebar with horizontal tabs
-tabs = st.tabs(["Home", "Chat", "Compare", "Roadmap", "Glossary"])
+tabs = st.tabs(["Home", "Chat", "Compare", "Roadmap", "Glossary", "Tuning"])
 
 with tabs[0]:
     st.title("🧠 GRAIL — Ghost-Refined Architecture for Interpretable Language")
@@ -42,3 +43,6 @@ with tabs[3]:
 
 with tabs[4]:
     glossary_run()
+
+with tabs[5]:
+    tuning_run()
