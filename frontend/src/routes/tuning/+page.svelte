@@ -56,12 +56,12 @@
           </div>
         </td>
         <td>
-          {#if key === 'creativity'}Novelty and stylistic variation{/if}
-          {#if key === 'coherence'}Logical flow and focus{/if}
-          {#if key === 'repetition'}Risk of repeating tokens or ideas{/if}
-          {#if key === 'length'}Length of generated text{/if}
-          {#if key === 'latency'}Speed of model response{/if}
-          {#if key === 'cost'}Approximate compute or token usage{/if}
+          {#if key === 'creativity'}Too low = boring output; too high = chaotic, off-topic, or hallucinated content.{/if}
+          {#if key === 'coherence'}Too low = disjointed or nonsensical replies; higher values improve logical flow.{/if}
+          {#if key === 'repetition'}Higher values increase the chance of word or idea loops; lower is usually better.{/if}
+          {#if key === 'length'}Lower values may feel abrupt; higher values allow more explanation (at a cost).{/if}
+          {#if key === 'latency'}Higher values mean slower response time; may frustrate users or delay feedback.{/if}
+          {#if key === 'cost'}Higher values increase token usage and compute load; affects scalability and billing.{/if}
         </td>
       </tr>
     {/each}
