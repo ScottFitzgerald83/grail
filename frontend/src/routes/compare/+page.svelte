@@ -4,16 +4,16 @@
     import {fade} from 'svelte/transition';
     import {marked} from 'marked';
 
-    // import DOMPurify from 'dompurify';
-    // import hljs from 'highlight.js';
-    // import 'highlight.js/styles/github.css';
+    import DOMPurify from 'dompurify';
+    import hljs from 'highlight.js';
+    import 'highlight.js/styles/github.css';
 
-    // marked.setOptions({
-    //   highlight: function (code, lang) {
-    //     const valid = hljs.getLanguage(lang) ? lang : 'plaintext';
-    //     return hljs.highlight(code, { language: valid }).value;
-    //   }
-    // });
+    marked.setOptions({
+      highlight: function (code, lang) {
+        const valid = hljs.getLanguage(lang) ? lang : 'plaintext';
+        return hljs.highlight(code, { language: valid }).value;
+      }
+    });
 
     let darkMode = false;
     let condensedView = false;
@@ -33,9 +33,19 @@
     let layoutMode = 'side-by-side';
 
     onMount(() => {
+        // Theme preference auto-detect
+        if (!localStorage.getItem("theme")) {
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          localStorage.setItem("theme", prefersDark ? "dark" : "light");
+          document.body.classList.toggle("dark", prefersDark);
+        }
         darkMode = localStorage.getItem("theme") === "dark";
         document.body.classList.toggle("dark", darkMode);
         if (browser) {
+            // Persistent compare history export: restore lastComparePrompt
+            const lastPrompt = localStorage.getItem('lastComparePrompt');
+            if (lastPrompt) prompt = lastPrompt;
+
             const savedY = localStorage.getItem('compareScroll');
             if (savedY) requestAnimationFrame(() => window.scrollTo(0, parseInt(savedY)));
 
@@ -86,8 +96,7 @@
     }
 
     function renderMarkdown(html) {
-        // return DOMPurify.sanitize(marked.parse(html || ''));
-        return marked.parse(html || '');
+        return DOMPurify.sanitize(marked.parse(html || ''));
     }
 
     async function runComparison() {
@@ -142,7 +151,9 @@
             localStorage.setItem('compareHistory', JSON.stringify(history.slice(0, 10)));
         }
 
+        // Persistent compare history export: save lastComparePrompt
         if (browser) {
+            localStorage.setItem('lastComparePrompt', prompt);
             setTimeout(() => localStorage.setItem('compareScroll', window.scrollY), 100);
         }
     }
