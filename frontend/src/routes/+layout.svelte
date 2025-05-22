@@ -14,6 +14,7 @@
     document.body.classList.toggle('dark', darkMode);
   }
 </script>
+
 <nav class="top-nav">
   <a href="/chat">Chat</a>
   <a href="/compare">Compare</a>
@@ -24,4 +25,5 @@
     {darkMode ? '☀️' : '🌙'}
   </button>
 </nav>
+
 <slot />
