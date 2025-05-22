@@ -58,6 +58,13 @@
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({prompt, config_a: configA, config_b: configB})
             });
+            if (!response.ok) {
+                resultA = null;
+                resultB = null;
+                alert("Comparison failed. Please try again.");
+                loading = false;
+                return;
+            }
             const data = await response.json();
             resultA = data.result_a;
             resultB = data.result_b;
@@ -67,6 +74,13 @@
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({prompts, config_a: configA, config_b: configB})
             });
+            if (!response.ok) {
+                resultA = null;
+                resultB = null;
+                alert("Comparison failed. Please try again.");
+                loading = false;
+                return;
+            }
             const data = await response.json();
             resultA = data;
             resultB = Array.isArray(data) && data.length > 0 ? data[0].result_b : null;
@@ -85,6 +99,10 @@
             };
             history.unshift(entry);
             localStorage.setItem('compareHistory', JSON.stringify(history.slice(0, 10)));
+        }
+
+        if (browser) {
+            setTimeout(() => localStorage.setItem('compareScroll', window.scrollY), 100);
         }
     }
 
@@ -241,6 +259,13 @@ ${row.result_b.output}`;
       </button>
     </div>
   </div>
+
+  {#if resultA && resultB}
+    <div class="summary-box">
+      <p class="tldr-summary">TL;DR: {getTldrSummary(resultA, resultB)}</p>
+      <button class="primary-button" on:click={runComparison}>🔁 Retry Last Comparison</button>
+    </div>
+  {/if}
 
   {#if !loading && (!resultA || !resultB)}
     <div class="empty-message">
