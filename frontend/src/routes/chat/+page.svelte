@@ -14,6 +14,17 @@
     let recognition, recognizing = false;
     let supportsSpeech = typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
+    function startVoice() {
+        if (!supportsSpeech || !recognition) return;
+        if (recognizing) {
+            recognition.stop();
+            recognizing = false;
+        } else {
+            recognition.start();
+            recognizing = true;
+        }
+    }
+
     if (browser && supportsSpeech) {
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SR();
@@ -21,6 +32,10 @@
         recognition.interimResults = false;
         recognition.onresult = (e) => {
             input += e.results[0][0].transcript + ' ';
+            recognizing = false;
+        };
+        recognition.onend = () => {
+            recognizing = false;
         };
     }
 
