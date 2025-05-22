@@ -24,19 +24,8 @@
         };
     }
 
-    function startVoice() {
-        if (recognition && !recognizing) {
-            recognizing = true;
-            recognition.start();
-        }
-    }
-
-    function formatTimestampForDisplay(ts) {
-        const date = new Date(ts);
-        if (isNaN(date)) return '';
-        const minutes = Math.floor((Date.now() - date) / 60000);
-        return minutes < 1 ? 'just now' : `${minutes}m ago`;
-    }
+    let sessionId = localStorage.getItem('grailSessionId') || Date.now().toString();
+    let historySessions = [];
 
     onMount(() => {
         const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
@@ -51,7 +40,38 @@
             localStorage.setItem("theme", prefersDark ? "dark" : "light");
             document.body.classList.toggle("dark", prefersDark);
         }
+
+        const stored = localStorage.getItem('grailHistory');
+        if (stored) {
+            historySessions = JSON.parse(stored);
+        }
+
+        const savedSession = localStorage.getItem(`session_${sessionId}`);
+        if (savedSession) {
+            messages = JSON.parse(savedSession);
+        }
     });
+
+    $: {
+        localStorage.setItem(`session_${sessionId}`, JSON.stringify(messages));
+    }
+
+    function newChat() {
+        if (confirm("Start a new chat?")) {
+            sessionId = Date.now().toString();
+            messages = [];
+            localStorage.setItem('grailSessionId', sessionId);
+        }
+    }
+
+    function loadChat(id) {
+        const saved = localStorage.getItem(`session_${id}`);
+        if (saved) {
+            messages = JSON.parse(saved);
+            sessionId = id;
+            localStorage.setItem('grailSessionId', sessionId);
+        }
+    }
 
     let chatWindow;
     let showScrollButton = false;
@@ -130,6 +150,13 @@
 
     function formatTimestamp(date) {
         return date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+    }
+
+    function formatTimestampForDisplay(ts) {
+        const date = new Date(ts);
+        if (isNaN(date)) return '';
+        const minutes = Math.floor((Date.now() - date) / 60000);
+        return minutes < 1 ? 'just now' : `${minutes}m ago`;
     }
 
     function scrollToBottom(force = false) {
@@ -220,6 +247,24 @@
         </div>
       </div>
     {/if}
+
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 1rem;">
+        <div>
+            <select on:change={(e) => loadChat(e.target.value)}>
+                <option value="">Load previous chat...</option>
+                {#each Object.keys(localStorage)
+                  .filter(k => k.startsWith('session_'))
+                  .sort()
+                  .reverse() as key}
+                  <option value={key}>{new Date(+key.slice(8)).toLocaleString()}</option>
+                {/each}
+            </select>
+        </div>
+        <div>
+            <button class="mini" on:click={newChat}>🆕 New Chat</button>
+        </div>
+    </div>
+
     <div style="text-align: right; padding: 0 1rem 0.5rem;">
         <button class="mini" on:click={() => exportChat('json')}>Export JSON</button>
         <button class="mini" on:click={() => exportChat('txt')}>Export Text</button>
@@ -264,7 +309,9 @@
                         <div class="timestamp" title={m.timestamp}>
                             {formatTimestampForDisplay(m.timestamp)}
                         </div>
-
+                        {#if m.role === 'assistant'}
+                            <div class="token-estimate">≈ {Math.ceil((m.content || '').split(' ').length * 1.25)} tokens</div>
+                        {/if}
                     </div>
                 {/if}
             </div>
@@ -307,3 +354,11 @@
         {/if}
     </form>
 </div>
+
+<style>
+.token-estimate {
+  font-size: 0.7rem;
+  color: #999;
+  margin-top: 0.25rem;
+}
+</style>
