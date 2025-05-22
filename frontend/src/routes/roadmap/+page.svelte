@@ -11,7 +11,7 @@
     }
   });
 </script>
-
+<style src="/src/app.css"></style>
 <h1>🗺️ Roadmap</h1>
 
 <div class="roadmap-table" bind:this={htmlContent}></div>

@@ -1,5 +1,5 @@
 <h1>🎛️ Model Tuning</h1>
-
+<style src="/src/app.css"></style>
 
 <div class="dashboard-container">
     <div class="param-grid">
@@ -251,20 +251,20 @@
 <h2 style="margin-top: 2rem;">🔐 API Key Configuration</h2>
 
 <div style="margin-bottom: 1rem;">
-  <label style="display: flex; flex-direction: column; gap: 0.25rem;">
-    <span>OpenAI API Key (optional):</span>
-    <input type="password" bind:value={apiKey} placeholder="sk-..." />
-  </label>
-  <label style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-    <input type="checkbox" bind:checked={persistApiKey} />
-    Remember this key (stored locally, not sent to backend)
-  </label>
-  <div style="margin-top: 0.5rem;">
-    <button on:click={testApiKey}>🔍 Test API Key</button>
-    {#if testStatus}
-      <span style="margin-left: 1rem; font-weight: 500;">{testStatus}</span>
-    {/if}
-  </div>
+    <label style="display: flex; flex-direction: column; gap: 0.25rem;">
+        <span>OpenAI API Key (optional):</span>
+        <input type="password" bind:value={apiKey} placeholder="sk-..."/>
+    </label>
+    <label style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        <input type="checkbox" bind:checked={persistApiKey}/>
+        Remember this key (stored locally, not sent to backend)
+    </label>
+    <div style="margin-top: 0.5rem;">
+        <button on:click={testApiKey}>🔍 Test API Key</button>
+        {#if testStatus}
+            <span style="margin-left: 1rem; font-weight: 500;">{testStatus}</span>
+        {/if}
+    </div>
 </div>
 
 <h2 style="margin-top: 2rem;">🏷️ Config Summary Tag</h2>
@@ -285,7 +285,7 @@
             return;
         }
         fetch('https://api.openai.com/v1/models', {
-            headers: { Authorization: `Bearer ${apiKey}` }
+            headers: {Authorization: `Bearer ${apiKey}`}
         }).then(res => {
             testStatus = res.ok ? '✅ Key valid' : '❌ Invalid or expired';
         }).catch(() => {

@@ -318,7 +318,7 @@
       setTimeout(() => toastMessage = '', 3000);
     }
 </script>
-
+<style src="/src/app.css"></style>
 <div class="chat-container">
     {#if activePersona !== 'none' || systemPrompt}
       <div class="persona-banner">
@@ -475,12 +475,3 @@
         {/if}
     </form>
 </div>
-
-<style>
-.token-preview {
-  text-align: right;
-  font-size: 0.8rem;
-  color: var(--text-muted, #666);
-  margin: 0.5rem 1rem;
-}
-</style>
