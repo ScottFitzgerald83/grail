@@ -1,8 +1,6 @@
 export const roadmapMarkdown = `
 | Priority | Description                                            | Filename / Location                                  |
 |----------|--------------------------------------------------------|------------------------------------------------------|
-
-| 🧪 P3    | CLI wizard to generate fine-tune configs               | cli/tune_wizard.py                                   |
 | 🧪 P3    | Local training job runner (Python)                     | backend/train_runner.py                              |
 | 💅 P3    | Theme + visual polish pass                             | frontend/app.css                                     |
 | 💅 P3    | Responsive layout for mobile                           | frontend/routes/*                                    |
