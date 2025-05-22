@@ -908,3 +908,25 @@ body.dark .system-box {
   font-size: 0.85rem;
   z-index: 999;
 }
+
+.compare-output {
+    display: flex;
+    gap: 1.25rem;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.output-block {
+    flex: 1 1 48%;
+    background: var(--surface);
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    box-shadow: var(--card-shadow);
+}
+
+.param-label-tooltip {
+    font-weight: 600;
+    border-bottom: 1px dotted var(--border-muted);
+    cursor: help;
+}

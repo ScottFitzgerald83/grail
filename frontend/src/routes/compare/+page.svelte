@@ -25,6 +25,10 @@
     let loading = false;
     let showAllDiff = true;
     let history = [];
+    // Preset support
+    let comparePresets = [];
+    let presetName = '';
+    let selectedPreset = '';
 
     onMount(() => {
         darkMode = localStorage.getItem("theme") === "dark";
@@ -35,6 +39,10 @@
 
             const stored = localStorage.getItem('compareHistory');
             if (stored) history = JSON.parse(stored);
+
+            // Load comparePresets from localStorage
+            const presetStore = localStorage.getItem('comparePresets');
+            if (presetStore) comparePresets = JSON.parse(presetStore);
 
             if (location.hash) {
                 try {
@@ -47,6 +55,27 @@
             }
         }
     });
+
+    function saveComparePreset() {
+        if (!presetName.trim()) return;
+        comparePresets.push({
+            name: presetName.trim(),
+            prompt,
+            configA,
+            configB
+        });
+        localStorage.setItem('comparePresets', JSON.stringify(comparePresets));
+        presetName = '';
+    }
+
+    function loadComparePreset() {
+        const found = comparePresets.find(p => p.name === selectedPreset);
+        if (found) {
+            prompt = found.prompt;
+            configA = found.configA;
+            configB = found.configB;
+        }
+    }
 
     function toggleDarkMode() {
         darkMode = !darkMode;
@@ -244,12 +273,29 @@ ${row.result_b.output}`;
   <div class="card-block">
     <label class="field-label">Prompt</label>
     <div class="preset-buttons">
-      <button on:click={() => prompt = 'Explain quantum computing to a child.'}>Explain like I\'m five</button>
+      <button on:click={() => prompt = 'Explain quantum computing to a child.'}>Explain like I&apos;m five</button>
       <button on:click={() => prompt = 'Write a poem about the sea.'}>Generate poetry</button>
       <button on:click={() => prompt = 'Translate: "I love you" into Japanese.'}>Translation test</button>
     </div>
     <textarea bind:value={prompt} rows="4" class="full-input" placeholder="Enter one or more prompts, separated by line breaks"></textarea>
   </div>
+
+  <div class="card-block">
+    <input type="text" bind:value={presetName} placeholder="Save compare preset as..." />
+    <button on:click={saveComparePreset}>💾 Save Compare Preset</button>
+  </div>
+
+  {#if comparePresets.length > 0}
+    <div class="card-block">
+      <select bind:value={selectedPreset}>
+        <option value="">Load compare preset...</option>
+        {#each comparePresets as p}
+          <option value={p.name}>{p.name}</option>
+        {/each}
+      </select>
+      <button on:click={loadComparePreset} disabled={!selectedPreset}>📥 Load Preset</button>
+    </div>
+  {/if}
 
   <div class="card-block config-panels">
     <div class="config-card">
@@ -313,10 +359,31 @@ ${row.result_b.output}`;
         </thead>
         <tbody>
           {#each getDiffTable(resultA?.config, resultB?.config) as row}
-            <tr><td>{row.key}</td><td>{row.a}</td><td>{row.b}</td></tr>
+            <tr title={row.key}>
+              <td>
+                <span class="param-label-tooltip" title={row.key}>
+                  {row.key}
+                </span>
+              </td>
+              <td>{row.a}</td>
+              <td>{row.b}</td>
+            </tr>
           {/each}
         </tbody>
       </table>
+    </div>
+  {/if}
+
+  {#if resultA && resultB && !Array.isArray(resultA)}
+    <div class="card-block compare-output">
+      <div class="output-block">
+        <h4>{resultA.model}</h4>
+        {@html renderMarkdown(resultA.output)}
+      </div>
+      <div class="output-block">
+        <h4>{resultB.model}</h4>
+        {@html renderMarkdown(resultB.output)}
+      </div>
     </div>
   {/if}
 
@@ -348,6 +415,42 @@ ${row.result_b.output}`;
     <div class="summary-box">
       <p class="tldr-summary">TL;DR: {getTldrSummary(resultA, resultB)}</p>
       <button class="primary-button" on:click={runComparison}>🔁 Retry Last Comparison</button>
+    </div>
+  {/if}
+
+  {#if Array.isArray(resultA)}
+    <div class="card-block">
+      <h3 class="section-title">📜 Batch Prompt Results</h3>
+      <table class="metrics-table">
+        <thead>
+          <tr>
+            <th>Prompt</th>
+            <th>{resultA[0].result_a.model}</th>
+            <th>{resultA[0].result_b.model}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each resultA as row}
+            <tr>
+              <td>{row.prompt}</td>
+              <td>
+                <details>
+                  <summary>{row.result_a.output.slice(0, 60)}...</summary>
+                  {@html renderMarkdown(row.result_a.output)}
+                </details>
+                <small>{row.result_a.tokens} tokens · {row.result_a.latency_ms} ms</small>
+              </td>
+              <td>
+                <details>
+                  <summary>{row.result_b.output.slice(0, 60)}...</summary>
+                  {@html renderMarkdown(row.result_b.output)}
+                </details>
+                <small>{row.result_b.tokens} tokens · {row.result_b.latency_ms} ms</small>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
     </div>
   {/if}
 
