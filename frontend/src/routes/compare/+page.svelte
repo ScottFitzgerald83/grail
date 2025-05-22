@@ -275,39 +275,6 @@ ${row.result_b.output}`;
 
 </script>
 <style src="/src/app.css"></style>
-<style>
-.fallback-label {
-  font-size: 0.75rem;
-  color: orange;
-  margin-top: 0.25rem;
-}
-.metrics-eval {
-  background: #f9f5e7;
-  border-left: 4px solid #eebc5a;
-  margin: 1rem 0;
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
-}
-.share-link-preview {
-  font-size: 0.75rem;
-  word-break: break-all;
-  margin-top: 0.5rem;
-  background: #f6f8fa;
-  padding: 0.5rem;
-  border-radius: 4px;
-}
-.toast {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  background: #222;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  z-index: 999;
-  font-size: 0.85rem;
-}
-</style>
 
 <div class="page-container">
   {#if history.length > 0}

@@ -627,18 +627,7 @@ Great for testing or debugging.`,
 Useful for strict response limits.`,
             type: 'text'
         },
-        {
-            key: 'truncate_prompt',
-            label: 'Truncate Prompt',
-            definition: 'Discards older tokens if the prompt exceeds this limit.',
-            eli5: 'This helps keep the prompt short by dropping old messages if needed.',
-            type: 'slider',
-            min: 0,
-            max: 8192,
-            step: 32,
-            lowLabel: 'Unlimited',
-            highLabel: 'Strict'
-        }
+        // Removed duplicate 'truncate_prompt' slider parameter
     ];
 
     function updateConfig(key, value) {
@@ -790,16 +779,6 @@ Useful for strict response limits.`,
         savedStatus = '💾 Preset saved';
     }
 
-    function loadPreset() {
-        const found = savedPresets.find(p => p.name === selectedPreset);
-        if (found) {
-            config = {...found.config};
-            localStorage.setItem('grailConfig', JSON.stringify(config));
-            savedStatus = `📥 Loaded ${selectedPreset}`;
-        }
-    }
-</script>
-
     function generateTag(cfg) {
         return [
             `temp:${cfg.temperature}`,
@@ -808,3 +787,5 @@ Useful for strict response limits.`,
             `model:${cfg.use_public_model === 'true' ? cfg.public_model_name : cfg.model_name}`
         ].join(' | ');
     }
+
+</script>
