@@ -3,16 +3,16 @@
     import {browser} from '$app/environment';
     import {fade} from 'svelte/transition';
     import {marked} from 'marked';
-    import DOMPurify from 'dompurify';
-    import hljs from 'highlight.js';
-    import 'highlight.js/styles/github.css';
+    // import DOMPurify from 'dompurify';
+    // import hljs from 'highlight.js';
+    // import 'highlight.js/styles/github.css';
 
-    marked.setOptions({
-      highlight: function (code, lang) {
-        const valid = hljs.getLanguage(lang) ? lang : 'plaintext';
-        return hljs.highlight(code, { language: valid }).value;
-      }
-    });
+    // marked.setOptions({
+    //   highlight: function (code, lang) {
+    //     const valid = hljs.getLanguage(lang) ? lang : 'plaintext';
+    //     return hljs.highlight(code, { language: valid }).value;
+    //   }
+    // });
 
     let darkMode = false;
     let condensedView = false;
@@ -55,7 +55,8 @@
     }
 
     function renderMarkdown(html) {
-        return DOMPurify.sanitize(marked.parse(html || ''));
+        // return DOMPurify.sanitize(marked.parse(html || ''));
+        return marked.parse(html || '');
     }
 
     async function runComparison() {
