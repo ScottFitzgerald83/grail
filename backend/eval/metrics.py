@@ -30,3 +30,33 @@ def plot_token_entropy(scores):
     plt.tight_layout()
 
     return fig
+
+
+def score_output(prompt: str, response: str) -> dict:
+    """
+    Simple heuristic scoring function to evaluate an output.
+    This version scores length, overlap, and response diversity.
+
+    :param prompt: original prompt string
+    :param response: model's generated response
+    :return: dictionary of scores
+    """
+    from collections import Counter
+    import re
+
+    def tokenize(text):
+        return re.findall(r'\b\w+\b', text.lower())
+
+    prompt_tokens = tokenize(prompt)
+    response_tokens = tokenize(response)
+
+    overlap = len(set(prompt_tokens) & set(response_tokens)) / (len(set(prompt_tokens)) + 1e-6)
+    diversity = len(set(response_tokens)) / (len(response_tokens) + 1e-6)
+    length_score = min(len(response_tokens) / 50.0, 1.0)
+
+    return {
+        "overlap": round(overlap, 3),
+        "diversity": round(diversity, 3),
+        "length_score": round(length_score, 3),
+        "total_score": round((overlap + diversity + length_score) / 3, 3)
+    }
