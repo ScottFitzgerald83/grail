@@ -31,6 +31,8 @@
     let presetName = '';
     let selectedPreset = '';
     let layoutMode = 'side-by-side';
+    let toast = '';
+    $: if (toast) setTimeout(() => toast = '', 3000);
 
     onMount(() => {
         // Theme preference auto-detect
@@ -258,7 +260,7 @@ ${row.result_b.output}`;
         const encoded = btoa(JSON.stringify({prompt, configA, configB}));
         const link = `${base}/compare#${encoded}`;
         navigator.clipboard.writeText(link);
-        alert("Link copied to clipboard!");
+        toast = "Share link copied!";
     }
 
     function highlightDiff(a, b) {
@@ -273,6 +275,39 @@ ${row.result_b.output}`;
 
 </script>
 <style src="/src/app.css"></style>
+<style>
+.fallback-label {
+  font-size: 0.75rem;
+  color: orange;
+  margin-top: 0.25rem;
+}
+.metrics-eval {
+  background: #f9f5e7;
+  border-left: 4px solid #eebc5a;
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+}
+.share-link-preview {
+  font-size: 0.75rem;
+  word-break: break-all;
+  margin-top: 0.5rem;
+  background: #f6f8fa;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: #222;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  z-index: 999;
+  font-size: 0.85rem;
+}
+</style>
 
 <div class="page-container">
   {#if history.length > 0}
@@ -410,12 +445,18 @@ ${row.result_b.output}`;
     <div class="card-block {layoutMode === 'stacked' ? 'output-stacked' : 'compare-output'}">
       <div class="output-block">
         <h4>🧠 {resultA.model}</h4>
-        <button class="copy-btn" on:click={() => navigator.clipboard.writeText(resultA.output)}>📋 Copy</button>
+        {#if resultA?.fallback_used}
+          <div class="fallback-label">⚠️ Fallback: {resultA.fallback_model}</div>
+        {/if}
+        <button class="copy-btn" on:click={() => {navigator.clipboard.writeText(resultA.output); toast = "Copied Model A output!";}}>📋 Copy</button>
         {@html highlightDiff(resultA.output, resultB.output)}
       </div>
       <div class="output-block">
         <h4>🧠 {resultB.model}</h4>
-        <button class="copy-btn" on:click={() => navigator.clipboard.writeText(resultB.output)}>📋 Copy</button>
+        {#if resultB?.fallback_used}
+          <div class="fallback-label">⚠️ Fallback: {resultB.fallback_model}</div>
+        {/if}
+        <button class="copy-btn" on:click={() => {navigator.clipboard.writeText(resultB.output); toast = "Copied Model B output!";}}>📋 Copy</button>
         {@html highlightDiff(resultB.output, resultA.output)}
       </div>
     </div>
@@ -427,6 +468,11 @@ ${row.result_b.output}`;
     <button class="mini" on:click={exportResultsCSV}>📊 Export CSV</button>
     <button class="mini" on:click={exportBatchMarkdown}>📘 Export Batch Markdown</button>
     <button class="mini" on:click={encodeCompareURL}>🔗 Copy Shareable Link</button>
+    {#if browser}
+      <p class="share-link-preview">
+        <code>{location.origin}/compare#{btoa(JSON.stringify({prompt, configA, configB}))}</code>
+      </p>
+    {/if}
   </div>
 
   <hr class="section-divider" />
@@ -445,11 +491,35 @@ ${row.result_b.output}`;
     </div>
   </div>
 
+  {#if toast}
+    <div class="toast">{toast}</div>
+  {/if}
+
   {#if resultA && resultB}
     <div class="summary-box">
       <p class="tldr-summary">TL;DR: {getTldrSummary(resultA, resultB)}</p>
       <button class="primary-button" on:click={runComparison}>🔁 Retry Last Comparison</button>
     </div>
+    {#if resultA?.metrics}
+      <div class="summary-box metrics-eval">
+        <h4>🧠 Model A Evaluation</h4>
+        <ul>
+          {#each Object.entries(resultA.metrics) as [key, val]}
+            <li><strong>{key}:</strong> {val}</li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+    {#if resultB?.metrics}
+      <div class="summary-box metrics-eval">
+        <h4>🧠 Model B Evaluation</h4>
+        <ul>
+          {#each Object.entries(resultB.metrics) as [key, val]}
+            <li><strong>{key}:</strong> {val}</li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
   {/if}
 
   {#if Array.isArray(resultA)}
