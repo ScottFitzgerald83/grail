@@ -190,6 +190,7 @@ ${row.result_b.output}`;
         alert("Link copied to clipboard!");
     }
 </script>
+<style src="/src/app.css"></style>
 
 <div class="page-container">
   <div class="card-block">
