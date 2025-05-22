@@ -1112,3 +1112,56 @@ body.dark .help-icon-wrapper:hover .help-icon {
     border-radius: 6px;
     border: 1px solid #ccc;
 }
+
+.output-header-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+.feature-badges {
+    display: inline-flex;
+    gap: 0.3em;
+    margin-left: 0.5em;
+}
+.feature-badge {
+    background: #e0e7ff;
+    color: #3730a3;
+    border-radius: 0.4em;
+    padding: 0.1em 0.5em;
+    font-size: 0.9em;
+    font-weight: 500;
+    vertical-align: middle;
+}
+.fallback-label {
+    color: #b45309;
+    font-weight: bold;
+    background: #fef3c7;
+    padding: 0.2em 0.7em;
+    border-radius: 0.5em;
+    margin-bottom: 0.5em;
+    display: inline-block;
+}
+.diff-miss {
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 0.2em;
+    padding: 0.1em 0.2em;
+}
+.output-stacked {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2em;
+}
+.compare-output {
+    display: flex;
+    flex-direction: row;
+    gap: 2em;
+}
+.metrics-eval .metrics-grid {
+    display: flex;
+    gap: 2em;
+}
+.metrics-model-label {
+    font-weight: bold;
+    margin-bottom: 0.2em;
+}

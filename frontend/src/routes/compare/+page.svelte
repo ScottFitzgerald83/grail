@@ -198,6 +198,7 @@
         a.download = `compare_${name}.${format === 'json' ? 'json' : 'md'}`;
         a.click();
         URL.revokeObjectURL(url);
+        toast = format === 'json' ? "Exported JSON!" : "Exported Markdown!";
     }
 
     function exportResultsCSV() {
@@ -230,6 +231,7 @@
         a.download = 'compare_batch_export.csv';
         a.click();
         URL.revokeObjectURL(url);
+        toast = "Exported CSV!";
     }
 
     function exportBatchMarkdown() {
@@ -253,6 +255,7 @@ ${row.result_b.output}`;
         a.download = 'compare_batch_export.md';
         a.click();
         URL.revokeObjectURL(url);
+        toast = "Exported Batch Markdown!";
     }
 
     function encodeCompareURL() {
@@ -265,6 +268,7 @@ ${row.result_b.output}`;
 
     function highlightDiff(a, b) {
       if (!a || !b) return a;
+      // word-level diff: show words in a not in b as highlighted
       const aWords = a.split(/\s+/);
       const bWords = new Set(b.split(/\s+/));
       return aWords.map(word =>
@@ -411,7 +415,16 @@ ${row.result_b.output}`;
   {#if resultA && resultB && !Array.isArray(resultA)}
     <div class="card-block {layoutMode === 'stacked' ? 'output-stacked' : 'compare-output'}">
       <div class="output-block">
-        <h4>🧠 {resultA.model}</h4>
+        <div class="output-header-row">
+          <h4>🧠 {resultA.model}</h4>
+          {#if resultA.features}
+            <span class="feature-badges">
+              {#each resultA.features as feat}
+                <span class="feature-badge">{feat}</span>
+              {/each}
+            </span>
+          {/if}
+        </div>
         {#if resultA?.fallback_used}
           <div class="fallback-label">⚠️ Fallback: {resultA.fallback_model}</div>
         {/if}
@@ -419,7 +432,16 @@ ${row.result_b.output}`;
         {@html highlightDiff(resultA.output, resultB.output)}
       </div>
       <div class="output-block">
-        <h4>🧠 {resultB.model}</h4>
+        <div class="output-header-row">
+          <h4>🧠 {resultB.model}</h4>
+          {#if resultB.features}
+            <span class="feature-badges">
+              {#each resultB.features as feat}
+                <span class="feature-badge">{feat}</span>
+              {/each}
+            </span>
+          {/if}
+        </div>
         {#if resultB?.fallback_used}
           <div class="fallback-label">⚠️ Fallback: {resultB.fallback_model}</div>
         {/if}
@@ -467,24 +489,31 @@ ${row.result_b.output}`;
       <p class="tldr-summary">TL;DR: {getTldrSummary(resultA, resultB)}</p>
       <button class="primary-button" on:click={runComparison}>🔁 Retry Last Comparison</button>
     </div>
-    {#if resultA?.metrics}
+    {#if resultA?.metrics || resultB?.metrics}
       <div class="summary-box metrics-eval">
-        <h4>🧠 Model A Evaluation</h4>
-        <ul>
-          {#each Object.entries(resultA.metrics) as [key, val]}
-            <li><strong>{key}:</strong> {val}</li>
-          {/each}
-        </ul>
-      </div>
-    {/if}
-    {#if resultB?.metrics}
-      <div class="summary-box metrics-eval">
-        <h4>🧠 Model B Evaluation</h4>
-        <ul>
-          {#each Object.entries(resultB.metrics) as [key, val]}
-            <li><strong>{key}:</strong> {val}</li>
-          {/each}
-        </ul>
+        <h4>📝 Prompt Evaluation</h4>
+        <div class="metrics-grid">
+          {#if resultA?.metrics}
+            <div>
+              <div class="metrics-model-label">{resultA.model}</div>
+              <ul>
+                {#each Object.entries(resultA.metrics) as [key, val]}
+                  <li><strong>{key}:</strong> {val}</li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+          {#if resultB?.metrics}
+            <div>
+              <div class="metrics-model-label">{resultB.model}</div>
+              <ul>
+                {#each Object.entries(resultB.metrics) as [key, val]}
+                  <li><strong>{key}:</strong> {val}</li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+        </div>
       </div>
     {/if}
   {/if}
