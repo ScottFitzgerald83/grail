@@ -1,9 +1,6 @@
 export const roadmapMarkdown = `
 | Priority | Description                               | Filename                              |
 |----------|-------------------------------------------|---------------------------------------|
-| 🚩 P0    | Return final stats from streamed outputs  | backend/main.py                       |
-| 🚩 P0    | Validate presence of API key before infer | backend/main.py                       |
-| 🚩 P0    | Compare POST/batch inference              | backend/main.py                       |
 | 🚩 P0    | Model execution wiring                    | backend/engine/remote.py              |
 | 🚩 P0    | Return fallback vs. primary model info    | backend/engine/remote.py              |
 | 🚩 P0    | Chat pipeline (send/edit/delete)          | frontend/routes/chat/+page.svelte     |

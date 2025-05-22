@@ -102,7 +102,26 @@ async def infer(request: Request):
         if model_name != "local":
             from backend.engine.remote import stream_public_model
             if stream:
-                return StreamingResponse(stream_public_model(model_name, prompt, config), media_type="text/plain")
+                response_text = route_model(model_name, prompt, config)
+                token_count = len(response_text.split())
+                cost_estimate = round(token_count * 0.00002, 4)
+
+                async def token_stream():
+                    for char in response_text:
+                        yield char
+                        await asyncio.sleep(0.01)
+                    yield f"\n[GRAIL_END] tokens={token_count} cost={cost_estimate}"
+
+                headers = {
+                    "X-GRAIL-Tokens": str(token_count),
+                    "X-GRAIL-Cost": str(cost_estimate)
+                }
+                save_to_memory(model_name, prompt, response_text, {
+                    "tokens": token_count,
+                    "cost_estimate": cost_estimate,
+                    "config": config
+                })
+                return StreamingResponse(token_stream(), media_type="text/plain", headers=headers)
             else:
                 response_text = route_model(model_name, prompt, config)
         else:
@@ -124,6 +143,7 @@ async def infer(request: Request):
                 for char in response_text:
                     yield char
                     await asyncio.sleep(0.01)
+                yield f"\n[GRAIL_END] tokens={token_count} cost={cost_estimate}"
 
             headers = {
                 "X-GRAIL-Tokens": str(token_count),
