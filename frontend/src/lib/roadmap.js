@@ -1,8 +1,6 @@
 export const roadmapMarkdown = `
 | Priority | Description                                            | Filename / Location                                  |
 |----------|--------------------------------------------------------|------------------------------------------------------|
-| ⚠️ P1    | Persist OpenAI API key and attach to all requests     | frontend/routes/tuning/+page.svelte, fetchWithKey    |
-| ⚠️ P2    | Session management + export                            | backend/session.py, frontend/logs                    |
 | 🧪 P2    | User training lab scaffold                             | frontend/routes/lab, backend/train.py                |
 | 🧪 P3    | CLI wizard to generate fine-tune configs               | cli/tune_wizard.py                                   |
 | 🧪 P3    | Local training job runner (Python)                     | backend/train_runner.py                              |
