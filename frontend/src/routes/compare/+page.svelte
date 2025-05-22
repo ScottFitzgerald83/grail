@@ -4,6 +4,15 @@
     import {fade} from 'svelte/transition';
     import {marked} from 'marked';
     import DOMPurify from 'dompurify';
+    import hljs from 'highlight.js';
+    import 'highlight.js/styles/github.css';
+
+    marked.setOptions({
+      highlight: function (code, lang) {
+        const valid = hljs.getLanguage(lang) ? lang : 'plaintext';
+        return hljs.highlight(code, { language: valid }).value;
+      }
+    });
 
     let darkMode = false;
     let condensedView = false;
@@ -233,6 +242,11 @@ ${row.result_b.output}`;
 
   <div class="card-block">
     <label class="field-label">Prompt</label>
+    <div class="preset-buttons">
+      <button on:click={() => prompt = 'Explain quantum computing to a child.'}>Explain like I\'m five</button>
+      <button on:click={() => prompt = 'Write a poem about the sea.'}>Generate poetry</button>
+      <button on:click={() => prompt = 'Translate: "I love you" into Japanese.'}>Translation test</button>
+    </div>
     <textarea bind:value={prompt} rows="4" class="full-input" placeholder="Enter one or more prompts, separated by line breaks"></textarea>
   </div>
 
