@@ -930,3 +930,15 @@ body.dark .system-box {
     border-bottom: 1px dotted var(--border-muted);
     cursor: help;
 }
+
+.output-stacked {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.diff-miss {
+    background: rgba(255, 0, 0, 0.15);
+    padding: 1px 4px;
+    border-radius: 3px;
+}

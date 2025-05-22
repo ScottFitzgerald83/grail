@@ -9,6 +9,9 @@ logger = logging.getLogger(__name__)  # NEW
 
 def load_model(config):
     model_name = config["model_name"]
+    if config.get("use_public_model") == "true":
+        print("[GRAIL] Using public hosted model:", config["public_model_name"])
+        return "remote", config["public_model_name"]
     if model_name in _model_cache:
         print("[GRAIL] Model loaded from cache:", model_name)
         return _model_cache[model_name]
@@ -41,6 +44,10 @@ def load_model(config):
 
 
 def run_inference(model_bundle, prompt, req):
+    if isinstance(model_bundle, tuple) and model_bundle[0] == "remote":
+        from backend.engine.remote import run_remote_inference
+        return run_remote_inference(model_bundle[1], prompt, req)
+
     model, tokenizer = model_bundle
     print("[GRAIL] Prompt:", prompt)
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)

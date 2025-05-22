@@ -3,6 +3,7 @@
     import {browser} from '$app/environment';
     import {fade} from 'svelte/transition';
     import {marked} from 'marked';
+
     // import DOMPurify from 'dompurify';
     // import hljs from 'highlight.js';
     // import 'highlight.js/styles/github.css';
@@ -29,6 +30,7 @@
     let comparePresets = [];
     let presetName = '';
     let selectedPreset = '';
+    let layoutMode = 'side-by-side';
 
     onMount(() => {
         darkMode = localStorage.getItem("theme") === "dark";
@@ -247,6 +249,17 @@ ${row.result_b.output}`;
         navigator.clipboard.writeText(link);
         alert("Link copied to clipboard!");
     }
+
+    function highlightDiff(a, b) {
+      if (!a || !b) return a;
+      const aWords = a.split(/\s+/);
+      const bWords = new Set(b.split(/\s+/));
+      return aWords.map(word =>
+              bWords.has(word) ? word : `<span class="diff-miss">${word}</span>`
+      ).join(' ');
+    }
+
+
 </script>
 <style src="/src/app.css"></style>
 
@@ -374,15 +387,23 @@ ${row.result_b.output}`;
     </div>
   {/if}
 
+  <div class="card-block">
+    <label class="field-label">Output Layout</label>
+    <select bind:value={layoutMode}>
+      <option value="side-by-side">🧩 Side-by-side</option>
+      <option value="stacked">📚 Stacked</option>
+    </select>
+  </div>
+
   {#if resultA && resultB && !Array.isArray(resultA)}
-    <div class="card-block compare-output">
+    <div class="card-block {layoutMode === 'stacked' ? 'output-stacked' : 'compare-output'}">
       <div class="output-block">
-        <h4>{resultA.model}</h4>
-        {@html renderMarkdown(resultA.output)}
+        <h4>🧠 {resultA.model}</h4>
+        {@html highlightDiff(resultA.output, resultB.output)}
       </div>
       <div class="output-block">
-        <h4>{resultB.model}</h4>
-        {@html renderMarkdown(resultB.output)}
+        <h4>🧠 {resultB.model}</h4>
+        {@html highlightDiff(resultB.output, resultA.output)}
       </div>
     </div>
   {/if}
