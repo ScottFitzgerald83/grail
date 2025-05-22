@@ -2,11 +2,8 @@ export const roadmapMarkdown = `
 | Priority | Task                                      | Domain | File                                      |
 |----------|-------------------------------------------|--------|-------------------------------------------|
 | ⚠️ P1     | Max token cap enforcement per model       | BE     | backend/engine/model.py                   |
-| ⚠️ P1     | Show warning if OpenAI key is missing     | FE     | frontend/routes/chat/+page.svelte         |
-| ⚠️ P1     | Token/cost display for streamed output    | FE     | frontend/routes/chat/+page.svelte         |
 | ⚠️ P1     | Return final stats from streamed outputs  | BE     | backend/main.py                           |
 | ⚠️ P1     | Return fallback vs. primary model info    | BE     | backend/engine/remote.py                  |
-| 🍀 P2     | Token preview before submission           | FE     | frontend/routes/chat/+page.svelte         |
 | 🍀 P2     | Model pricing table (per-token cost)      | FE     | frontend/config/pricing.js                |
 | 🍀 P2     | Prompt evaluation integration             | BE+FE  | backend/eval/metrics.py + compare/+page.svelte |
 | 🍀 P2     | Model fallback status indicator           | FE     | frontend/routes/compare/+page.svelte      |
