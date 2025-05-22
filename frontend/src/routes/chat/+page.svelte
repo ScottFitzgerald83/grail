@@ -1,5 +1,7 @@
 <script>
     import { afterUpdate, onMount } from 'svelte';
+    import { marked } from 'marked';
+    import { browser } from '$app/environment';
 
     let messages = [];
     let input = '';
@@ -9,10 +11,44 @@
     let activePersona = '';
     let systemPrompt = '';
 
+    let recognition, recognizing = false;
+    let supportsSpeech = typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+
+    if (supportsSpeech && typeof window !== 'undefined') {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SR();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.onresult = (e) => {
+            input += e.results[0][0].transcript + ' ';
+        };
+    }
+
+    function startVoice() {
+        if (recognition && !recognizing) {
+            recognizing = true;
+            recognition.start();
+        }
+    }
+
+    function formatTimestampForDisplay(ts) {
+        const minutes = Math.floor((Date.now() - new Date(ts)) / 60000);
+        return minutes < 1 ? 'just now' : `${minutes}m ago`;
+    }
+
     onMount(() => {
         const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
         activePersona = config.persona || '';
         systemPrompt = config.system_prompt || '';
+
+        const savedY = localStorage.getItem('chatScroll');
+        if (savedY && chatWindow) chatWindow.scrollTop = parseInt(savedY);
+
+        if (!localStorage.getItem("theme")) {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            localStorage.setItem("theme", prefersDark ? "dark" : "light");
+            document.body.classList.toggle("dark", prefersDark);
+        }
     });
 
     let chatWindow;
@@ -185,7 +221,9 @@
         <button class="mini" on:click={() => exportChat('json')}>Export JSON</button>
         <button class="mini" on:click={() => exportChat('txt')}>Export Text</button>
     </div>
-    <div class="messages" bind:this={chatWindow}>
+    <div class="messages" bind:this={chatWindow} on:scroll={() => {
+        localStorage.setItem('chatScroll', chatWindow.scrollTop);
+    }}>
         {#each messages as m (m.id)}
             <div class="message-row {m.role}">
                 <span class="avatar">{m.role === 'user' ? '🙋' : '🧠'}</span>
@@ -198,10 +236,13 @@
                                 <button on:click={cancelEdit}>Cancel</button>
                             </div>
                         {:else}
-                            {@html m.content}
+                            {@html marked.parse(m.content || '')}
                         {/if}
                     </div>
-                    <div class="timestamp">{m.timestamp}</div>
+                    <div class="reactions">❤️ 😄 👍</div>
+                    <div class="timestamp" title={m.timestamp}>
+                        {formatTimestampForDisplay(m.timestamp)}
+                    </div>
                     {#if m.role === 'user' && editingId !== m.id}
                         <div class="controls">
                             <button class="mini" title="Edit" on:click={() => startEdit(m)}>📝</button>
@@ -244,5 +285,8 @@
             class="chat-input-textarea"
         ></textarea>
         <button type="submit">Send</button>
+        {#if supportsSpeech}
+          <button on:click={startVoice} title="Voice Input 🎙️">🎙️</button>
+        {/if}
     </form>
 </div>

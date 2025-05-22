@@ -2,9 +2,6 @@ export const roadmapMarkdown = `
 | Priority | Task                             | Domain    | Description                                                                                           | Value                   |
 |----------|----------------------------------|-----------|-------------------------------------------------------------------------------------------------------|-------------------------|
 | 🚩P0     | Model execution wiring           | BE        | Connect to real models via Ollama, OpenAI, etc. Route based on config and handle authentication.     | Core functionality      |
-| ⚠️P1     | Tuning: history restore          | FE        | Restore previous tuning sessions from history.                                                        | Productivity            |
-| ⚠️P1     | Tuning: config presets           | FE        | Allow users to save and load config presets for quick tuning.                                         | Efficiency              |
-| ⚠️P1     | Per-model config translation     | BE        | Normalize tuning fields across backends (e.g., Ollama vs OpenAI).                                     | Compatibility           |
 | 🍀P2     | Dark mode contrast audit         | FE        | Verify WCAG contrast ratios for all dark mode components.                                              | Accessibility           |
 | 🍀P2     | Scroll context memory            | FE        | Preserve scroll position when switching between Chat and Compare tabs.                                | Productivity            |
 | 🍀P2     | Export filename personalization  | FE        | Include model names and timestamp in exported chat/compare files.                                     | Clarity/Traceability    |
