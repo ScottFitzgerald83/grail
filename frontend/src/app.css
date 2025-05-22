@@ -841,3 +841,70 @@ body.dark .system-box {
         gap: 0.75rem;
     }
 }
+
+/* Added styles for Chat page polish */
+
+.empty-state {
+  text-align: center;
+  margin: 2rem auto;
+  opacity: 0.8;
+  font-size: 0.95rem;
+}
+
+.model-badge {
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 0.25rem;
+  color: var(--text);
+}
+
+.context-menu {
+  position: fixed;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  padding: 0.5rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.context-menu button {
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.context-menu button:hover {
+  background: #f0f0f0;
+}
+
+.blinking-cursor {
+  display: inline-block;
+  width: 0.6ch;
+  background: currentColor;
+  animation: blink 1s step-start infinite;
+  margin-left: 0.1rem;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.toast {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background: #444;
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  z-index: 999;
+}

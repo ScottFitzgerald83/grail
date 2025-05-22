@@ -102,6 +102,14 @@
     let editingId = null;
     let editedInput = '';
 
+    let toastMessage = '';
+    let previousMessages = [];
+
+    // Context menu state
+    let showContextMenu = false;
+    let contextTarget = null;
+    let contextPosition = { x: 0, y: 0 };
+
     function personaDescription(key) {
         const descriptions = {
             friendly: 'You are a helpful, friendly assistant who explains things clearly and kindly.',
@@ -114,6 +122,7 @@
     function startEdit(message) {
         editingId = message.id;
         editedInput = message.content;
+        closeContextMenu();
     }
 
     function cancelEdit() {
@@ -139,16 +148,20 @@
 
         const result = await res.json();
         if (result.status === 'updated') {
+            previousMessages = [...messages];
             messages = messages.map(m =>
                 m.id === id
                     ? { ...m, content: editedInput }
                     : m
             );
             cancelEdit();
+            toastMessage = 'Edit successful. Undo?';
+            setTimeout(() => toastMessage = '', 3000);
         }
     }
 
     async function deleteMessage(id) {
+        previousMessages = [...messages];
         const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
         const res = await fetch(`/memory/${config.public_model_name || 'local'}/${id}`, {
             method: 'DELETE'
@@ -156,7 +169,10 @@
         const result = await res.json();
         if (result.status === 'deleted') {
             messages = messages.filter(m => m.id !== id);
+            toastMessage = 'Delete successful. Undo?';
+            setTimeout(() => toastMessage = '', 3000);
         }
+        closeContextMenu();
     }
 
     function exportChat(format = 'json') {
@@ -266,6 +282,23 @@
         input = '';
         sending = false;
     }
+
+    function openContextMenu(event, message) {
+      event.preventDefault();
+      contextTarget = message;
+      showContextMenu = true;
+      contextPosition = { x: event.clientX, y: event.clientY };
+    }
+
+    function closeContextMenu() {
+      showContextMenu = false;
+    }
+
+    function handleUndo() {
+      messages = [...previousMessages];
+      toastMessage = 'Undo successful';
+      setTimeout(() => toastMessage = '', 3000);
+    }
 </script>
 
 <div class="chat-container">
@@ -276,6 +309,23 @@
           {systemPrompt || personaDescription(activePersona)}
         </div>
       </div>
+    {/if}
+
+    {#if messages.length === 0}
+      <div class="empty-state">
+        <h2>Welcome to GRAIL Chat</h2>
+        <p>Ask a question, explore ideas, or test your prompt configurations.</p>
+      </div>
+    {/if}
+
+    {#if browser}
+      {#await Promise.resolve(JSON.parse(localStorage.getItem("grailConfig") || "{}")) then config}
+        {#if config?.public_model_name}
+          <div class="model-badge">
+            Using: <strong>{config.public_model_name}</strong>
+          </div>
+        {/if}
+      {/await}
     {/if}
 
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 1rem;">
@@ -310,11 +360,7 @@
                 {#if m.role === 'user' && editingId !== m.id}
                     <div
                         class="message-bubble"
-                        on:contextmenu|preventDefault={() => {
-                            const confirmed = confirm('Edit this message? Click OK to edit, Cancel to delete.');
-                            if (confirmed) startEdit(m);
-                            else deleteMessage(m.id);
-                        }}
+                        on:contextmenu={(e) => openContextMenu(e, m)}
                         title="{m.role.toUpperCase()} • {m.timestamp}"
                     >
                         <div class="content">
@@ -354,7 +400,7 @@
                 <span class="avatar">🧠</span>
                 <div class="message-bubble">
                     <div class="content typing-indicator">
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                        <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="blinking-cursor">▋</span>
                     </div>
                 </div>
             </div>
@@ -367,6 +413,18 @@
         </button>
     {/if}
 
+    {#if showContextMenu}
+      <div class="context-menu" style="top: {contextPosition.y}px; left: {contextPosition.x}px;">
+        <button on:click={() => { startEdit(contextTarget); closeContextMenu(); }}>✏️ Edit</button>
+        <button on:click={() => { deleteMessage(contextTarget.id); closeContextMenu(); }}>🗑️ Delete</button>
+        <button on:click={closeContextMenu}>Cancel</button>
+      </div>
+    {/if}
+
+    {#if toastMessage}
+      <div class="toast" on:click={handleUndo}>{toastMessage}</div>
+    {/if}
+
     <form on:submit|preventDefault={sendMessage}>
         <textarea
             bind:value={input}
@@ -376,6 +434,11 @@
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();
+                } else if (e.key === 'Escape') {
+                    cancelEdit();
+                } else if (e.key === 'ArrowUp' && !input && !editingId) {
+                    const last = [...messages].reverse().find(m => m.role === 'user');
+                    if (last) startEdit(last);
                 }
             }}
             class="chat-input-textarea"
