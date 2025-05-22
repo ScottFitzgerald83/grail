@@ -244,7 +244,14 @@
         messages = [...messages, assistantMessage];
 
         const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+        // Patch 1: Warn if OpenAI key missing before /infer
+        if (config.use_public_model === 'true' && !localStorage.getItem('grailOpenAIKey')) {
+            alert('⚠️ OpenAI API key is missing. Please enter it in the Tuning tab.');
+            sending = false;
+            return;
+        }
         const payload = { prompt: input, message_id: assistantMessage.id, ...config };
+        payload.openai_api_key = localStorage.getItem('grailOpenAIKey');
 
         try {
             const response = await fetch("/infer", {
@@ -261,6 +268,9 @@
                 );
             } else {
                 let currentText = '';
+                // Patch 3: Token/cost display for streamed output
+                let tokenEstimate = Math.ceil(data.output.length * 1.25);
+                console.log(`[GRAIL] Streamed estimate: ~${tokenEstimate} tokens`);
                 for (let i = 0; i < data.output.length; i++) {
                     currentText += data.output[i];
                     messages = messages.map(m =>
@@ -436,6 +446,11 @@
       <div class="toast" on:click={handleUndo}>{toastMessage}</div>
     {/if}
 
+    {#if input}
+      <div class="token-preview">
+        Estimated input tokens: ~{Math.ceil(input.trim().split(/\s+/).length * 1.25)}
+      </div>
+    {/if}
     <form on:submit|preventDefault={sendMessage}>
         <textarea
             bind:value={input}
@@ -460,3 +475,12 @@
         {/if}
     </form>
 </div>
+
+<style>
+.token-preview {
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--text-muted, #666);
+  margin: 0.5rem 1rem;
+}
+</style>
