@@ -101,11 +101,22 @@
         return DOMPurify.sanitize(marked.parse(html || ''));
     }
 
+    // Helper to fetch with OpenAI key if present
+    async function fetchWithKey(url, options = {}) {
+        if (localStorage.getItem('grailOpenAIKey')?.startsWith('sk-')) {
+            options.headers = {
+                ...(options.headers || {}),
+                Authorization: `Bearer ${localStorage.getItem('grailOpenAIKey')}`
+            };
+        }
+        return fetch(url, options);
+    }
+
     async function runComparison() {
         loading = true;
         const prompts = prompt.split("\\n").join("\n").split('\n').filter(p => p.trim());
         if (prompts.length === 1) {
-            const response = await fetch('/compare', {
+            const response = await fetchWithKey('/compare', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({prompt, config_a: configA, config_b: configB})
@@ -121,7 +132,7 @@
             resultA = data.result_a;
             resultB = data.result_b;
         } else {
-            const response = await fetch('/compare/batch', {
+            const response = await fetchWithKey('/compare/batch', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({prompts, config_a: configA, config_b: configB})
