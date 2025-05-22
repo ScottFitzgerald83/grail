@@ -1,7 +1,13 @@
+from transformers import GPT2TokenizerFast
+tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
 import json
 
 import time
 import requests
+
+
+def estimate_tokens(text):
+    return len(tokenizer.encode(text))
 
 def model_router(prompt, config):
     """Entry point to route inference to a remote model if public mode is enabled."""
@@ -37,6 +43,8 @@ def run_openai(model_name, prompt, config):
         "frequency_penalty": float(config.get("frequency_penalty", 0.0)),
         "stream": config.get("stream", "false") == "true"
     }
+    estimated_tokens = estimate_tokens(prompt)
+    print(f"[GRAIL] Estimated OpenAI input tokens: {estimated_tokens}")
     start = time.time()
     try:
         res = requests.post(url, headers=headers, json=body)
@@ -65,6 +73,8 @@ def run_ollama(model_name, prompt, config):
             "num_predict": int(config.get("max_tokens", 256))
         }
     }
+    estimated_tokens = estimate_tokens(prompt)
+    print(f"[GRAIL] Estimated Ollama input tokens: {estimated_tokens}")
     start = time.time()
     try:
         res = requests.post(url, json=body)
