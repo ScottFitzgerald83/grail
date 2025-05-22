@@ -1,5 +1,3 @@
-
-
 import json
 import time
 from pathlib import Path
@@ -10,17 +8,30 @@ KEY_LOG_FILE = LOG_DIR / "api_key_usage.jsonl"
 
 LOG_DIR.mkdir(exist_ok=True)
 
-def log_event(event_type: str, payload: dict):
+def log_event(event_type: str, payload: dict, level: str = "info", session_id: str = None, model_name: str = None):
     """
-    Log general backend events to a flat file.
+    Log general backend events to a structured log file.
     """
     entry = {
         "timestamp": time.time(),
+        "level": level,
         "event_type": event_type,
+        "session_id": session_id,
+        "model": model_name,
         "payload": payload
     }
     with open(LOG_FILE, "a") as f:
         f.write(json.dumps(entry) + "\n")
+
+
+# Helper for consistently logging inference events
+def log_inference(prompt: str, model: str, tokens: int, user: str = "anonymous"):
+    log_event("inference", {
+        "prompt_preview": prompt[:60],
+        "model": model,
+        "tokens_used": tokens,
+        "user": user
+    }, level="info", model_name=model)
 
 def log_api_key_usage(api_key_id: str, model_name: str, tokens_used: int):
     """
