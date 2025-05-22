@@ -1,8 +1,6 @@
 export const roadmapMarkdown = `
 | Priority | Task                                         | Domain | File                                      |
 |----------|----------------------------------------------|--------|-------------------------------------------|
-| ⚠️ P1     | Roadmap filtering, table view                | FE     | frontend/routes/roadmap/+page.svelte      |
-| 🍀 P2     | Model pricing table (per-token cost)         | FE     | frontend/config/pricing.js                |
 | 🍀 P2     | Prompt evaluation integration                | FE     | frontend/routes/compare/+page.svelte      |
 | 🍀 P2     | Model fallback status indicator              | FE     | frontend/routes/compare/+page.svelte      |
 | 🍀 P2     | Tokenizer validation endpoint                | BE     | backend/token.py                          |
