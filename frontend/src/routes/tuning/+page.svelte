@@ -571,6 +571,18 @@ Great for testing or debugging.`,
             eli5: `Lets you define multiple phrases that cut off generation.
 Useful for strict response limits.`,
             type: 'text'
+        },
+        {
+            key: 'truncate_prompt',
+            label: 'Truncate Prompt',
+            definition: 'Discards older tokens if the prompt exceeds this limit.',
+            eli5: 'This helps keep the prompt short by dropping old messages if needed.',
+            type: 'slider',
+            min: 0,
+            max: 8192,
+            step: 32,
+            lowLabel: 'Unlimited',
+            highLabel: 'Strict'
         }
     ];
 
@@ -611,7 +623,10 @@ Useful for strict response limits.`,
 
     function exportConfig() {
         const translated = translateConfig(config);
-        const blob = new Blob([JSON.stringify(translated, null, 2)], {type: 'application/json'});
+        const blob = new Blob(
+            [JSON.stringify(translated, null, 2)],
+            {type: 'application/json'}
+        );
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
