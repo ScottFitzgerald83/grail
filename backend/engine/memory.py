@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 import os
 
-def save_session(session_id, messages, model_name, total_tokens):
+def save_session(session_id, messages, model_name, total_tokens, token_log=None, fallback_model=None):
     session_data = {
         "id": session_id,
         "messages": messages,
@@ -11,6 +11,11 @@ def save_session(session_id, messages, model_name, total_tokens):
         "cost_estimate": round(total_tokens * 0.00002, 4),
         "created_at": datetime.utcnow().isoformat() + "Z"
     }
+    if token_log:
+        session_data["token_log"] = token_log
+    if fallback_model:
+        session_data["fallback_model"] = fallback_model
+
     filename = f"session_{session_id}.json"
     with open(filename, 'w') as f:
         json.dump(session_data, f, indent=2)

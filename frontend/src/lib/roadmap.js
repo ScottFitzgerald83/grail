@@ -1,8 +1,6 @@
 export const roadmapMarkdown = `
 | Priority | Description                               | Filename                              |
 |----------|-------------------------------------------|---------------------------------------|
-| ⚠️ P1    | Cost/token tracking in memory save        | backend/engine/memory.py              |
-| ⚠️ P1    | Structured session file I/O               | backend/engine/memory.py              |
 | ⚠️ P1    | API key validation logic                  | backend/lib/secrets.py                |
 | ⚠️ P1    | Request logging framework                 | backend/log.py                        |
 | ⚠️ P1    | Per-API key usage logging                 | backend/log.py                        |
