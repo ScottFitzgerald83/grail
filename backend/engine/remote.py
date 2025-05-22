@@ -13,6 +13,8 @@ def model_router(prompt, config):
     """Entry point to route inference to a remote model if public mode is enabled."""
     model_name = config.get("public_model_name", "gpt-4")
     try:
+        if config.get("stream", "false") == "true":
+            return stream_public_model(model_name, prompt, config)
         if model_name.startswith("gpt-"):
             return run_openai(model_name, prompt, config)
         elif model_name.startswith("ollama:"):
@@ -53,14 +55,7 @@ def run_openai(model_name, prompt, config):
         res = requests.post(url, headers=headers, json=body)
         delta = int((time.time() - start) * 1000)
         out = res.json()
-        return {
-            "output": out["choices"][0]["message"]["content"],
-            "tokens": out.get("usage", {}).get("total_tokens", 0),
-            "latency_ms": delta,
-            "model": model_name,
-            "config": config,
-            "fallback_used": False,
-        }
+        return summarize_result(out["choices"][0]["message"]["content"], model_name, config, delta, out.get("usage", {}).get("total_tokens", 0))
     except Exception as e:
         return {"output": f"⚠️ OpenAI error: {e}", "model": model_name, "fallback_used": False}
 
@@ -84,14 +79,7 @@ def run_ollama(model_name, prompt, config):
         res = requests.post(url, json=body)
         delta = int((time.time() - start) * 1000)
         out = res.json()
-        return {
-            "output": out.get("response", ""),
-            "tokens": out.get("eval_count", len(out.get("response", "").split())),
-            "latency_ms": delta,
-            "model": model_name,
-            "config": config,
-            "fallback_used": False,
-        }
+        return summarize_result(out.get("response", ""), model_name, config, delta, out.get("eval_count", len(out.get("response", "").split())))
     except Exception as e:
         return {"output": f"⚠️ Ollama error: {e}", "model": model_name, "fallback_used": False}
 import aiohttp
@@ -129,3 +117,13 @@ async def stream_public_model(model_name: str, prompt: str, config: dict):
                                 yield content
                         except Exception:
                             continue
+
+def summarize_result(raw, model_name, config, delta, token_est):
+    return {
+        "output": raw,
+        "tokens": token_est,
+        "latency_ms": delta,
+        "model": model_name,
+        "config": config,
+        "fallback_used": False
+    }
