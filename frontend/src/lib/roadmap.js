@@ -3,8 +3,6 @@ export const roadmapMarkdown = `
 |----------|----------------------------------------------|--------|-------------------------------------------|
 | 🚩 P0     | Config routing + translation                 | BE     | backend/config/settings.py                |
 | ⚠️ P1     | API key validation logic                     | BE     | backend/lib/secrets.py                    |
-| ⚠️ P1     | Cost/token tracking in memory save           | BE     | backend/engine/memory.py                  |
-| ⚠️ P1     | Structured session file I/O                  | BE     | backend/engine/memory.py                  |
 | ⚠️ P1     | Roadmap filtering, table view                | FE     | frontend/routes/roadmap/+page.svelte      |
 | 🍀 P2     | Model pricing table (per-token cost)         | FE     | frontend/config/pricing.js                |
 | 🍀 P2     | Prompt evaluation integration                | FE     | frontend/routes/compare/+page.svelte      |
