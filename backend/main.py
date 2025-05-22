@@ -79,13 +79,20 @@ async def infer(request: Request):
         if "persona" in config and config["persona"] != "none" and "system_prompt" not in config:
             config["system_prompt"] = persona_map.get(config["persona"], "")
 
-        response_text = None if prompt.strip().lower() == "fail" else route_model(model_name, prompt, config)
+        if model_name != "local":
+            from backend.engine.remote import stream_public_model
+            if stream:
+                return StreamingResponse(stream_public_model(model_name, prompt, config), media_type="text/plain")
+            else:
+                response_text = route_model(model_name, prompt, config)
+        else:
+            response_text = route_model(model_name, prompt, config)
 
         if response_text:
             token_count = len(response_text.split()) if response_text else 0
             save_to_memory(model_name, prompt, response_text, {
                 "tokens": token_count,
-                "cost_estimate": round(token_count * 0.00002, 4),  # adjustable rate
+                "cost_estimate": round(token_count * 0.00002, 4),
                 "config": config
             })
 
@@ -94,7 +101,6 @@ async def infer(request: Request):
                 for char in response_text:
                     yield char
                     await asyncio.sleep(0.01)
-
             return StreamingResponse(token_stream(), media_type="text/plain")
 
         return {
