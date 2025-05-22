@@ -4,12 +4,20 @@ import requests
 def model_router(prompt, config):
     """Entry point to route inference to a remote model if public mode is enabled."""
     model_name = config.get("public_model_name", "gpt-4")
-    if model_name.startswith("gpt-"):
-        return run_openai(model_name, prompt, config)
-    elif model_name.startswith("ollama:"):
-        return run_ollama(model_name, prompt, config)
-    else:
-        return {"output": f"⚠️ Unsupported model: {model_name}", "model": model_name}
+    try:
+        if model_name.startswith("gpt-"):
+            return run_openai(model_name, prompt, config)
+        elif model_name.startswith("ollama:"):
+            return run_ollama(model_name, prompt, config)
+        else:
+            return {"output": f"⚠️ Unsupported model: {model_name}", "model": model_name}
+    except Exception as e:
+        fallback = config.get("fallback_model")
+        if fallback and fallback != model_name:
+            print(f"[GRAIL] Primary model failed, attempting fallback: {fallback}")
+            config["public_model_name"] = fallback
+            return model_router(prompt, config)
+        return {"output": f"⚠️ Model error and no fallback: {e}", "model": model_name}
 
 def run_openai(model_name, prompt, config):
     url = "https://api.openai.com/v1/chat/completions"
