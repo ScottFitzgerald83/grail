@@ -232,6 +232,7 @@
     <input type="file" accept=".json" on:change={importConfig}/>
 </div>
 
+
 <div style="margin-bottom: 1rem;">
     <input type="text" bind:value={presetName} placeholder="Save current config as..."/>
     <button on:click={savePreset}>💾 Save Preset</button>
@@ -247,8 +248,51 @@
     <button on:click={loadPreset} disabled={!selectedPreset}>📥 Load Preset</button>
 </div>
 
+<h2 style="margin-top: 2rem;">🔐 API Key Configuration</h2>
+
+<div style="margin-bottom: 1rem;">
+  <label style="display: flex; flex-direction: column; gap: 0.25rem;">
+    <span>OpenAI API Key (optional):</span>
+    <input type="password" bind:value={apiKey} placeholder="sk-..." />
+  </label>
+  <label style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+    <input type="checkbox" bind:checked={persistApiKey} />
+    Remember this key (stored locally, not sent to backend)
+  </label>
+  <div style="margin-top: 0.5rem;">
+    <button on:click={testApiKey}>🔍 Test API Key</button>
+    {#if testStatus}
+      <span style="margin-left: 1rem; font-weight: 500;">{testStatus}</span>
+    {/if}
+  </div>
+</div>
+
+<h2 style="margin-top: 2rem;">🏷️ Config Summary Tag</h2>
+<p>This tag helps identify your current config in exports or comparisons:</p>
+<pre style="padding: 0.5rem; background: #eee; border-radius: 4px; margin-bottom: 1rem;">
+{generateTag(config)}
+</pre>
+
 
 <script>
+    let apiKey = '';
+    let persistApiKey = false;
+    let testStatus = '';
+
+    function testApiKey() {
+        if (!apiKey.startsWith('sk-')) {
+            testStatus = '❌ Invalid format';
+            return;
+        }
+        fetch('https://api.openai.com/v1/models', {
+            headers: { Authorization: `Bearer ${apiKey}` }
+        }).then(res => {
+            testStatus = res.ok ? '✅ Key valid' : '❌ Invalid or expired';
+        }).catch(() => {
+            testStatus = '⚠️ Network error';
+        });
+    }
+
     import {onMount} from 'svelte';
     import {browser} from '$app/environment';
 
@@ -329,8 +373,19 @@
                 config = JSON.parse(saved);
                 savedStatus = '✅ Loaded saved config';
             }
+            const stored = localStorage.getItem('grailOpenAIKey');
+            if (stored) {
+                apiKey = stored;
+                persistApiKey = true;
+            }
         }
     });
+    $: if (persistApiKey) {
+        localStorage.setItem('grailOpenAIKey', apiKey);
+    } else {
+        localStorage.removeItem('grailOpenAIKey');
+    }
+
 
     function reset() {
         config = {
@@ -744,3 +799,12 @@ Useful for strict response limits.`,
         }
     }
 </script>
+
+    function generateTag(cfg) {
+        return [
+            `temp:${cfg.temperature}`,
+            `top-p:${cfg.top_p}`,
+            `top-k:${cfg.top_k}`,
+            `model:${cfg.use_public_model === 'true' ? cfg.public_model_name : cfg.model_name}`
+        ].join(' | ');
+    }
