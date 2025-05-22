@@ -25,13 +25,19 @@ def get_config(overrides: Dict = {}) -> Dict:
     return config
 
 
+
 # Translate GRAIL unified config to model-specific payload for inference.
 def translate_config(config: Dict, model_name: str) -> Dict:
     """Translate GRAIL unified config to model-specific payload for inference."""
+    prompt = config.get("prompt", "")
+
     if model_name.startswith("gpt-"):
         return {
             "model": model_name,
-            "messages": [{"role": "user", "content": config.get("prompt", "")}],
+            "messages": (
+                ([{"role": "system", "content": config.get("system_prompt", "")}] if config.get("system_prompt") else [])
+                + [{"role": "user", "content": prompt}]
+            ),
             "temperature": config.get("temperature", 0.7),
             "top_p": config.get("top_p", 0.9),
             "max_tokens": config.get("max_tokens", 256),
@@ -39,10 +45,11 @@ def translate_config(config: Dict, model_name: str) -> Dict:
             "frequency_penalty": config.get("frequency_penalty", 0.0),
             "stream": config.get("stream", "false") == "true"
         }
+
     elif model_name.startswith("ollama:"):
         return {
             "model": model_name.split(":", 1)[1],
-            "prompt": config.get("prompt", ""),
+            "prompt": prompt,
             "stream": False,
             "options": {
                 "temperature": config.get("temperature", 0.7),
@@ -50,8 +57,20 @@ def translate_config(config: Dict, model_name: str) -> Dict:
                 "num_predict": config.get("max_tokens", 256)
             }
         }
-    else:
-        return config  # return as-is for unsupported types
+
+    return {
+        "model": model_name,
+        "prompt": prompt,
+        "max_tokens": config.get("max_tokens", 256),
+        "temperature": config.get("temperature", 0.7),
+        "top_k": config.get("top_k", 50),
+        "top_p": config.get("top_p", 0.9),
+        "presence_penalty": config.get("presence_penalty", 0.0),
+        "frequency_penalty": config.get("frequency_penalty", 0.0),
+        "system_prompt": config.get("system_prompt", ""),
+        "stop": config.get("stop_sequence", None),
+        "stream": config.get("stream", "false") == "true"
+    }
 
 
 def load_presets() -> Dict:
