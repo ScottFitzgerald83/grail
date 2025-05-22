@@ -69,3 +69,23 @@ def save_presets(presets: Dict):
 def get_preset(name: str) -> Dict:
     presets = load_presets()
     return presets.get(name, {})
+
+
+# Validate GRAIL config schema for runtime use
+def validate_config_schema(cfg: Dict):
+    if not isinstance(cfg, dict):
+        raise ValueError("Configuration must be a dictionary.")
+
+    required_keys = ["prompt", "temperature", "top_p", "max_tokens"]
+    for key in required_keys:
+        if key not in cfg:
+            raise ValueError(f"Missing required key: '{key}'")
+
+    if not isinstance(cfg["prompt"], str):
+        raise TypeError("Prompt must be a string.")
+    if not isinstance(cfg["temperature"], (float, int)):
+        raise TypeError("Temperature must be a number.")
+    if not isinstance(cfg["top_p"], (float, int)):
+        raise TypeError("Top-p must be a number.")
+    if not isinstance(cfg["max_tokens"], int):
+        raise TypeError("Max tokens must be an integer.")
