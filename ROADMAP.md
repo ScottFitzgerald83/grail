@@ -1,38 +1,77 @@
+# 🔥 FORGE_ROADMAP.md
 
-
-# GRAIL Roadmap
-
-This document outlines the core milestones, current status, and planned enhancements for GRAIL — the Ghost-Refined Architecture for Interpretable Language.
+This roadmap defines the evolution of **The Forge**, from a fine-tuning panel into a full LLM lifecycle interface — empowering users to train, tune, analyze, and deploy custom language models.
 
 ---
 
-## ✅ Completed P0 Milestones
+## 🧱 Phase 1: Split and Scaffold Core Tabs
 
-- [x] Model selector UI
-- [x] Config presets (load/save)
-- [x] Inference backend with FastAPI
-- [x] Chat UI with dial controls
-- [x] Compare view with dual configs
-- [x] Token-level entropy plotting
-- [x] JSON serialization error handling
-- [x] Crash-safe metrics profiling
+- [ ] Create **tabbed interface** with two primary views:
+    - 🔨 Full Training
+    - 🎯 Fine-Tuning
+- [ ] Migrate current UI content into **Fine-Tuning** tab
+- [ ] Scaffold placeholder layout + YAML config preview in **Full Training** tab
+- [ ] Add tab description + tooltips to explain the distinction
 
 ---
 
-## 🔧 Active P0 Tasks
+## 🧬 Phase 2: Full Training MVP
 
-- [ ] Token count tracker in chat & compare
-- [ ] Streamlit UI error feedback
-- [ ] Model override support from presets
-- [ ] Save inference result to disk (JSON/CSV)
-- [ ] Add CLI runner for eval/compare
+- [ ] Let user upload raw corpus for pretraining (e.g. .txt, .jsonl)
+- [ ] Choose base model or start from scratch
+- [ ] Basic config form:
+    - Epochs, batch size, learning rate
+- [ ] Launch `train_runner.py` from frontend
+- [ ] Log training output and save model locally
 
 ---
 
-## 🚧 Planned P1 Features
+## 🎯 Phase 3: Fine-Tuning Upgrade
 
-- [ ] Attention visualization per token
-- [ ] Logit inspector (top-k token probabilities)
-- [ ] Output diff viewer for compare
-- [ ] Session replay or memory threading
-- [ ] Frontend theming and tone polish
+- [ ] Validate dataset structure (prompt → completion pairs)
+- [ ] Add support for multi-format (chat, CSV)
+- [ ] Show training impact estimations (token cost, steps, time)
+- [ ] Add support for LoRA-based fine-tuning (optional backend)
+
+---
+
+## 🧠 Phase 4: Evaluation & Feedback
+
+- [ ] Add **Evaluation tab**
+    - Upload eval set or write test prompts
+    - Show output side-by-side across checkpoints
+- [ ] Visualize metrics:
+    - Diversity
+    - Accuracy (if labeled)
+    - Output style match
+- [ ] Hook into existing compare UI for visualization
+
+---
+
+## 🔁 Phase 5: Iteration Tools
+
+- [ ] Load previous configs and results
+- [ ] Fork from previous run
+- [ ] Create tuning “branches” for controlled experimentation
+- [ ] Allow restore to Codex for prompt-based testing
+
+---
+
+## 📦 Phase 6: Packaging & Export
+
+- [ ] Export model checkpoint + YAML config bundle
+- [ ] Add deployment target presets (Hugging Face, Ollama, etc.)
+- [ ] Include metadata (author, license, version, tags)
+
+---
+
+## 🧙‍♂️ Phase 7: Learn Mode (Optional)
+
+- [ ] Add collapsible explainer panels for every stage
+- [ ] “Did you know?” prompts and tuning tips
+- [ ] Inline definitions: temperature, overfitting, batch size
+- [ ] Recommended reading / link to LLM 101
+
+---
+
+Let me know when you're ready to turn this into issues, cards, or code scaffolds.

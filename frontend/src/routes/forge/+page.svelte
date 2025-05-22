@@ -1,4 +1,7 @@
-<h1>🎛️ Model Tuning</h1>
+<h1>🔥 The Forge</h1>
+<p class="page-subtext">
+    This is where the sparks fly—upload your data, shape your config, and temper your model in the fires of fine-tuning.
+</p>
 <style src="/src/app.css"></style>
 
 <div class="dashboard-container">

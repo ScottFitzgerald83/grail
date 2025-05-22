@@ -17,10 +17,10 @@
 <nav class="top-nav">
   <a href="/chat">Chat</a>
   <a href="/compare">Compare</a>
-  <a href="/tuning">Tuning</a>
+  <a href="/codex">Codex</a>
   <a href="/glossary">Glossary</a>
   <a href="/roadmap">Roadmap</a>
-  <a href="/training">Training</a>
+  <a href="/forge">Forge</a>
   <button on:click={toggleDarkMode} class="theme-toggle">
     {darkMode ? '☀️' : '🌙'}
   </button>
