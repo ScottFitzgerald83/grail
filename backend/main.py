@@ -31,6 +31,19 @@ def save_to_memory(model_name: str, prompt: str, output: str, metadata: dict = N
         except Exception:
             history = []
 
+    # Truncate old messages if configured
+    limit = metadata.get("truncate_prompt") if metadata else 0
+    if limit and isinstance(limit, int) and limit > 0:
+        def token_len(x): return len(x["prompt"].split()) + len(x["output"].split())
+        total = 0
+        new_history = []
+        for msg in reversed(history):
+            total += token_len(msg)
+            if total > limit:
+                break
+            new_history.insert(0, msg)
+        history = new_history
+
     entry = {
         "timestamp": time.time(),
         "prompt": prompt,
@@ -67,8 +80,13 @@ async def infer(request: Request):
             return {"output": None, "error": "Empty prompt received."}
         stream = data.get("stream") == "true"
         model_name = data.get("public_model_name") if data.get("use_public_model") == "true" else "local"
+
+        # Validate API key if public model is selected
+        if model_name != "local" and not data.get("openai_api_key"):
+            return {"output": None, "error": "Missing OpenAI API key"}
         config = {k: v for k, v in data.items() if
                   k not in ["prompt", "use_public_model", "public_model_name", "stream", "message_id"]}
+        config["openai_api_key"] = data.get("openai_api_key", "")
 
         # Persona support: inject system prompt if persona is set and no system_prompt provided
         persona_map = {
