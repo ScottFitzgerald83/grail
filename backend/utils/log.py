@@ -47,3 +47,21 @@ def log_api_key_usage(api_key_id: str, model_name: str, tokens_used: int, ip_add
     }
     with open(KEY_LOG_FILE, "a") as f:
         f.write(json.dumps(entry) + "\n")
+
+def log_request(method: str, path: str, status_code: int, duration_ms: float, ip_address: str = None, user_agent: str = None, session_id: str = None):
+    """
+    Log HTTP requests in a structured format.
+    """
+    entry = {
+        "timestamp": time.time(),
+        "event_type": "http_request",
+        "method": method,
+        "path": path,
+        "status_code": status_code,
+        "duration_ms": duration_ms,
+        "ip_address": ip_address,
+        "user_agent": user_agent,
+        "session_id": session_id
+    }
+    with open(LOG_FILE, "a") as f:
+        f.write(json.dumps(entry) + "\n")

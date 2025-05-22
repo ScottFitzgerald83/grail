@@ -2,8 +2,6 @@ export const roadmapMarkdown = `
 | Priority | Description                               | Filename                              |
 |----------|-------------------------------------------|---------------------------------------|
 | ⚠️ P1    | API key validation logic                  | backend/lib/secrets.py                |
-| ⚠️ P1    | Request logging framework                 | backend/log.py                        |
-| ⚠️ P1    | Per-API key usage logging                 | backend/log.py                        |
 | 🍀 P2    | Tokenizer validation endpoint             | backend/main.py                       |
 | 🍀 P2    | Prompt evaluation scoring                 | backend/eval/metrics.py               |
 | 🍀 P2    | Prompt evaluation integration             | frontend/routes/compare/+page.svelte  |
