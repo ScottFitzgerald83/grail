@@ -82,8 +82,10 @@ async def infer(request: Request):
         model_name = data.get("public_model_name") if data.get("use_public_model") == "true" else "local"
 
         # Validate API key if public model is selected
-        if model_name != "local" and not data.get("openai_api_key"):
-            return {"output": None, "error": "Missing OpenAI API key"}
+        if model_name != "local":
+            api_key = data.get("openai_api_key", "")
+            if not api_key or not api_key.startswith("sk-"):
+                return {"output": None, "error": "Missing or invalid OpenAI API key"}
         config = {k: v for k, v in data.items() if
                   k not in ["prompt", "use_public_model", "public_model_name", "stream", "message_id"]}
         config["openai_api_key"] = data.get("openai_api_key", "")
@@ -115,11 +117,19 @@ async def infer(request: Request):
             })
 
         if stream and response_text is not None:
+            token_count = len(response_text.split())
+            cost_estimate = round(token_count * 0.00002, 4)
+
             async def token_stream():
                 for char in response_text:
                     yield char
                     await asyncio.sleep(0.01)
-            return StreamingResponse(token_stream(), media_type="text/plain")
+
+            headers = {
+                "X-GRAIL-Tokens": str(token_count),
+                "X-GRAIL-Cost": str(cost_estimate)
+            }
+            return StreamingResponse(token_stream(), media_type="text/plain", headers=headers)
 
         return {
             "output": response_text,
@@ -235,13 +245,19 @@ async def compare(request: Request):
         result_b = invoke(config_b)
 
         timestamp = time.strftime('%Y%m%d_%H%M%S')
-        filename = f"{result_a['model']}_vs_{result_b['model']}_{timestamp}.json"
+        filename = f"{result_a.get('model', 'unknown')}_vs_{result_b.get('model', 'unknown')}_{timestamp}.json"
 
         return {
             "result_a": result_a,
             "result_b": result_b,
             "prompt": prompt,
-            "filename": filename
+            "filename": filename,
+            "model_a": result_a.get("model", "unknown"),
+            "tokens_a": result_a.get("tokens", 0),
+            "cost_a": result_a.get("cost", 0.0),
+            "model_b": result_b.get("model", "unknown"),
+            "tokens_b": result_b.get("tokens", 0),
+            "cost_b": result_b.get("cost", 0.0),
         }
 
     except Exception as e:
@@ -269,12 +285,18 @@ async def compare_batch(request: Request):
             results.append({
                 "prompt": p,
                 "result_a": result_a,
-                "result_b": result_b
+                "result_b": result_b,
+                "model_a": result_a.get("model", "unknown"),
+                "tokens_a": result_a.get("tokens", 0),
+                "cost_a": result_a.get("cost", 0.0),
+                "model_b": result_b.get("model", "unknown"),
+                "tokens_b": result_b.get("tokens", 0),
+                "cost_b": result_b.get("cost", 0.0),
             })
 
         if results:
-            m1 = results[0]["result_a"]["model"]
-            m2 = results[0]["result_b"]["model"]
+            m1 = results[0]["model_a"]
+            m2 = results[0]["model_b"]
             timestamp = time.strftime('%Y%m%d_%H%M%S')
             filename = f"{m1}_vs_{m2}_{timestamp}.json"
         else:

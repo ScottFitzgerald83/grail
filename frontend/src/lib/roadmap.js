@@ -3,10 +3,7 @@ export const roadmapMarkdown = `
 |----------|----------------------------------------------|--------|-------------------------------------------|
 | 🚩 P0     | Model execution wiring                       | BE     | backend/engine/remote.py                  |
 | 🚩 P0     | Config routing + translation                 | BE     | backend/config/settings.py                |
-| 🚩 P0     | Return final stats from streamed outputs     | BE     | backend/main.py                           |
 | 🚩 P0     | Return fallback vs. primary model info       | BE     | backend/engine/remote.py                  |
-| 🚩 P0     | Validate presence of API key before infer    | BE     | backend/main.py                           |
-| 🚩 P0     | Compare POST/batch inference                 | BE     | backend/main.py                           |
 | 🚩 P0     | Chat pipeline (send/edit/delete)             | FE     | frontend/routes/chat/+page.svelte         |
 | ⚠️ P1     | API key validation logic                     | BE     | backend/lib/secrets.py                    |
 | ⚠️ P1     | Show warning if OpenAI key is missing        | FE     | frontend/routes/chat/+page.svelte         |
