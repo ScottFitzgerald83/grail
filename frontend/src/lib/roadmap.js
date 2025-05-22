@@ -1,17 +1,14 @@
 export const roadmapMarkdown = `
 | Priority | Task                                      | Domain | File                                      |
 |----------|-------------------------------------------|--------|-------------------------------------------|
-| 🚩 P0     | Pre-generation token estimation           | BE     | backend/engine/remote.py                  |
 | 🚩 P0     | Secure OpenAI key handling                | FE     | frontend/routes/tuning/+page.svelte       |
 | 🚩 P0     | Validate presence of API key before infer | BE     | backend/main.py                           |
 | ⚠️ P1     | API key setup field (OpenAI)              | FE     | frontend/routes/tuning/+page.svelte       |
 | ⚠️ P1     | Prompt schema validation                  | BE     | backend/config/settings.py                |
 | ⚠️ P1     | Max token cap enforcement per model       | BE     | backend/engine/model.py                   |
 | ⚠️ P1     | Truncate chat history to fit context      | BE     | backend/main.py                           |
-| ⚠️ P1     | System prompt passthrough (remote)        | BE     | backend/engine/remote.py                  |
 | ⚠️ P1     | Show warning if OpenAI key is missing     | FE     | frontend/routes/chat/+page.svelte         |
 | ⚠️ P1     | Token/cost display for streamed output    | FE     | frontend/routes/chat/+page.svelte         |
-| ⚠️ P1     | Return fallback vs. primary model info    | BE     | backend/engine/remote.py                  |
 | ⚠️ P1     | Return final stats from streamed outputs  | BE     | backend/main.py                           |
 | 🍀 P2     | API key input and persistence (opt-in)    | FE     | frontend/routes/tuning/+page.svelte       |
 | 🍀 P2     | Test API key button                       | FE     | frontend/routes/tuning/+page.svelte       |
