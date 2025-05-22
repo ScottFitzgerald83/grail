@@ -7,11 +7,14 @@
 
 body.dark {
     --bg: #121212;
-    --text: #eaeaea;
+    --text: #f0f0f0;
     --primary: #4ea2ff;
     --card: #1e1e1e;
-    background: var(--bg) !important;
-    color: var(--text) !important;
+    --surface: #2a2a2a;
+    --border: #555;
+    --border-muted: #777;
+    background: var(--bg);
+    color: var(--text);
 }
 
 body {
@@ -958,4 +961,39 @@ button.mini {
     border: 1px solid var(--border);
     border-radius: 4px;
     margin-left: 0.5rem;
+}
+
+/* WCAG-compliant dark mode: high contrast for cards, surfaces, forms, nav, toasts */
+body.dark .param-tile,
+body.dark .config-card,
+body.dark .result-card,
+body.dark .tooltip-card {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+body.dark .top-nav,
+body.dark form,
+body.dark .message-bubble {
+    background: #1a1a1a;
+    color: #f0f0f0;
+}
+
+body.dark .message-row.user .message-bubble {
+    background-color: #0d6efd;
+    color: white;
+}
+
+body.dark .toast {
+    background: #2c2c2c;
+    color: #f0f0f0;
+}
+
+body.dark .help-icon {
+    color: #89c9ff;
+}
+
+body.dark .help-icon-wrapper:hover .help-icon {
+    color: #4ea2ff;
 }

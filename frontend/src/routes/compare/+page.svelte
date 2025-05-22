@@ -172,8 +172,8 @@
     function exportResults(format = 'json') {
         const safeA = resultA && resultA.model ? resultA : { model: 'modelA', output: '' };
         const safeB = resultB && resultB.model ? resultB : { model: 'modelB', output: '' };
-        const name = `${safeA.model}_vs_${safeB.model}`;
-        const timestamp = Date.now();
+
+        const name = resultA?.filename || `${safeA.model}_vs_${safeB.model}_${Date.now()}`;
         const blob = new Blob([
             format === 'json'
                 ? JSON.stringify({prompt, configA, configB, resultA: safeA, resultB: safeB}, null, 2)
@@ -182,7 +182,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `compare_${name}_${timestamp}.${format === 'json' ? 'json' : 'md'}`;
+        a.download = `compare_${name}.${format === 'json' ? 'json' : 'md'}`;
         a.click();
         URL.revokeObjectURL(url);
     }
