@@ -67,15 +67,17 @@
     }
 
     function exportResults(format = 'json') {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const name = `${resultA?.model || 'modelA'}_vs_${resultB?.model || 'modelB'}`;
         const blob = new Blob([
             format === 'json'
-                ? JSON.stringify({prompt, configA, configB, resultA, resultB}, null, 2)
-                : `### Prompt:\n${prompt}\n\n### Config A (${resultA.model}):\n${resultA.output}\n\n### Config B (${resultB.model}):\n${resultB.output}`
-        ], {type: format === 'json' ? 'application/json' : 'text/markdown'});
+                ? JSON.stringify({ prompt, configA, configB, resultA, resultB }, null, 2)
+                : `# Prompt:\n${prompt}\n\n## ${resultA.model}:\n${resultA.output}\n\n## ${resultB.model}:\n${resultB.output}`
+        ], { type: format === 'json' ? 'application/json' : 'text/markdown' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `compare_result.${format}`;
+        a.download = `compare_${name}_${timestamp}.${format === 'json' ? 'json' : 'md'}`;
         a.click();
         URL.revokeObjectURL(url);
     }
