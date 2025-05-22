@@ -253,7 +253,10 @@
 <div style="margin-bottom: 1rem;">
     <label style="display: flex; flex-direction: column; gap: 0.25rem;">
         <span>OpenAI API Key (optional):</span>
-        <input type="password" bind:value={apiKey} placeholder="sk-..."/>
+        <input bind:value={apiKey} placeholder="sk-..." type={showApi ? 'text' : 'password'} />
+        <label style="font-size: 0.9rem; margin-top: 0.25rem;">
+            <input type="checkbox" bind:checked={showApi} /> Show API key
+        </label>
     </label>
     <label style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
         <input type="checkbox" bind:checked={persistApiKey}/>
@@ -281,10 +284,11 @@
     let persistApiKey = false;
     let testStatus = '';
     let testingKey = false;
+    let showApi = false;
 
     async function testApiKey() {
-        if (!apiKey.startsWith('sk-')) {
-            testStatus = '❌ Invalid format';
+        if (!apiKey || !apiKey.startsWith('sk-')) {
+            testStatus = '❌ Invalid or missing API key';
             return;
         }
         testingKey = true;
@@ -388,7 +392,7 @@
             }
         }
     });
-    $: if (persistApiKey) {
+    $: if (persistApiKey && apiKey.startsWith('sk-')) {
         localStorage.setItem('grailOpenAIKey', apiKey);
     } else {
         localStorage.removeItem('grailOpenAIKey');
