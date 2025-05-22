@@ -16,18 +16,32 @@ app.add_middleware(
 )
 
 
-def save_to_memory(model_name: str, prompt: str, output: str):
+def save_to_memory(model_name: str, prompt: str, output: str, metadata: dict = None):
     model_key = model_name.replace(":", "_") if model_name else "local"
     memory_path = Path(f"memory/chat_{model_key}.json")
     memory_path.parent.mkdir(exist_ok=True)
+
     history = []
     if memory_path.exists():
         try:
             with open(memory_path, "r") as f:
                 history = json.load(f)
+                if not isinstance(history, list):
+                    history = []
         except Exception:
             history = []
-    history.append({"timestamp": time.time(), "prompt": prompt, "output": output})
+
+    entry = {
+        "timestamp": time.time(),
+        "prompt": prompt,
+        "output": output,
+        "model": model_name,
+    }
+    if metadata:
+        entry.update(metadata)
+
+    history.append(entry)
+
     with open(memory_path, "w") as f:
         json.dump(history, f, indent=2)
 
@@ -68,7 +82,12 @@ async def infer(request: Request):
         response_text = None if prompt.strip().lower() == "fail" else route_model(model_name, prompt, config)
 
         if response_text:
-            save_to_memory(model_name, prompt, response_text)
+            token_count = len(response_text.split()) if response_text else 0
+            save_to_memory(model_name, prompt, response_text, {
+                "tokens": token_count,
+                "cost_estimate": round(token_count * 0.00002, 4),  # adjustable rate
+                "config": config
+            })
 
         if stream and response_text is not None:
             async def token_stream():
