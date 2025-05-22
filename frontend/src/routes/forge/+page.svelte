@@ -2,6 +2,11 @@
 <p class="page-subtext">
     This is where the sparks fly—upload your data, shape your config, and temper your model in the fires of fine-tuning.
 </p>
+<p class="page-subtext">
+    The dashboard below guides you through training a language model on your own data. Whether you're starting from a
+    base model or training from scratch, this is where you define the outcome. You’ll set the learning pace, select
+    your strategy, and observe how small changes forge new behaviors into the model’s foundation.
+</p>
 <style src="/src/app.css"></style>
 
 <div class="dashboard-container">

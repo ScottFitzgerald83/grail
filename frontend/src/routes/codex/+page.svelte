@@ -1,8 +1,14 @@
 <style src="/src/app.css"></style>
 <h1>📘 The Codex</h1>
 <p class="page-subtext">
-    A chamber of whispering parameters and ancient sliders—here you tune the voice of the machine, without retraining
-    the mind behind it.
+    A sacred chamber for live experimentation—tune your prompts, test your spellcraft, and shape how language flows
+    from your chosen model. What you try here is ephemeral, but it teaches you what to forge.
+</p>
+<p class="page-subtext">
+    Below, you’ll find a dashboard of settings that shape how the model responds to your prompts — from its creativity
+    and verbosity to its randomness and structure. These controls don’t change the model itself, but they guide its
+    behavior in real time. Use them to discover what combinations yield clarity, elegance, or surprise. As you tweak
+    each setting, a live summary will help you anticipate the outcome.
 </p>
 
 <div class="dashboard-container">
