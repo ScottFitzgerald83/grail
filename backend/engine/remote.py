@@ -18,14 +18,17 @@ def model_router(prompt, config):
         elif model_name.startswith("ollama:"):
             return run_ollama(model_name, prompt, config)
         else:
-            return {"output": f"⚠️ Unsupported model: {model_name}", "model": model_name}
+            return {"output": f"⚠️ Unsupported model: {model_name}", "model": model_name, "fallback_used": False}
     except Exception as e:
         fallback = config.get("fallback_model")
         if fallback and fallback != model_name:
             print(f"[GRAIL] Primary model failed, attempting fallback: {fallback}")
             config["public_model_name"] = fallback
-            return model_router(prompt, config)
-        return {"output": f"⚠️ Model error and no fallback: {e}", "model": model_name}
+            fallback_response = model_router(prompt, config)
+            fallback_response["fallback_used"] = True
+            fallback_response["fallback_model"] = fallback
+            return fallback_response
+        return {"output": f"⚠️ Model error and no fallback: {e}", "model": model_name, "fallback_used": False}
 
 def run_openai(model_name, prompt, config):
     url = "https://api.openai.com/v1/chat/completions"
@@ -55,10 +58,11 @@ def run_openai(model_name, prompt, config):
             "tokens": out.get("usage", {}).get("total_tokens", 0),
             "latency_ms": delta,
             "model": model_name,
-            "config": config
+            "config": config,
+            "fallback_used": False,
         }
     except Exception as e:
-        return {"output": f"⚠️ OpenAI error: {e}", "model": model_name}
+        return {"output": f"⚠️ OpenAI error: {e}", "model": model_name, "fallback_used": False}
 
 def run_ollama(model_name, prompt, config):
     model = model_name.split(":", 1)[1]
@@ -85,10 +89,11 @@ def run_ollama(model_name, prompt, config):
             "tokens": out.get("eval_count", len(out.get("response", "").split())),
             "latency_ms": delta,
             "model": model_name,
-            "config": config
+            "config": config,
+            "fallback_used": False,
         }
     except Exception as e:
-        return {"output": f"⚠️ Ollama error: {e}", "model": model_name}
+        return {"output": f"⚠️ Ollama error: {e}", "model": model_name, "fallback_used": False}
 import aiohttp
 import asyncio
 
