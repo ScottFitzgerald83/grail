@@ -765,3 +765,28 @@ body.dark .markdown-output pre {
 body.dark .markdown-output {
     color: #ddd;
 }
+
+/* Added for Compare tab system prompt preview */
+.system-prompt-preview {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #444;
+}
+
+.system-prompt-preview pre {
+  background: #f9f9fb;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+body.dark .system-prompt-preview {
+  color: #ccc;
+}
+
+body.dark .system-prompt-preview pre {
+  background: #2e2e38;
+  color: #ddd;
+  border-color: #444;
+}

@@ -2,6 +2,7 @@
     import {onMount} from 'svelte';
 
     let darkMode = false;
+    let condensedView = false;
 
     onMount(() => {
         darkMode = localStorage.getItem("theme") === "dark";
@@ -52,7 +53,7 @@
                 body: JSON.stringify({prompts, config_a: configA, config_b: configB})
             });
             const data = await response.json();
-            resultA = data[0].result_a;
+            resultA = data;
             resultB = data[0].result_b;
         }
         loading = false;
@@ -81,12 +82,35 @@
         a.click();
         URL.revokeObjectURL(url);
     }
+
+    function exportResultsCSV() {
+      if (!Array.isArray(resultA)) return;
+      const header = ['Prompt', 'Model A', 'Output A', 'Latency A', 'Tokens A', 'Model B', 'Output B', 'Latency B', 'Tokens B'];
+      const rows = resultA.map((row, i) => [
+        row.prompt, row.result_a.model, row.result_a.output, row.result_a.latency_ms, row.result_a.tokens,
+        row.result_b.model, row.result_b.output, row.result_r.latency_ms, row.result_r.tokens
+      ]);
+      const csv = [header, ...rows].map(r => r.map(c => `"${(c || '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'compare_batch_export.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
 </script>
 <div style="text-align: right; margin-bottom: 0.5rem;">
     <button on:click={toggleDarkMode}>
         {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
     </button>
 </div>
+
+<label style="margin-right: 1rem;">
+  <input type="checkbox" bind:checked={condensedView} />
+  Condensed View
+</label>
+
 <h1>🔁 Compare</h1>
 
 <div style="margin-bottom: 1rem;">
@@ -108,6 +132,12 @@
                 <option value="mixtral">Mixtral</option>
             </select>
         </label>
+        {#if resultA?.config?.system_prompt}
+          <div class="system-prompt-preview">
+            <strong>System Prompt:</strong>
+            <pre>{resultA.config.system_prompt}</pre>
+          </div>
+        {/if}
     </div>
     <div class="config-card">
         <h3>Config B</h3>
@@ -120,17 +150,23 @@
                 <option value="mixtral">Mixtral</option>
             </select>
         </label>
+        {#if resultB?.config?.system_prompt}
+          <div class="system-prompt-preview">
+            <strong>System Prompt:</strong>
+            <pre>{resultB.config.system_prompt}</pre>
+          </div>
+        {/if}
     </div>
 </div>
 
-{#if resultA && resultB}
+{#if resultA && resultB && !condensedView}
     <p class="summary-box">
         {resultA.model} was {resultA.latency_ms < resultB.latency_ms ? 'faster' : 'slower'} and
         used {resultA.tokens < resultB.tokens ? 'fewer' : 'more'} tokens than {resultB.model}.
     </p>
 {/if}
 
-{#if resultA && resultB}
+{#if resultA && resultB && !condensedView}
     <div class="compare-output">
         <div class="result-card" transition:fade>
             <h4>{resultA.model}</h4>
@@ -145,6 +181,12 @@
                 </div>
             </div>
             {@html `<div class="markdown-output">${renderMarkdown(resultA.output)}</div>`}
+            {#if resultA?.config?.system_prompt}
+              <div class="system-prompt-preview">
+                <strong>System Prompt:</strong>
+                <pre>{resultA.config.system_prompt}</pre>
+              </div>
+            {/if}
         </div>
         <div class="result-card" transition:fade>
             <h4>{resultB.model}</h4>
@@ -159,6 +201,12 @@
                 </div>
             </div>
             {@html `<div class="markdown-output">${renderMarkdown(resultB.output)}</div>`}
+            {#if resultB?.config?.system_prompt}
+              <div class="system-prompt-preview">
+                <strong>System Prompt:</strong>
+                <pre>{resultB.config.system_prompt}</pre>
+              </div>
+            {/if}
         </div>
     </div>
 {/if}
@@ -168,10 +216,13 @@
         <button on:click={runComparison}>🔁 Retry Comparison</button>
         <button on:click={() => exportResults('json')}>📤 Export JSON</button>
         <button on:click={() => exportResults('md')}>📝 Export Markdown</button>
+        {#if Array.isArray(resultA)}
+          <button on:click={exportResultsCSV}>📊 Export Batch CSV</button>
+        {/if}
     </div>
 {/if}
 
-{#if resultA && resultB}
+{#if resultA && resultB && !condensedView}
     <h2 style="margin-top: 2rem;">🔍 Config Differences</h2>
     <table class="diff-table">
         <thead>
