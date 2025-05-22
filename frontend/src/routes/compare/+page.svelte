@@ -191,57 +191,59 @@ ${row.result_b.output}`;
     }
 </script>
 
-<div class="card-block">
-  <label class="field-label">Prompt</label>
-  <textarea bind:value={prompt} rows="4" class="full-input" placeholder="Enter one or more prompts, separated by line breaks"></textarea>
+<div class="page-container">
+  <div class="card-block">
+    <label class="field-label">Prompt</label>
+    <textarea bind:value={prompt} rows="4" class="full-input" placeholder="Enter one or more prompts, separated by line breaks"></textarea>
+  </div>
+
+  <div class="card-block config-panels">
+    <div class="config-card">
+      <h3>Config A</h3>
+      <label>Model A:
+        <select bind:value={configA.public_model_name}>
+          <option value="gpt-4">GPT-4</option>
+          <option value="gpt-3.5">GPT-3.5</option>
+          <option value="ollama:llama2">Ollama: LLaMA 2</option>
+          <option value="ollama:mistral">Ollama: Mistral</option>
+          <option value="mixtral">Mixtral</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="config-card">
+      <h3>Config B</h3>
+      <label>Model B:
+        <select bind:value={configB.public_model_name}>
+          <option value="gpt-4">GPT-4</option>
+          <option value="gpt-3.5">GPT-3.5</option>
+          <option value="ollama:llama2">Ollama: LLaMA 2</option>
+          <option value="ollama:mistral">Ollama: Mistral</option>
+          <option value="mixtral">Mixtral</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <hr class="section-divider" />
+
+  <div class="controls-row spaced">
+    <div class="control-item">
+      <label class="toggle-label">
+        <input type="checkbox" bind:checked={condensedView} />
+        Condensed View
+      </label>
+    </div>
+    <div class="control-item">
+      <button class="primary-button" on:click={runComparison} disabled={loading}>
+        {loading ? 'Comparing...' : 'Run Comparison'}
+      </button>
+    </div>
+  </div>
+
+  {#if !loading && (!resultA || !resultB)}
+    <div class="empty-message">
+      <p>👋 Enter a prompt and click <strong>Run Comparison</strong> to see results.</p>
+    </div>
+  {/if}
 </div>
-
-<div class="card-block config-panels">
-  <div class="config-card">
-    <h3>Config A</h3>
-    <label>Model A:
-      <select bind:value={configA.public_model_name}>
-        <option value="gpt-4">GPT-4</option>
-        <option value="gpt-3.5">GPT-3.5</option>
-        <option value="ollama:llama2">Ollama: LLaMA 2</option>
-        <option value="ollama:mistral">Ollama: Mistral</option>
-        <option value="mixtral">Mixtral</option>
-      </select>
-    </label>
-  </div>
-
-  <div class="config-card">
-    <h3>Config B</h3>
-    <label>Model B:
-      <select bind:value={configB.public_model_name}>
-        <option value="gpt-4">GPT-4</option>
-        <option value="gpt-3.5">GPT-3.5</option>
-        <option value="ollama:llama2">Ollama: LLaMA 2</option>
-        <option value="ollama:mistral">Ollama: Mistral</option>
-        <option value="mixtral">Mixtral</option>
-      </select>
-    </label>
-  </div>
-</div>
-
-<hr class="section-divider" />
-
-<div class="controls-row spaced">
-  <div class="control-item">
-    <label class="toggle-label">
-      <input type="checkbox" bind:checked={condensedView} />
-      Condensed View
-    </label>
-  </div>
-  <div class="control-item">
-    <button class="primary-button" on:click={runComparison} disabled={loading}>
-      {loading ? 'Comparing...' : 'Run Comparison'}
-    </button>
-  </div>
-</div>
-
-{#if !loading && (!resultA || !resultB)}
-  <div class="empty-message">
-    <p>👋 Enter a prompt and click <strong>Run Comparison</strong> to see results.</p>
-  </div>
-{/if}
