@@ -1,6 +1,9 @@
 <script>
-    import {onMount} from 'svelte';
+    import { onMount } from 'svelte';
     import { browser } from '$app/environment';
+    import { fade } from 'svelte/transition';
+    import { marked } from 'marked';
+    import DOMPurify from 'dompurify';
 
     let darkMode = false;
     let condensedView = false;
@@ -11,7 +14,9 @@
         document.body.classList.toggle("dark", darkMode);
         if (browser) {
             const savedY = localStorage.getItem('compareScroll');
-            if (savedY) window.scrollTo(0, parseInt(savedY));
+            if (savedY) {
+                requestAnimationFrame(() => window.scrollTo(0, parseInt(savedY)));
+            }
         }
     });
 
@@ -21,14 +26,12 @@
         document.body.classList.toggle("dark", darkMode);
     }
 
-    import {fade} from 'svelte/transition';
-    import {marked} from 'marked';
-    import DOMPurify from 'dompurify';
-
     let prompt = '';
-    let configA = {public_model_name: 'gpt-4'};
-    let configB = {public_model_name: 'ollama:llama2'};
+    let configA = { public_model_name: 'gpt-4' };
+    let configB = { public_model_name: 'ollama:llama2' };
+    /** @type {any} */
     let resultA = null;
+    /** @type {any} */
     let resultB = null;
     let loading = false;
 
@@ -42,7 +45,7 @@
         if (prompts.length === 1) {
             const response = await fetch('/compare', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     prompt,
                     config_a: configA,
@@ -55,8 +58,8 @@
         } else {
             const response = await fetch('/compare/batch', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({prompts, config_a: configA, config_b: configB})
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompts, config_a: configA, config_b: configB })
             });
             const data = await response.json();
             resultA = data;
@@ -65,12 +68,23 @@
         loading = false;
     }
 
+    // Estimate cost for a given model and tokens
+    function estimateCost(model, tokens) {
+        if (!model || !tokens) return "$0.00";
+        const t = tokens;
+        if (model.startsWith("gpt-4")) return `$${((t / 1000) * 0.06).toFixed(4)}`;
+        if (model.startsWith("gpt-3.5")) return `$${((t / 1000) * 0.002).toFixed(4)}`;
+        return "$0.00";
+    }
+
+    let showAllDiff = true;
+
     function getDiffTable(configA, configB) {
         const keys = new Set([...Object.keys(configA), ...Object.keys(configB)]);
         return Array.from(keys)
-            .filter(key => configA[key] !== configB[key])
+            .filter(key => showAllDiff || configA[key] !== configB[key])
             .sort()
-            .map(key => ({key, a: configA[key], b: configB[key]}));
+            .map(key => ({ key, a: configA[key], b: configB[key] }));
     }
 
     function exportResults(format = 'json') {
@@ -90,33 +104,40 @@
     }
 
     function exportResultsCSV() {
-      if (!Array.isArray(resultA)) return;
-      const header = ['Prompt', 'Model A', 'Output A', 'Latency A', 'Tokens A', 'Model B', 'Output B', 'Latency B', 'Tokens B'];
-      const rows = resultA.map((row, i) => [
-        row.prompt, row.result_a.model, row.result_a.output, row.result_a.latency_ms, row.result_a.tokens,
-        row.result_b.model, row.result_b.output, row.result_b.latency_ms, row.result_b.tokens
-      ]);
-      const csv = [header, ...rows].map(r => r.map(c => `"${(c || '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'compare_batch_export.csv';
-      a.click();
-      URL.revokeObjectURL(url);
+        if (!Array.isArray(resultA)) return;
+        const header = [
+            'Prompt', 'Model A', 'Cost A', 'Output A', 'Latency A', 'Tokens A',
+            'Model B', 'Cost B', 'Output B', 'Latency B', 'Tokens B'
+        ];
+        const rows = resultA.map((row) => [
+            row.prompt,
+            row.result_a.model,
+            estimateCost(row.result_a.model, row.result_a.tokens),
+            row.result_a.output,
+            row.result_a.latency_ms,
+            row.result_a.tokens,
+            row.result_b.model,
+            estimateCost(row.result_b.model, row.result_b.tokens),
+            row.result_b.output,
+            row.result_b.latency_ms,
+            row.result_b.tokens
+        ]);
+        const csv = [header, ...rows].map(r => r.map(c => `"${(c || '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'compare_batch_export.csv';
+        a.click();
+        URL.revokeObjectURL(url);
     }
 
     function exportBatchMarkdown() {
         if (!Array.isArray(resultA)) return;
         const parts = resultA.map(row => {
-            return `## Prompt
-${row.prompt}
-
-### ${row.result_a.model}
-${row.result_a.output}
-
-### ${row.result_b.model}
-${row.result_b.output}`;
+            const costA = estimateCost(row.result_a.model, row.result_a.tokens);
+            const costB = estimateCost(row.result_b.model, row.result_b.tokens);
+            return `## Prompt\n${row.prompt}\n\n### ${row.result_a.model} (cost: ${costA})\n${row.result_a.output}\n\n### ${row.result_b.model} (cost: ${costB})\n${row.result_b.output}`;
         });
         const blob = new Blob([parts.join('\n\n---\n\n')], { type: 'text/markdown' });
         const url = URL.createObjectURL(blob);
@@ -126,10 +147,12 @@ ${row.result_b.output}`;
         a.click();
         URL.revokeObjectURL(url);
     }
+</script>
+
 <svelte:window on:scroll={() => {
     if (browser) localStorage.setItem('compareScroll', window.scrollY);
 }} />
-</script>
+
 <div style="text-align: right; margin-bottom: 0.5rem;">
     <button on:click={toggleDarkMode}>
         {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
@@ -137,8 +160,8 @@ ${row.result_b.output}`;
 </div>
 
 <label style="margin-right: 1rem;">
-  <input type="checkbox" bind:checked={condensedView} />
-  Condensed View
+    <input type="checkbox" bind:checked={condensedView} />
+    Condensed View
 </label>
 
 <h1>🔁 Compare</h1>
@@ -163,10 +186,10 @@ ${row.result_b.output}`;
             </select>
         </label>
         {#if resultA?.config?.system_prompt}
-          <div class="system-prompt-preview">
-            <strong>System Prompt:</strong>
-            <pre>{resultA.config.system_prompt}</pre>
-          </div>
+            <div class="system-prompt-preview">
+                <strong>System Prompt:</strong>
+                <pre>{resultA.config.system_prompt}</pre>
+            </div>
         {/if}
     </div>
     <div class="config-card">
@@ -181,10 +204,10 @@ ${row.result_b.output}`;
             </select>
         </label>
         {#if resultB?.config?.system_prompt}
-          <div class="system-prompt-preview">
-            <strong>System Prompt:</strong>
-            <pre>{resultB.config.system_prompt}</pre>
-          </div>
+            <div class="system-prompt-preview">
+                <strong>System Prompt:</strong>
+                <pre>{resultB.config.system_prompt}</pre>
+            </div>
         {/if}
     </div>
 </div>
@@ -210,13 +233,12 @@ ${row.result_b.output}`;
                     <div class="fill" style="width: {resultA.tokens / 2}%"></div>
                 </div>
             </div>
+            <div class="metric-bar"><span>Estimated Cost</span>
+                <div style="font-size: 0.85rem; margin-top: 0.25rem;">
+                    {estimateCost(resultA.model, resultA.tokens)}
+                </div>
+            </div>
             {@html `<div class="markdown-output">${renderMarkdown(resultA.output)}</div>`}
-            {#if resultA?.config?.system_prompt}
-              <div class="system-prompt-preview">
-                <strong>System Prompt:</strong>
-                <pre>{resultA.config.system_prompt}</pre>
-              </div>
-            {/if}
         </div>
         <div class="result-card" transition:fade>
             <h4>{resultB.model}</h4>
@@ -230,13 +252,12 @@ ${row.result_b.output}`;
                     <div class="fill" style="width: {resultB.tokens / 2}%"></div>
                 </div>
             </div>
+            <div class="metric-bar"><span>Estimated Cost</span>
+                <div style="font-size: 0.85rem; margin-top: 0.25rem;">
+                    {estimateCost(resultB.model, resultB.tokens)}
+                </div>
+            </div>
             {@html `<div class="markdown-output">${renderMarkdown(resultB.output)}</div>`}
-            {#if resultB?.config?.system_prompt}
-              <div class="system-prompt-preview">
-                <strong>System Prompt:</strong>
-                <pre>{resultB.config.system_prompt}</pre>
-              </div>
-            {/if}
         </div>
     </div>
 {/if}
@@ -247,14 +268,18 @@ ${row.result_b.output}`;
         <button on:click={() => exportResults('json')}>📤 Export JSON</button>
         <button on:click={() => exportResults('md')}>📝 Export Markdown</button>
         {#if Array.isArray(resultA)}
-          <button on:click={exportResultsCSV}>📊 Export Batch CSV</button>
-          <button on:click={exportBatchMarkdown}>📘 Export Batch Markdown</button>
+            <button on:click={exportResultsCSV}>📊 Export Batch CSV</button>
+            <button on:click={exportBatchMarkdown}>📘 Export Batch Markdown</button>
         {/if}
     </div>
 {/if}
 
 {#if resultA && resultB && !condensedView}
     <h2 style="margin-top: 2rem;">🔍 Config Differences</h2>
+    <label style="display: block; margin-top: 1rem;">
+      <input type="checkbox" bind:checked={showAllDiff} />
+      Show all config fields
+    </label>
     <table class="diff-table">
         <thead>
         <tr>
