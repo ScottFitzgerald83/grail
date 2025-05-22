@@ -88,7 +88,7 @@ h3 {
     border: 1px solid #ccc;
     border-radius: 12px;
     padding: 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
     background: var(--card);
 }
 
@@ -317,6 +317,7 @@ body.dark ::-webkit-scrollbar-thumb {
     color: #666;
     margin-top: 0.25rem;
 }
+
 body {
     background: #f4f7fb;
 }
@@ -569,6 +570,7 @@ h1 {
     color: #333;
     margin-bottom: 0.5rem;
 }
+
 /* Toggle Switch Styles */
 .toggle-switch {
     position: relative;
@@ -690,21 +692,26 @@ form {
     font-size: 0.9rem;
     line-height: 1.4;
 }
+
 .message-bubble .timestamp {
     margin-top: 0.25rem;
     font-size: 0.7rem;
     color: #888;
 }
+
 .timestamp {
     color: #888;
 }
+
 body.dark .timestamp {
     color: #aaa;
 }
+
 body.dark .message-bubble {
     background-color: #2d2f3a;
     color: #f0f0f0;
 }
+
 textarea.chat-input-textarea {
     padding: 0.5rem;
     font-size: 0.95rem;
@@ -771,27 +778,27 @@ body.dark .markdown-output {
 
 /* Added for Compare tab system prompt preview */
 .system-prompt-preview {
-  margin-top: 1rem;
-  font-size: 0.85rem;
-  color: #444;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: #444;
 }
 
 .system-prompt-preview pre {
-  background: #f9f9fb;
-  padding: 0.5rem;
-  font-size: 0.85rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+    background: #f9f9fb;
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
 }
 
 body.dark .system-prompt-preview {
-  color: #ccc;
+    color: #ccc;
 }
 
 body.dark .system-prompt-preview pre {
-  background: #2e2e38;
-  color: #ddd;
-  border-color: #444;
+    background: #2e2e38;
+    color: #ddd;
+    border-color: #444;
 }
 
 .token-estimate {
@@ -848,68 +855,68 @@ body.dark .system-box {
 /* Added styles for Chat page polish */
 
 .empty-state {
-  text-align: center;
-  margin: 2rem auto;
-  opacity: 0.8;
-  font-size: 0.95rem;
+    text-align: center;
+    margin: 2rem auto;
+    opacity: 0.8;
+    font-size: 0.95rem;
 }
 
 .model-badge {
-  text-align: center;
-  font-size: 0.85rem;
-  padding: 0.25rem;
-  color: var(--text);
+    text-align: center;
+    font-size: 0.85rem;
+    padding: 0.25rem;
+    color: var(--text);
 }
 
 .context-menu {
-  position: fixed;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  padding: 0.5rem;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+    position: fixed;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    padding: 0.5rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 
 .context-menu button {
-  padding: 0.25rem 0.5rem;
-  background: transparent;
-  border: none;
-  text-align: left;
-  cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
 }
 
 .context-menu button:hover {
-  background: #f0f0f0;
+    background: #f0f0f0;
 }
 
 .blinking-cursor {
-  display: inline-block;
-  width: 0.6ch;
-  background: currentColor;
-  animation: blink 1s step-start infinite;
-  margin-left: 0.1rem;
+    display: inline-block;
+    width: 0.6ch;
+    background: currentColor;
+    animation: blink 1s step-start infinite;
+    margin-left: 0.1rem;
 }
 
 @keyframes blink {
-  50% {
-    opacity: 0;
-  }
+    50% {
+        opacity: 0;
+    }
 }
 
 .toast {
-  position: fixed;
-  bottom: 1rem;
-  right: 1rem;
-  background: #444;
-  color: white;
-  padding: 0.6rem 1rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  z-index: 999;
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    background: #444;
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    z-index: 999;
 }
 
 /* --- Compare tab output blocks --- */
@@ -1003,6 +1010,7 @@ body.dark .help-icon-wrapper:hover .help-icon {
     color: orange;
     margin-top: 0.25rem;
 }
+
 .metrics-eval {
     background: #f9f5e7;
     border-left: 4px solid #eebc5a;
@@ -1010,6 +1018,7 @@ body.dark .help-icon-wrapper:hover .help-icon {
     padding: 0.75rem 1rem;
     border-radius: 6px;
 }
+
 .share-link-preview {
     font-size: 0.75rem;
     word-break: break-all;
@@ -1018,6 +1027,7 @@ body.dark .help-icon-wrapper:hover .help-icon {
     padding: 0.5rem;
     border-radius: 4px;
 }
+
 .toast {
     position: fixed;
     bottom: 2rem;
@@ -1118,11 +1128,13 @@ body.dark .help-icon-wrapper:hover .help-icon {
     align-items: center;
     gap: 0.5em;
 }
+
 .feature-badges {
     display: inline-flex;
     gap: 0.3em;
     margin-left: 0.5em;
 }
+
 .feature-badge {
     background: #e0e7ff;
     color: #3730a3;
@@ -1132,6 +1144,7 @@ body.dark .help-icon-wrapper:hover .help-icon {
     font-weight: 500;
     vertical-align: middle;
 }
+
 .fallback-label {
     color: #b45309;
     font-weight: bold;
@@ -1141,27 +1154,65 @@ body.dark .help-icon-wrapper:hover .help-icon {
     margin-bottom: 0.5em;
     display: inline-block;
 }
+
 .diff-miss {
     background: #fee2e2;
     color: #991b1b;
     border-radius: 0.2em;
     padding: 0.1em 0.2em;
 }
+
 .output-stacked {
     display: flex;
     flex-direction: column;
     gap: 1.2em;
 }
+
 .compare-output {
     display: flex;
     flex-direction: row;
     gap: 2em;
 }
+
 .metrics-eval .metrics-grid {
     display: flex;
     gap: 2em;
 }
+
 .metrics-model-label {
     font-weight: bold;
     margin-bottom: 0.2em;
+}
+
+.training-config {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--bg-alt);
+    border-radius: 8px;
+}
+
+.upload-section, .config-preview, .launch-buttons {
+    margin-top: 1rem;
+}
+
+.yaml-box {
+    background: #f5f5f5;
+    padding: 1rem;
+    font-family: monospace;
+    border-radius: 6px;
+    white-space: pre-wrap;
+}
+
+.file-status {
+    color: #444;
+    margin-top: 0.5rem;
+}
+
+.launch-link {
+    margin-left: 1rem;
+    text-decoration: none;
+    background: #4caf50;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
 }

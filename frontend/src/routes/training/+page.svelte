@@ -1,6 +1,28 @@
 <h1>🎛️ Model Tuning</h1>
 <style src="/src/app.css"></style>
+<section class="training-config">
+    <h2>🧪 Fine-tuning a Model</h2>
+    <p>This panel lets you upload a dataset, preview config YAML, and launch a training job using CLI or Colab.</p>
 
+    <div class="upload-section">
+        <label for="file-upload">📁 Upload Dataset (JSONL, CSV, Chat):</label>
+        <input id="file-upload" type="file" accept=".jsonl,.json,.csv" on:change={handleFileUpload}/>
+        {#if fileName}
+            <p class="file-status">Uploaded: <strong>{fileName}</strong></p>
+        {/if}
+    </div>
+
+    <div class="config-preview">
+        <h3>📄 Training Config YAML</h3>
+        <pre class="yaml-box">{yamlPreview}</pre>
+    </div>
+
+    <div class="launch-buttons">
+        <button on:click={copyToClipboard}>📋 Copy YAML</button>
+        <a href="https://colab.research.google.com/" target="_blank" class="launch-link">🚀 Launch in Colab</a>
+        <button on:click={launchCli} title="Prints CLI instructions to console">🖥️ Show CLI Instructions</button>
+    </div>
+</section>
 <div class="dashboard-container">
     <div class="param-grid">
         {#each [...parameters]
@@ -253,27 +275,28 @@
 <div style="margin-bottom: 1rem;">
     <label style="display: flex; flex-direction: column; gap: 0.25rem;">
         <span>OpenAI API Key (optional):</span>
-        <input bind:value={apiKey} placeholder="sk-..." type={showApi ? 'text' : 'password'} />
+        <input bind:value={apiKey} placeholder="sk-..." type={showApi ? 'text' : 'password'}/>
         <label style="font-size: 0.9rem; margin-top: 0.25rem;">
-            <input type="checkbox" bind:checked={showApi} /> Show API key
+            <input type="checkbox" bind:checked={showApi}/> Show API key
         </label>
     </label>
     <label style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
         <input type="checkbox" bind:checked={persistApiKey}/>
         Remember this key (stored only in your browser)
-        <span style="font-size: 0.85rem; color: #888;" title="For privacy: your key is never sent to our servers, only stored in your browser if checked.">ⓘ</span>
+        <span style="font-size: 0.85rem; color: #888;"
+              title="For privacy: your key is never sent to our servers, only stored in your browser if checked.">ⓘ</span>
     </label>
     <div style="margin-top: 0.5rem;">
         <button
-            on:click={testApiKey}
-            title="Check if your API key is valid and active with OpenAI (never sent to this site)">
+                on:click={testApiKey}
+                title="Check if your API key is valid and active with OpenAI (never sent to this site)">
             🔍 Test API Key
         </button>
         {#if testingKey}
-          <span style="margin-left: 1rem; font-weight: 500; color: #888;">⏳ Testing...</span>
+            <span style="margin-left: 1rem; font-weight: 500; color: #888;">⏳ Testing...</span>
         {:else if testStatus}
           <span
-            style="margin-left: 1rem; font-weight: 500;
+                  style="margin-left: 1rem; font-weight: 500;
               color:
                 {testStatus.startsWith('✅') ? '#228B22'
                 : testStatus.startsWith('❌') ? '#c62828'
@@ -807,6 +830,51 @@ Useful for strict response limits.`,
             `top-k:${cfg.top_k}`,
             `model:${cfg.use_public_model === 'true' ? cfg.public_model_name : cfg.model_name}`
         ].join(' | ');
+    }
+
+    let yamlPreview = '';
+    let fileName = '';
+
+    function handleFileUpload(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        fileName = file.name;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const content = e.target.result;
+            try {
+                const json = JSON.parse(content);
+                yamlPreview = generateYamlFromJson(json);
+            } catch {
+                yamlPreview = `# Could not parse file: ${file.name}`;
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function generateYamlFromJson(json) {
+        const sample = Array.isArray(json) ? json[0] : json;
+        return [
+            'model: gpt-3.5-turbo',
+            'format: openai',
+            'train_file: ./your_dataset.jsonl',
+            'n_epochs: 3',
+            'batch_size: 4',
+            'learning_rate: 2e-5',
+            '',
+            '# Example input structure:',
+            ...Object.entries(sample).map(([k, v]) => `# ${k}: ${JSON.stringify(v)}`)
+        ].join('\n');
+    }
+
+    function copyToClipboard() {
+        navigator.clipboard.writeText(yamlPreview);
+        alert('YAML copied to clipboard');
+    }
+
+    function launchCli() {
+        console.log('To run locally:\n\n$ python train.py --config training.yaml\n\n# Make sure your dataset and config are prepared.');
     }
 
 </script>

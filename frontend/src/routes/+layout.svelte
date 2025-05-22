@@ -20,6 +20,7 @@
   <a href="/tuning">Tuning</a>
   <a href="/glossary">Glossary</a>
   <a href="/roadmap">Roadmap</a>
+  <a href="/training">Training</a>
   <button on:click={toggleDarkMode} class="theme-toggle">
     {darkMode ? '☀️' : '🌙'}
   </button>
