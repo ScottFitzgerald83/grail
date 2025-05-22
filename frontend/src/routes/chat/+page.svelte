@@ -32,7 +32,9 @@
     }
 
     function formatTimestampForDisplay(ts) {
-        const minutes = Math.floor((Date.now() - new Date(ts)) / 60000);
+        const date = new Date(ts);
+        if (isNaN(date)) return '';
+        const minutes = Math.floor((Date.now() - date) / 60000);
         return minutes < 1 ? 'just now' : `${minutes}m ago`;
     }
 
@@ -227,29 +229,43 @@
         {#each messages as m (m.id)}
             <div class="message-row {m.role}">
                 <span class="avatar">{m.role === 'user' ? '🙋' : '🧠'}</span>
-                <div class="message-bubble" title="{m.role.toUpperCase()} • {m.timestamp}">
-                    <div class="content">
-                        {#if editingId === m.id}
-                            <textarea bind:value={editedInput} rows="2" style="width: 100%; font-size: 0.9rem;"></textarea>
-                            <div style="margin-top: 0.25rem;">
-                                <button on:click={() => applyEdit(m.id)} style="margin-right: 0.5rem;">Save</button>
-                                <button on:click={cancelEdit}>Cancel</button>
-                            </div>
-                        {:else}
+                {#if m.role === 'user' && editingId !== m.id}
+                    <div
+                        class="message-bubble"
+                        on:contextmenu|preventDefault={() => {
+                            const confirmed = confirm('Edit this message? Click OK to edit, Cancel to delete.');
+                            if (confirmed) startEdit(m);
+                            else deleteMessage(m.id);
+                        }}
+                        title="{m.role.toUpperCase()} • {m.timestamp}"
+                    >
+                        <div class="content">
                             {@html marked.parse(m.content || '')}
-                        {/if}
-                    </div>
-                    <div class="reactions">❤️ 😄 👍</div>
-                    <div class="timestamp" title={m.timestamp}>
-                        {formatTimestampForDisplay(m.timestamp)}
-                    </div>
-                    {#if m.role === 'user' && editingId !== m.id}
-                        <div class="controls">
-                            <button class="mini" title="Edit" on:click={() => startEdit(m)}>📝</button>
-                            <button class="mini" title="Delete" on:click={() => deleteMessage(m.id)}>❌</button>
                         </div>
-                    {/if}
-                </div>
+                        <div class="timestamp" title={m.timestamp}>
+                            {formatTimestampForDisplay(m.timestamp)}
+                        </div>
+
+                    </div>
+                {:else}
+                    <div class="message-bubble" title="{m.role.toUpperCase()} • {m.timestamp}">
+                        <div class="content">
+                            {#if editingId === m.id}
+                                <textarea bind:value={editedInput} rows="2" style="width: 100%; font-size: 0.9rem;"></textarea>
+                                <div style="margin-top: 0.25rem;">
+                                    <button on:click={() => applyEdit(m.id)} style="margin-right: 0.5rem;">Save</button>
+                                    <button on:click={cancelEdit}>Cancel</button>
+                                </div>
+                            {:else}
+                                {@html marked.parse(m.content || '')}
+                            {/if}
+                        </div>
+                        <div class="timestamp" title={m.timestamp}>
+                            {formatTimestampForDisplay(m.timestamp)}
+                        </div>
+
+                    </div>
+                {/if}
             </div>
         {/each}
 
