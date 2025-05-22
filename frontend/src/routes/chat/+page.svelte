@@ -290,7 +290,7 @@ function loadChat(id) {
             config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
             openaiKey = localStorage.getItem('grailOpenAIKey');
         }
-        // Patch 1: Warn if OpenAI key missing before /infer
+        // Warn if OpenAI key missing before /infer
         if (config.use_public_model === 'true' && !openaiKey) {
             alert('⚠️ OpenAI API key is missing. Please enter it in the Tuning tab.');
             sending = false;
@@ -314,7 +314,7 @@ function loadChat(id) {
                 );
             } else {
                 let currentText = '';
-                // Patch 3: Token/cost display for streamed output
+                // Token/cost display for streamed output
                 let tokenEstimate = Math.ceil(data.output.length * 1.25);
                 console.log(`[GRAIL] Streamed estimate: ~${tokenEstimate} tokens`);
                 for (let i = 0; i < data.output.length; i++) {

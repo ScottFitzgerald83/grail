@@ -1,11 +1,7 @@
 export const roadmapMarkdown = `
 | Priority | Description                               | Filename                              |
 |----------|-------------------------------------------|---------------------------------------|
-| 🚩 P0    | Chat pipeline (send/edit/delete)          | frontend/routes/chat/+page.svelte     |
 | 🚩 P0    | Config routing + translation              | backend/config/settings.py            |
-| ⚠️ P1    | Show warning if OpenAI key is missing     | frontend/routes/chat/+page.svelte     |
-| ⚠️ P1    | Token/cost display for streamed output    | frontend/routes/chat/+page.svelte     |
-| ⚠️ P1    | Token preview before submission           | frontend/routes/chat/+page.svelte     |
 | ⚠️ P1    | Cost/token tracking in memory save        | backend/engine/memory.py              |
 | ⚠️ P1    | Structured session file I/O               | backend/engine/memory.py              |
 | ⚠️ P1    | API key validation logic                  | backend/lib/secrets.py                |
