@@ -1,12 +1,18 @@
 <script>
     import {onMount} from 'svelte';
+    import { browser } from '$app/environment';
 
     let darkMode = false;
     let condensedView = false;
+    let scrollY = 0;
 
     onMount(() => {
         darkMode = localStorage.getItem("theme") === "dark";
         document.body.classList.toggle("dark", darkMode);
+        if (browser) {
+            const savedY = localStorage.getItem('compareScroll');
+            if (savedY) window.scrollTo(0, parseInt(savedY));
+        }
     });
 
     function toggleDarkMode() {
@@ -88,7 +94,7 @@
       const header = ['Prompt', 'Model A', 'Output A', 'Latency A', 'Tokens A', 'Model B', 'Output B', 'Latency B', 'Tokens B'];
       const rows = resultA.map((row, i) => [
         row.prompt, row.result_a.model, row.result_a.output, row.result_a.latency_ms, row.result_a.tokens,
-        row.result_b.model, row.result_b.output, row.result_r.latency_ms, row.result_r.tokens
+        row.result_b.model, row.result_b.output, row.result_b.latency_ms, row.result_b.tokens
       ]);
       const csv = [header, ...rows].map(r => r.map(c => `"${(c || '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
       const blob = new Blob([csv], { type: 'text/csv' });
@@ -99,6 +105,30 @@
       a.click();
       URL.revokeObjectURL(url);
     }
+
+    function exportBatchMarkdown() {
+        if (!Array.isArray(resultA)) return;
+        const parts = resultA.map(row => {
+            return `## Prompt
+${row.prompt}
+
+### ${row.result_a.model}
+${row.result_a.output}
+
+### ${row.result_b.model}
+${row.result_b.output}`;
+        });
+        const blob = new Blob([parts.join('\n\n---\n\n')], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'compare_batch_export.md';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+<svelte:window on:scroll={() => {
+    if (browser) localStorage.setItem('compareScroll', window.scrollY);
+}} />
 </script>
 <div style="text-align: right; margin-bottom: 0.5rem;">
     <button on:click={toggleDarkMode}>
@@ -218,6 +248,7 @@
         <button on:click={() => exportResults('md')}>📝 Export Markdown</button>
         {#if Array.isArray(resultA)}
           <button on:click={exportResultsCSV}>📊 Export Batch CSV</button>
+          <button on:click={exportBatchMarkdown}>📘 Export Batch Markdown</button>
         {/if}
     </div>
 {/if}
