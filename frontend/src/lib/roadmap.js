@@ -3,8 +3,7 @@ export const roadmapMarkdown = `
 |----------|--------------------------------------|--------|---------------------------------------|
 | 🚩 P0     | Request logging framework            | BE     | backend/utils/log.py                  |
 | ⚠️ P1     | Prompt schema validation             | BE     | backend/config/settings.py            |
-| ⚠️ P1     | System prompt passthrough (remote)   | BE     | backend/engine/remote.py              |
-| 🍀 P2     | Tuning config export formatting      | FE     | frontend/routes/tuning/+page.svelte   |
+| 🍀 P2     | Tuning config export formatting      | FE     | frontend/routes/tuning/+page.esvelte   |
 | 🍀 P2     | Prompt evaluation integration         | FE     | frontend/routes/compare/+page.svelte  |
 | 🍀 P2     | Prompt truncation UI control          | FE     | frontend/routes/tuning/+page.svelte   |
 | 🍀 P2     | Model fallback status indicator       | FE     | frontend/routes/compare/+page.svelte  |

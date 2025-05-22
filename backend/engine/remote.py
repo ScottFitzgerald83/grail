@@ -1,3 +1,5 @@
+import json
+
 import time
 import requests
 
@@ -77,3 +79,38 @@ def run_ollama(model_name, prompt, config):
         }
     except Exception as e:
         return {"output": f"⚠️ Ollama error: {e}", "model": model_name}
+import aiohttp
+import asyncio
+
+async def stream_public_model(model_name: str, prompt: str, config: dict):
+    """Stream OpenAI-compatible model output character by character."""
+    if model_name.startswith("gpt-"):
+        url = "https://api.openai.com/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {config.get('openai_api_key') or 'sk-REPLACE'}",
+            "Content-Type": "application/json"
+        }
+        body = {
+            "model": model_name,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": float(config.get("temperature", 0.7)),
+            "top_p": float(config.get("top_p", 0.9)),
+            "presence_penalty": float(config.get("presence_penalty", 0.0)),
+            "frequency_penalty": float(config.get("frequency_penalty", 0.0)),
+            "stream": True
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, headers=headers, json=body) as resp:
+                async for line in resp.content:
+                    if line.startswith(b'data:'):
+                        try:
+                            json_str = line.decode().split("data: ")[1].strip()
+                            if json_str == "[DONE]":
+                                break
+                            delta = json.loads(json_str)["choices"][0]["delta"]
+                            content = delta.get("content", "")
+                            if content:
+                                yield content
+                        except Exception:
+                            continue
