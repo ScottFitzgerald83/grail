@@ -2,9 +2,9 @@ export const roadmapMarkdown = `
 | Priority | Task                             | Domain    | Description                                                                                           | Value                   |
 |----------|----------------------------------|-----------|-------------------------------------------------------------------------------------------------------|-------------------------|
 | 🚩P0     | Model execution wiring           | BE        | Connect to real models via Ollama, OpenAI, etc. Route based on config and handle authentication.     | Core functionality      |
-| 🍀P2     | Dark mode contrast audit         | FE        | Verify WCAG contrast ratios for all dark mode components.                                              | Accessibility           |
-| 🍀P2     | Scroll context memory            | FE        | Preserve scroll position when switching between Chat and Compare tabs.                                | Productivity            |
-| 🍀P2     | Export filename personalization  | FE        | Include model names and timestamp in exported chat/compare files.                                     | Clarity/Traceability    |
+| ⚠️P1     | Dark mode contrast audit         | FE        | Verify WCAG contrast ratios for all dark mode components.                                              | Accessibility           |
+| ⚠️P1     | Scroll context memory            | FE        | Preserve scroll position when switching between Chat and Compare tabs.                                | Productivity            |
+| ⚠️P1     | Export filename personalization  | FE        | Include model names and timestamp in exported chat/compare files.                                     | Clarity/Traceability    |
 | 🍀P2     | Multi-language support           | FE        | Localize app UI and prompts.                                                                          | Internationalization    |
 | 🍀P2     | Voice input                      | FE        | Add speech-to-text message input.                                                                     | Accessibility           |
 | 🍀P2     | Message reactions                | FE        | Add emoji-based reactions to assistant/user messages.                                                 | Engagement              |

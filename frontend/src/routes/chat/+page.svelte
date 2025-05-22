@@ -120,10 +120,11 @@
     function exportChat(format = 'json') {
         const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
         const model = config.public_model_name || 'local';
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const url = `/memory/${model}?format=${format}`;
         const a = document.createElement('a');
         a.href = url;
-        a.download = `chat_${model}.${format === 'json' ? 'json' : 'txt'}`;
+        a.download = `chat_${model}_${timestamp}.${format === 'json' ? 'json' : 'txt'}`;
         a.click();
     }
 
