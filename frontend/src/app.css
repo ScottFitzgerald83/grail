@@ -790,3 +790,54 @@ body.dark .system-prompt-preview pre {
   color: #ddd;
   border-color: #444;
 }
+
+.token-estimate {
+    font-size: 0.7rem;
+    color: #999;
+    margin-top: 0.25rem;
+}
+
+.system-box {
+    background: #eef4ff;
+    border-left: 4px solid #0d6efd;
+    padding: 0.75rem;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+}
+
+body.dark .system-box {
+    background: #2c3545;
+    border-left-color: #4ea2ff;
+    color: #eee;
+}
+
+@media (max-width: 600px) {
+    .chat-container {
+        padding: 0.5rem;
+    }
+
+    form {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .messages {
+        padding: 0.5rem;
+    }
+
+    .message-bubble {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .chat-input-textarea {
+        font-size: 1rem;
+        width: 100%;
+    }
+
+    .top-nav {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+}

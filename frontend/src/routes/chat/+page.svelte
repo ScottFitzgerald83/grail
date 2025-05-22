@@ -14,7 +14,7 @@
     let recognition, recognizing = false;
     let supportsSpeech = typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
-    if (supportsSpeech && typeof window !== 'undefined') {
+    if (browser && supportsSpeech) {
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SR();
         recognition.continuous = false;
@@ -24,8 +24,30 @@
         };
     }
 
-    let sessionId = localStorage.getItem('grailSessionId') || Date.now().toString();
+    let sessionId = browser ? localStorage.getItem('grailSessionId') : null;
+    if (!sessionId) sessionId = Date.now().toString();
     let historySessions = [];
+
+    let isOnline = navigator.onLine;
+    let offlineQueue = [];
+
+    if (browser) {
+      window.addEventListener('online', () => {
+        isOnline = true;
+        processOfflineQueue();
+      });
+      window.addEventListener('offline', () => {
+        isOnline = false;
+      });
+    }
+
+    async function processOfflineQueue() {
+      for (const queued of offlineQueue) {
+        input = queued;
+        await sendMessage();
+      }
+      offlineQueue = [];
+    }
 
     onMount(() => {
         const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
@@ -176,6 +198,14 @@
 
     async function sendMessage() {
         if (!input.trim() || sending) return;
+
+        if (!navigator.onLine) {
+          offlineQueue.push(input);
+          input = '';
+          alert('You are offline. Message saved and will send when back online.');
+          return;
+        }
+
         sending = true;
 
         const userMessage = {
@@ -242,7 +272,7 @@
     {#if activePersona !== 'none' || systemPrompt}
       <div class="persona-banner">
         <strong>Active System Prompt:</strong>
-        <div class="prompt-content">
+        <div class="prompt-content system-box">
           {systemPrompt || personaDescription(activePersona)}
         </div>
       </div>
@@ -250,15 +280,17 @@
 
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 1rem;">
         <div>
-            <select on:change={(e) => loadChat(e.target.value)}>
-                <option value="">Load previous chat...</option>
-                {#each Object.keys(localStorage)
-                  .filter(k => k.startsWith('session_'))
-                  .sort()
-                  .reverse() as key}
-                  <option value={key}>{new Date(+key.slice(8)).toLocaleString()}</option>
-                {/each}
-            </select>
+            {#if browser}
+              <select on:change={(e) => loadChat(e.target.value)}>
+                  <option value="">Load previous chat...</option>
+                  {#each Object.keys(localStorage)
+                    .filter(k => k.startsWith('session_'))
+                    .sort()
+                    .reverse() as key}
+                    <option value={key}>{new Date(+key.slice(8)).toLocaleString()}</option>
+                  {/each}
+              </select>
+            {/if}
         </div>
         <div>
             <button class="mini" on:click={newChat}>🆕 New Chat</button>
@@ -354,11 +386,3 @@
         {/if}
     </form>
 </div>
-
-<style>
-.token-estimate {
-  font-size: 0.7rem;
-  color: #999;
-  margin-top: 0.25rem;
-}
-</style>
