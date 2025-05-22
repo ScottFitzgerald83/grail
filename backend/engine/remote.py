@@ -55,7 +55,9 @@ def run_openai(model_name, prompt, config):
         res = requests.post(url, headers=headers, json=body)
         delta = int((time.time() - start) * 1000)
         out = res.json()
-        return summarize_result(out["choices"][0]["message"]["content"], model_name, config, delta, out.get("usage", {}).get("total_tokens", 0))
+        result = summarize_result(out["choices"][0]["message"]["content"], model_name, config, delta, out.get("usage", {}).get("total_tokens", 0))
+        result["fallback_used"] = False
+        return result
     except Exception as e:
         return {"output": f"⚠️ OpenAI error: {e}", "model": model_name, "fallback_used": False}
 
@@ -79,7 +81,9 @@ def run_ollama(model_name, prompt, config):
         res = requests.post(url, json=body)
         delta = int((time.time() - start) * 1000)
         out = res.json()
-        return summarize_result(out.get("response", ""), model_name, config, delta, out.get("eval_count", len(out.get("response", "").split())))
+        result = summarize_result(out.get("response", ""), model_name, config, delta, out.get("eval_count", len(out.get("response", "").split())))
+        result["fallback_used"] = False
+        return result
     except Exception as e:
         return {"output": f"⚠️ Ollama error: {e}", "model": model_name, "fallback_used": False}
 import aiohttp
@@ -117,6 +121,7 @@ async def stream_public_model(model_name: str, prompt: str, config: dict):
                                 yield content
                         except Exception:
                             continue
+        yield f"\n[GRAIL_END] model={model_name} tokens=?"
 
 def summarize_result(raw, model_name, config, delta, token_est):
     return {

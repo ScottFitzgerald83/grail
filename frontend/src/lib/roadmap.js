@@ -1,12 +1,8 @@
 export const roadmapMarkdown = `
 | Priority | Description                               | Filename                              |
 |----------|-------------------------------------------|---------------------------------------|
-| 🚩 P0    | Model execution wiring                    | backend/engine/remote.py              |
-| 🚩 P0    | Return fallback vs. primary model info    | backend/engine/remote.py              |
 | 🚩 P0    | Chat pipeline (send/edit/delete)          | frontend/routes/chat/+page.svelte     |
 | 🚩 P0    | Config routing + translation              | backend/config/settings.py            |
-| ⚠️ P1    | Streaming support for public models       | backend/engine/remote.py              |
-| ⚠️ P1    | Model fallback routing                    | backend/engine/remote.py              |
 | ⚠️ P1    | Show warning if OpenAI key is missing     | frontend/routes/chat/+page.svelte     |
 | ⚠️ P1    | Token/cost display for streamed output    | frontend/routes/chat/+page.svelte     |
 | ⚠️ P1    | Token preview before submission           | frontend/routes/chat/+page.svelte     |
