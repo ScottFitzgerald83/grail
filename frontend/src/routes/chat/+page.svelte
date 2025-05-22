@@ -283,6 +283,14 @@
         sending = false;
     }
 
+    function retryMessage(failedId) {
+        const failed = messages.find(m => m.id === failedId && m.role === 'assistant');
+        const previous = messages.findLast(m => m.timestamp && m.timestamp < failed.timestamp && m.role === 'user');
+        if (!previous) return;
+        input = previous.content;
+        sendMessage();
+    }
+
     function openContextMenu(event, message) {
       event.preventDefault();
       contextTarget = message;
@@ -389,6 +397,9 @@
                         </div>
                         {#if m.role === 'assistant'}
                             <div class="token-estimate">≈ {Math.ceil((m.content || '').split(' ').length * 1.25)} tokens</div>
+                            {#if m.content.startsWith("⚠️")}
+                                <button class="mini" on:click={() => retryMessage(m.id)}>🔁 Retry</button>
+                            {/if}
                         {/if}
                     </div>
                 {/if}
@@ -449,3 +460,15 @@
         {/if}
     </form>
 </div>
+
+</style>
+<style>
+button.mini {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-left: 0.5rem;
+}
+</style>
