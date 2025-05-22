@@ -1,22 +1,21 @@
 export const roadmapMarkdown = `
 | Priority | Description                               | Filename                              |
 |----------|-------------------------------------------|---------------------------------------|
-| ⚠️ P1    | API key validation logic                  | backend/lib/secrets.py                |
-| 🍀 P2    | Tokenizer validation endpoint             | backend/main.py                       |
-| 🍀 P2    | Prompt evaluation scoring                 | backend/eval/metrics.py               |
-| 🍀 P2    | Prompt evaluation integration             | frontend/routes/compare/+page.svelte  |
-| 🍀 P2    | Model fallback status indicator           | frontend/routes/compare/+page.svelte  |
-| 🍀 P2    | Prompt truncation UI control              | frontend/routes/tuning/+page.svelte   |
-| 🍀 P2    | Tuning config export formatting           | frontend/routes/tuning/+page.svelte   |
-| 🍀 P2    | API key test button (live validation)     | frontend/routes/tuning/+page.svelte   |
-| 🍀 P2    | Persist OpenAI key (opt-in)               | frontend/routes/tuning/+page.svelte   |
-| 🍀 P2    | Training tab layout + config YAML preview | frontend/routes/training/+page.svelte |
+| ⚠️ P1    | Prompt evaluation metrics + feedback loop | backend/eval.py, frontend/compare     |
+| ⚠️ P1    | Session management + export               | backend/session.py, frontend/logs     |
+| 🍀 P2    | Prompt truncation UI + controls           | frontend/routes/tuning/+page.svelte   |
+| 🍀 P2    | API key live test + persistence           | frontend/routes/tuning/+page.svelte   |
+| 🍀 P2    | Model fallback indicator                  | frontend/routes/compare/+page.svelte  |
+| 🍀 P2    | Prompt diff + evaluation highlight        | frontend/routes/compare/+page.svelte  |
+| 🍀 P2    | Training tab + config YAML preview        | frontend/routes/training/+page.svelte |
 | 🍀 P2    | Dataset import (CSV/JSON/Chat)            | frontend/routes/training/+page.svelte |
 | 🍀 P2    | Launch trainer via CLI or Colab           | frontend/routes/training/+page.svelte |
-| 🍬 P3    | Shareable compare URL preview             | frontend/routes/compare/+page.svelte  |
-| 🍬 P3    | Toast after copy/export                   | frontend/routes/compare/+page.svelte  |
-| 🍬 P3    | Output diff highlight                     | frontend/routes/compare/+page.svelte  |
-| 🍬 P3    | Visual layout toggle                      | frontend/routes/compare/+page.svelte  |
+| 🍬 P3    | Visual layout toggle (stacked vs side)    | frontend/routes/compare/+page.svelte  |
+| 🍬 P3    | Shareable compare URL + export toast      | frontend/routes/compare/+page.svelte  |
 | 🍬 P3    | Model feature badges                      | frontend/routes/compare/+page.svelte  |
-
+| 🧪 P2    | User training lab scaffold (UI + files)   | frontend/routes/lab, backend/train.py |
+| 🧪 P3    | CLI wizard to generate fine-tune configs  | cli/tune_wizard.py                    |
+| 🧪 P3    | Local training job runner (Python)        | backend/train_runner.py               |
+| 💅 P3    | Theme + visual polish pass                | frontend/app.css                      |
+| 💅 P3    | Responsive layout for mobile              | frontend/routes/*                     |
 `;

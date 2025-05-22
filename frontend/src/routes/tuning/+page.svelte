@@ -286,6 +286,18 @@
     let testingKey = false;
     let showApi = false;
 
+    // Use this wrapper for any outbound OpenAI fetch calls
+    // The API key is now usable globally for any OpenAI call, not just for testing.
+    async function fetchWithKey(url, options = {}) {
+        if (persistApiKey && apiKey.startsWith('sk-')) {
+            options.headers = {
+                ...(options.headers || {}),
+                Authorization: `Bearer ${apiKey}`
+            };
+        }
+        return fetch(url, options);
+    }
+
     async function testApiKey() {
         if (!apiKey || !apiKey.startsWith('sk-')) {
             testStatus = '❌ Invalid or missing API key';
@@ -294,9 +306,7 @@
         testingKey = true;
         testStatus = '⏳ Testing...';
         try {
-            const res = await fetch('https://api.openai.com/v1/models', {
-                headers: {Authorization: `Bearer ${apiKey}`}
-            });
+            const res = await fetchWithKey('https://api.openai.com/v1/models');
             testStatus = res.ok ? '✅ Key valid' : '❌ Invalid or expired';
         } catch {
             testStatus = '⚠️ Network error';
@@ -389,6 +399,7 @@
             if (stored) {
                 apiKey = stored;
                 persistApiKey = true;
+                // The API key is now available for global OpenAI fetches via fetchWithKey.
             }
         }
     });
