@@ -49,6 +49,16 @@ def run_inference(model_bundle, prompt, req):
         return run_remote_inference(model_bundle[1], prompt, req)
 
     model, tokenizer = model_bundle
+
+    # Enforce prompt truncation if limit is configured
+    truncate_limit = req.get("truncate_prompt", 0) if isinstance(req, dict) else getattr(req, "truncate_prompt", 0)
+    if truncate_limit > 0:
+        tokens = tokenizer(prompt, return_tensors="pt")["input_ids"][0]
+        if len(tokens) > truncate_limit:
+            print(f"[GRAIL] Truncating prompt from {len(tokens)} to {truncate_limit} tokens.")
+            tokens = tokens[-truncate_limit:]
+            prompt = tokenizer.decode(tokens, skip_special_tokens=True)
+
     print("[GRAIL] Prompt:", prompt)
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
     print("[GRAIL] Inputs shape:", inputs["input_ids"].shape)
