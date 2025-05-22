@@ -1,7 +1,6 @@
 export const roadmapMarkdown = `
 | Priority | Task                                      | Domain | File                                      |
 |----------|-------------------------------------------|--------|-------------------------------------------|
-| ⚠️ P1     | Return final stats from streamed outputs  | BE     | backend/main.py                           |
 | ⚠️ P1     | Return fallback vs. primary model info    | BE     | backend/engine/remote.py                  |
 | 🍀 P2     | Model pricing table (per-token cost)      | FE     | frontend/config/pricing.js                |
 | 🍀 P2     | Prompt evaluation integration             | BE+FE  | backend/eval/metrics.py + compare/+page.svelte |
