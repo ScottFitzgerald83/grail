@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse, PlainTextResponse
 import asyncio, time, json
 from pathlib import Path
+from backend.engine.model import load_model, run_inference
+from backend.engine.remote import model_router
 
 app = FastAPI()
 
@@ -179,28 +181,24 @@ async def compare(request: Request):
         config_a = data.get("config_a", {})
         config_b = data.get("config_b", {})
 
-        model_a = config_a.get("public_model_name", "local")
-        model_b = config_b.get("public_model_name", "local")
+        def invoke(config):
+            if config.get("use_public_model") == "true":
+                return model_router(prompt, config)
+            else:
+                model = load_model(config)
+                return run_inference(model, prompt, config)
 
-        def simulate(prompt, model, config):
-            output = route_model(model, prompt, config)
-            latency = len(output) * 0.5  # simulate latency in ms
-            tokens = len(output.split())
-            return {
-                "output": output,
-                "latency_ms": round(latency),
-                "tokens": tokens,
-                "model": model,
-                "config": config
-            }
+        result_a = invoke(config_a)
+        result_b = invoke(config_b)
 
-        result_a = simulate(prompt, model_a, config_a)
-        result_b = simulate(prompt, model_b, config_b)
+        timestamp = time.strftime('%Y%m%d_%H%M%S')
+        filename = f"{result_a['model']}_vs_{result_b['model']}_{timestamp}.json"
 
         return {
             "result_a": result_a,
             "result_b": result_b,
-            "prompt": prompt
+            "prompt": prompt,
+            "filename": filename
         }
 
     except Exception as e:
@@ -214,31 +212,31 @@ async def compare_batch(request: Request):
         config_a = data.get("config_a", {})
         config_b = data.get("config_b", {})
 
-        model_a = config_a.get("public_model_name", "local")
-        model_b = config_b.get("public_model_name", "local")
-
-        def simulate(prompt, model, config):
-            output = route_model(model, prompt, config)
-            latency = len(output) * 0.5
-            tokens = len(output.split())
-            return {
-                "output": output,
-                "latency_ms": round(latency),
-                "tokens": tokens,
-                "model": model,
-                "config": config
-            }
+        def invoke(p, config):
+            if config.get("use_public_model") == "true":
+                return model_router(p, config)
+            else:
+                model = load_model(config)
+                return run_inference(model, p, config)
 
         results = []
-        for prompt in prompts:
-            result_a = simulate(prompt, model_a, config_a)
-            result_b = simulate(prompt, model_b, config_b)
+        for p in prompts:
+            result_a = invoke(p, config_a)
+            result_b = invoke(p, config_b)
             results.append({
-                "prompt": prompt,
+                "prompt": p,
                 "result_a": result_a,
                 "result_b": result_b
             })
 
-        return results
+        if results:
+            m1 = results[0]["result_a"]["model"]
+            m2 = results[0]["result_b"]["model"]
+            timestamp = time.strftime('%Y%m%d_%H%M%S')
+            filename = f"{m1}_vs_{m2}_{timestamp}.json"
+        else:
+            filename = "compare_batch_result.json"
+
+        return {"results": results, "filename": filename}
     except Exception as e:
         return {"error": str(e)}

@@ -6,10 +6,10 @@
 }
 
 body.dark {
-    --bg: #1c1f26;
-    --text: #f0f0f0;
+    --bg: #121212;
+    --text: #eaeaea;
     --primary: #4ea2ff;
-    --card: #2a2e39;
+    --card: #1e1e1e;
     background: var(--bg) !important;
     color: var(--text) !important;
 }
@@ -909,6 +909,7 @@ body.dark .system-box {
   z-index: 999;
 }
 
+/* --- Compare tab output blocks --- */
 .compare-output {
     display: flex;
     gap: 1.25rem;
@@ -923,6 +924,13 @@ body.dark .system-box {
     border-radius: 6px;
     overflow-x: auto;
     box-shadow: var(--card-shadow);
+}
+
+/* Dark mode high-contrast for compare-output and output-block */
+body.dark .output-block {
+    background-color: #1e1e1e;
+    color: #eaeaea;
+    border: 1px solid #444;
 }
 
 .param-label-tooltip {
@@ -941,4 +949,13 @@ body.dark .system-box {
     background: rgba(255, 0, 0, 0.15);
     padding: 1px 4px;
     border-radius: 3px;
+}
+
+button.mini {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-left: 0.5rem;
 }

@@ -460,15 +460,3 @@
         {/if}
     </form>
 </div>
-
-</style>
-<style>
-button.mini {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  margin-left: 0.5rem;
-}
-</style>

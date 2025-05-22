@@ -399,10 +399,12 @@ ${row.result_b.output}`;
     <div class="card-block {layoutMode === 'stacked' ? 'output-stacked' : 'compare-output'}">
       <div class="output-block">
         <h4>🧠 {resultA.model}</h4>
+        <button class="copy-btn" on:click={() => navigator.clipboard.writeText(resultA.output)}>📋 Copy</button>
         {@html highlightDiff(resultA.output, resultB.output)}
       </div>
       <div class="output-block">
         <h4>🧠 {resultB.model}</h4>
+        <button class="copy-btn" on:click={() => navigator.clipboard.writeText(resultB.output)}>📋 Copy</button>
         {@html highlightDiff(resultB.output, resultA.output)}
       </div>
     </div>
