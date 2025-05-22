@@ -11,8 +11,11 @@
     let activePersona = '';
     let systemPrompt = '';
 
-    let recognition, recognizing = false;
-    let supportsSpeech = typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+let recognition, recognizing = false;
+let supportsSpeech = false;
+if (browser) {
+    supportsSpeech = ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+}
 
     function startVoice() {
         if (!supportsSpeech || !recognition) return;
@@ -25,36 +28,42 @@
         }
     }
 
-    if (browser && supportsSpeech) {
-        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SR();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.onresult = (e) => {
-            input += e.results[0][0].transcript + ' ';
-            recognizing = false;
-        };
-        recognition.onend = () => {
-            recognizing = false;
-        };
-    }
+if (browser && supportsSpeech) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onresult = (e) => {
+        input += e.results[0][0].transcript + ' ';
+        recognizing = false;
+    };
+    recognition.onend = () => {
+        recognizing = false;
+    };
+}
 
-    let sessionId = browser ? localStorage.getItem('grailSessionId') : null;
-    if (!sessionId) sessionId = Date.now().toString();
-    let historySessions = [];
+let sessionId = null;
+if (browser) {
+    sessionId = localStorage.getItem('grailSessionId');
+}
+if (!sessionId) sessionId = Date.now().toString();
+let historySessions = [];
 
-    let isOnline = navigator.onLine;
-    let offlineQueue = [];
+let isOnline = true;
+if (browser) {
+    isOnline = navigator.onLine;
+}
+let offlineQueue = [];
 
-    if (browser) {
-      window.addEventListener('online', () => {
-        isOnline = true;
-        processOfflineQueue();
-      });
-      window.addEventListener('offline', () => {
-        isOnline = false;
-      });
-    }
+if (browser) {
+  window.addEventListener('online', () => {
+    isOnline = true;
+    processOfflineQueue();
+  });
+  window.addEventListener('offline', () => {
+    isOnline = false;
+  });
+}
 
     async function processOfflineQueue() {
       for (const queued of offlineQueue) {
@@ -64,7 +73,8 @@
       offlineQueue = [];
     }
 
-    onMount(() => {
+onMount(() => {
+    if (browser) {
         const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
         activePersona = config.persona || '';
         systemPrompt = config.system_prompt || '';
@@ -87,21 +97,25 @@
         if (savedSession) {
             messages = JSON.parse(savedSession);
         }
-    });
-
-    $: {
-        localStorage.setItem(`session_${sessionId}`, JSON.stringify(messages));
     }
+});
 
-    function newChat() {
-        if (confirm("Start a new chat?")) {
-            sessionId = Date.now().toString();
-            messages = [];
+$: if (browser) {
+    localStorage.setItem(`session_${sessionId}`, JSON.stringify(messages));
+}
+
+function newChat() {
+    if (confirm("Start a new chat?")) {
+        sessionId = Date.now().toString();
+        messages = [];
+        if (browser) {
             localStorage.setItem('grailSessionId', sessionId);
         }
     }
+}
 
-    function loadChat(id) {
+function loadChat(id) {
+    if (browser) {
         const saved = localStorage.getItem(`session_${id}`);
         if (saved) {
             messages = JSON.parse(saved);
@@ -109,6 +123,7 @@
             localStorage.setItem('grailSessionId', sessionId);
         }
     }
+}
 
     let chatWindow;
     let showScrollButton = false;
@@ -148,7 +163,10 @@
     async function applyEdit(id) {
         const updatedMessage = messages.find(m => m.id === id);
         if (!updatedMessage) return;
-        const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+        let config = {};
+        if (browser) {
+            config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+        }
         const payload = {
             message_id: updatedMessage.id,
             new_prompt: editedInput,
@@ -177,7 +195,10 @@
 
     async function deleteMessage(id) {
         previousMessages = [...messages];
-        const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+        let config = {};
+        if (browser) {
+            config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+        }
         const res = await fetch(`/memory/${config.public_model_name || 'local'}/${id}`, {
             method: 'DELETE'
         });
@@ -191,14 +212,19 @@
     }
 
     function exportChat(format = 'json') {
-        const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+        let config = {};
+        if (browser) {
+            config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+        }
         const model = config.public_model_name || 'local';
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const url = `/memory/${model}?format=${format}`;
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `chat_${model}_${timestamp}.${format === 'json' ? 'json' : 'txt'}`;
-        a.click();
+        if (browser) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `chat_${model}_${timestamp}.${format === 'json' ? 'json' : 'txt'}`;
+            a.click();
+        }
     }
 
     function formatTimestamp(date) {
@@ -230,11 +256,11 @@
     async function sendMessage() {
         if (!input.trim() || sending) return;
 
-        if (!navigator.onLine) {
-          offlineQueue.push(input);
-          input = '';
-          alert('You are offline. Message saved and will send when back online.');
-          return;
+        if (browser && !navigator.onLine) {
+            offlineQueue.push(input);
+            input = '';
+            alert('You are offline. Message saved and will send when back online.');
+            return;
         }
 
         sending = true;
@@ -258,15 +284,20 @@
 
         messages = [...messages, assistantMessage];
 
-        const config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+        let config = {};
+        let openaiKey = null;
+        if (browser) {
+            config = JSON.parse(localStorage.getItem("grailConfig") || "{}");
+            openaiKey = localStorage.getItem('grailOpenAIKey');
+        }
         // Patch 1: Warn if OpenAI key missing before /infer
-        if (config.use_public_model === 'true' && !localStorage.getItem('grailOpenAIKey')) {
+        if (config.use_public_model === 'true' && !openaiKey) {
             alert('⚠️ OpenAI API key is missing. Please enter it in the Tuning tab.');
             sending = false;
             return;
         }
         const payload = { prompt: input, message_id: assistantMessage.id, ...config };
-        payload.openai_api_key = localStorage.getItem('grailOpenAIKey');
+        payload.openai_api_key = openaiKey;
 
         try {
             const response = await fetch("/infer", {
@@ -385,7 +416,7 @@
         <button class="mini" on:click={() => exportChat('txt')}>Export Text</button>
     </div>
     <div class="messages" bind:this={chatWindow} on:scroll={() => {
-        localStorage.setItem('chatScroll', chatWindow.scrollTop);
+        if (browser) localStorage.setItem('chatScroll', chatWindow.scrollTop);
     }}>
         {#each messages as m (m.id)}
             <div class="message-row {m.role}">
