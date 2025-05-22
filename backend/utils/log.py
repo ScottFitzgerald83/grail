@@ -33,7 +33,7 @@ def log_inference(prompt: str, model: str, tokens: int, user: str = "anonymous")
         "user": user
     }, level="info", model_name=model)
 
-def log_api_key_usage(api_key_id: str, model_name: str, tokens_used: int):
+def log_api_key_usage(api_key_id: str, model_name: str, tokens_used: int, ip_address: str = None, endpoint: str = None):
     """
     Log per-API key usage in a structured JSONL format.
     """
@@ -41,7 +41,9 @@ def log_api_key_usage(api_key_id: str, model_name: str, tokens_used: int):
         "timestamp": time.time(),
         "api_key_id": api_key_id,
         "model": model_name,
-        "tokens": tokens_used
+        "tokens": tokens_used,
+        "ip_address": ip_address,
+        "endpoint": endpoint
     }
     with open(KEY_LOG_FILE, "a") as f:
         f.write(json.dumps(entry) + "\n")

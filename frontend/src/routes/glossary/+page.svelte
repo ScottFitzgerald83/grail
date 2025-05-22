@@ -16,33 +16,18 @@
 
     $: {
         const lines = glossaryMarkdown.split('\n');
-        let currentTerm = '';
-        let currentBlock = '';
-        let filteredBlocks = [];
+        const header = lines.slice(0, 2); // header + separator
+        const body = lines.slice(2);
 
-        for (const line of lines) {
-            if (line.startsWith('### ')) {
-                if (currentTerm && currentBlock) {
-                    if (currentTerm.toLowerCase().includes(search.toLowerCase())) {
-                        filteredBlocks.push(currentBlock.trim());
-                    }
-                }
-                currentTerm = line;
-                currentBlock = line + '\n';
-            } else {
-                currentBlock += line + '\n';
-            }
-        }
+        const filteredRows = body.filter(line => {
+            const parts = line.split('|').map(s => s.trim());
+            return parts.length > 1 && (parts[0] + parts[1]).toLowerCase().includes(search.toLowerCase());
+        });
 
-        if (currentTerm && currentBlock) {
-            if (currentTerm.toLowerCase().includes(search.toLowerCase())) {
-                filteredBlocks.push(currentBlock.trim());
-            }
-        }
+        const filtered = [...header, ...filteredRows].join('\n');
 
-        filteredMarkdown = search.trim() ? filteredBlocks.join('\n\n') : glossaryMarkdown;
         if (htmlContent) {
-            htmlContent.innerHTML = marked.parse(filteredMarkdown);
+            htmlContent.innerHTML = marked.parse(filtered);
         }
     }
 </script>
