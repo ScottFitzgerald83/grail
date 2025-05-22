@@ -58,19 +58,24 @@ def translate_config(config: Dict, model_name: str) -> Dict:
             }
         }
 
-    return {
-        "model": model_name,
-        "prompt": prompt,
-        "max_tokens": config.get("max_tokens", 256),
-        "temperature": config.get("temperature", 0.7),
-        "top_k": config.get("top_k", 50),
-        "top_p": config.get("top_p", 0.9),
-        "presence_penalty": config.get("presence_penalty", 0.0),
-        "frequency_penalty": config.get("frequency_penalty", 0.0),
-        "system_prompt": config.get("system_prompt", ""),
-        "stop": config.get("stop_sequence", None),
-        "stream": config.get("stream", "false") == "true"
-    }
+    else:
+        return {
+            "model": model_name,
+            "input": prompt,
+            "generation_params": {
+                "max_tokens": config.get("max_tokens", 256),
+                "temperature": config.get("temperature", 0.7),
+                "top_k": config.get("top_k", 50),
+                "top_p": config.get("top_p", 0.9),
+                "presence_penalty": config.get("presence_penalty", 0.0),
+                "frequency_penalty": config.get("frequency_penalty", 0.0),
+                "stop": config.get("stop_sequence", None),
+                "stream": config.get("stream", "false") == "true"
+            },
+            "metadata": {
+                "system_prompt": config.get("system_prompt", "")
+            }
+        }
 
 
 def load_presets() -> Dict:
