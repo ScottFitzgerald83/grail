@@ -288,6 +288,16 @@ ${row.result_b.output}`;
     }
 
 
+    // Helper to submit feedback for prompt/model/metrics
+    async function submitFeedback(model, prompt, metrics) {
+      const sessionId = localStorage.getItem('activeSessionId') || 'unknown';
+      await fetch('/api/eval', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ session_id: sessionId, prompt, model, metrics })
+      });
+      toast = "✅ Feedback submitted!";
+    }
 </script>
 <style src="/src/app.css"></style>
 
@@ -512,6 +522,16 @@ ${row.result_b.output}`;
                   <li><strong>{key}:</strong> {val}</li>
                 {/each}
               </ul>
+              <label>Rate Helpfulness:
+                <select on:change={(e) => submitFeedback(resultA.model, prompt, { helpfulness: e.target.value })}>
+                  <option value="">--</option>
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+              </label>
             </div>
           {/if}
           {#if resultB?.metrics}
@@ -522,6 +542,16 @@ ${row.result_b.output}`;
                   <li><strong>{key}:</strong> {val}</li>
                 {/each}
               </ul>
+              <label>Rate Helpfulness:
+                <select on:change={(e) => submitFeedback(resultB.model, prompt, { helpfulness: e.target.value })}>
+                  <option value="">--</option>
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+              </label>
             </div>
           {/if}
         </div>
