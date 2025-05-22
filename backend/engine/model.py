@@ -64,6 +64,12 @@ def run_inference(model_bundle, prompt, req):
     print("[GRAIL] Inputs shape:", inputs["input_ids"].shape)
 
     max_new_tokens = req.get("max_new_tokens", 128) if isinstance(req, dict) else getattr(req, "max_new_tokens", 128)
+    # Enforce token cap
+    max_total_tokens = req.get("max_total_tokens", 4096)
+    input_token_count = inputs["input_ids"].shape[1]
+    if input_token_count + max_new_tokens > max_total_tokens:
+        raise ValueError(f"[GRAIL] Token limit exceeded: {input_token_count} input + {max_new_tokens} gen > {max_total_tokens}")
+    print(f"[GRAIL] Token count check passed: input={input_token_count}, max_new={max_new_tokens}, cap={max_total_tokens}")
     sampling = req.get("sampling", {}) if isinstance(req, dict) else getattr(req, "sampling", {})
 
     start_time = time.time()
