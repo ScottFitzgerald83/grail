@@ -44,11 +44,17 @@ def load_model(config):
 
 
 def run_inference(model_bundle, prompt, req):
+    if not isinstance(prompt, str) or not prompt.strip():
+        raise ValueError("[GRAIL] Invalid prompt: Must be a non-empty string.")
+
     if isinstance(model_bundle, tuple) and model_bundle[0] == "remote":
         from backend.engine.remote import run_remote_inference
         return run_remote_inference(model_bundle[1], prompt, req)
 
     model, tokenizer = model_bundle
+
+    token_estimate = len(tokenizer.encode(prompt))
+    print(f"[GRAIL] Estimated token count for prompt: {token_estimate}")
 
     # Enforce prompt truncation if limit is configured
     truncate_limit = req.get("truncate_prompt", 0) if isinstance(req, dict) else getattr(req, "truncate_prompt", 0)
