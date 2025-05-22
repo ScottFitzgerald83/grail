@@ -121,17 +121,18 @@
     }
 
     function getDiffTable(configA, configB) {
-        const keys = new Set([...Object.keys(configA), ...Object.keys(configB)]);
+        const keys = new Set([...Object.keys(configA || {}), ...Object.keys(configB || {})]);
         return Array.from(keys)
-            .filter(key => showAllDiff || configA[key] !== configB[key])
+            .filter(key => showAllDiff || (configA && configB && configA[key] !== configB[key]))
             .sort()
-            .map(key => ({key, a: configA[key], b: configB[key]}));
+            .map(key => ({key, a: configA ? configA[key] : undefined, b: configB ? configB[key] : undefined}));
     }
 
     function exportResults(format = 'json') {
         const safeA = resultA && resultA.model ? resultA : { model: 'modelA', output: '' };
         const safeB = resultB && resultB.model ? resultB : { model: 'modelB', output: '' };
         const name = `${safeA.model}_vs_${safeB.model}`;
+        const timestamp = Date.now();
         const blob = new Blob([
             format === 'json'
                 ? JSON.stringify({prompt, configA, configB, resultA: safeA, resultB: safeB}, null, 2)
@@ -211,6 +212,25 @@ ${row.result_b.output}`;
 <style src="/src/app.css"></style>
 
 <div class="page-container">
+  {#if history.length > 0}
+    <div class="card-block">
+      <label class="field-label">Load Previous Prompt</label>
+      <select on:change={(e) => {
+        const item = history.find(h => h.timestamp.toString() === e.target.value);
+        if (item) {
+          prompt = item.prompt;
+          configA = item.configA;
+          configB = item.configB;
+        }
+      }}>
+        <option value="">-- select --</option>
+        {#each history as h}
+          <option value={h.timestamp}>{new Date(h.timestamp).toLocaleString()} | {h.summary}</option>
+        {/each}
+      </select>
+    </div>
+  {/if}
+
   <div class="card-block">
     <label class="field-label">Prompt</label>
     <textarea bind:value={prompt} rows="4" class="full-input" placeholder="Enter one or more prompts, separated by line breaks"></textarea>
@@ -242,6 +262,55 @@ ${row.result_b.output}`;
         </select>
       </label>
     </div>
+  </div>
+
+  {#if resultA && resultB}
+    <div class="card-block">
+      <h3 class="section-title">📊 Metrics</h3>
+      <table class="metrics-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>{resultA.model}</th>
+            <th>{resultB.model}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Latency (ms)</td><td>{resultA.latency_ms}</td><td>{resultB.latency_ms}</td></tr>
+          <tr><td>Tokens</td><td>{resultA.tokens}</td><td>{resultB.tokens}</td></tr>
+          <tr><td>Cost</td><td>{estimateCost(resultA.model, resultA.tokens)}</td><td>{estimateCost(resultB.model, resultB.tokens)}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-block">
+      <label>
+        <input type="checkbox" bind:checked={showAllDiff} />
+        Show full config
+      </label>
+      <table class="diff-table" style="margin-top: 1rem;">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Config A</th>
+            <th>Config B</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each getDiffTable(resultA?.config, resultB?.config) as row}
+            <tr><td>{row.key}</td><td>{row.a}</td><td>{row.b}</td></tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  {/if}
+
+  <div class="card-block controls-row spaced">
+    <button class="mini" on:click={() => exportResults('json')}>📤 Export JSON</button>
+    <button class="mini" on:click={() => exportResults('md')}>📝 Export Markdown</button>
+    <button class="mini" on:click={exportResultsCSV}>📊 Export CSV</button>
+    <button class="mini" on:click={exportBatchMarkdown}>📘 Export Batch Markdown</button>
+    <button class="mini" on:click={encodeCompareURL}>🔗 Copy Shareable Link</button>
   </div>
 
   <hr class="section-divider" />
