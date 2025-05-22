@@ -261,8 +261,10 @@
     </label>
     <div style="margin-top: 0.5rem;">
         <button on:click={testApiKey}>🔍 Test API Key</button>
-        {#if testStatus}
-            <span style="margin-left: 1rem; font-weight: 500;">{testStatus}</span>
+        {#if testingKey}
+          <span style="margin-left: 1rem; font-weight: 500; color: #888;">⏳ Testing...</span>
+        {:else if testStatus}
+          <span style="margin-left: 1rem; font-weight: 500;">{testStatus}</span>
         {/if}
     </div>
 </div>
@@ -278,19 +280,25 @@
     let apiKey = '';
     let persistApiKey = false;
     let testStatus = '';
+    let testingKey = false;
 
-    function testApiKey() {
+    async function testApiKey() {
         if (!apiKey.startsWith('sk-')) {
             testStatus = '❌ Invalid format';
             return;
         }
-        fetch('https://api.openai.com/v1/models', {
-            headers: {Authorization: `Bearer ${apiKey}`}
-        }).then(res => {
+        testingKey = true;
+        testStatus = '⏳ Testing...';
+        try {
+            const res = await fetch('https://api.openai.com/v1/models', {
+                headers: {Authorization: `Bearer ${apiKey}`}
+            });
             testStatus = res.ok ? '✅ Key valid' : '❌ Invalid or expired';
-        }).catch(() => {
+        } catch {
             testStatus = '⚠️ Network error';
-        });
+        } finally {
+            testingKey = false;
+        }
     }
 
     import {onMount} from 'svelte';
