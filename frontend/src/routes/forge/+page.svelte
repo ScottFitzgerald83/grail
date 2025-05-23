@@ -2,6 +2,18 @@
 <p class="page-subtext">
     This is where the sparks fly—upload your data, shape your config, and temper your model in the fires of fine-tuning.
 </p>
+<script>
+  let selectedTab = 'Fine-Tuning';
+</script>
+
+<nav class="tab-nav" style="margin-bottom: 1.25rem;">
+  <button class:selected={selectedTab === 'Fine-Tuning'} on:click={() => selectedTab = 'Fine-Tuning'}>🎯 Fine-Tuning</button>
+  <button class:selected={selectedTab === 'Full Training'} on:click={() => selectedTab = 'Full Training'}>🧱 Full Training</button>
+</nav>
+
+<p class="page-subtext">
+  Switch between fine-tuning an existing model and training a new one from scratch. Each path has different requirements, strategies, and rewards.
+</p>
 <p class="page-subtext">
     The dashboard below guides you through training a language model on your own data. Whether you're starting from a
     base model or training from scratch, this is where you define the outcome. You’ll set the learning pace, select
@@ -9,6 +21,8 @@
 </p>
 <style src="/src/app.css"></style>
 
+
+{#if selectedTab === 'Fine-Tuning'}
 <div class="dashboard-container">
     <div class="param-grid">
         {#each [...parameters]
@@ -192,7 +206,29 @@
         </div>
     </details>
 </div>
+{/if}
 
+{#if selectedTab === 'Full Training'}
+  <div class="training-placeholder" style="margin-top: 2rem;">
+    <h2>🧱 Full Training</h2>
+    <p>Train a model from scratch or from a minimal checkpoint using raw text data.</p>
+    <label style="display: block; margin-top: 1.5rem; margin-bottom: 1rem;">
+      Upload training corpus (.txt or .jsonl):<br>
+      <input type="file" />
+    </label>
+    <pre class="config-preview" style="margin-top: 1.5rem; background: #f7f7f7; color: #444; padding: 1rem; border-radius: 6px;"># Training config preview will appear here...</pre>
+    <div style="margin-top: 1.25rem;">
+      <strong>Instructions:</strong>
+      <ul>
+        <li>Upload your dataset in .txt or .jsonl format.</li>
+        <li>Review the generated YAML config preview.</li>
+        <li>Adjust training parameters (coming soon) and launch your run.</li>
+      </ul>
+    </div>
+  </div>
+{/if}
+
+{#if selectedTab === 'Fine-Tuning'}
 <h2 style="margin-top: 2rem;">🧠 Predicted Model Behavior</h2>
 <table class="performance-table">
     <thead>
@@ -285,6 +321,7 @@
 <pre style="padding: 0.5rem; background: #eee; border-radius: 4px; margin-bottom: 1rem;">
 {generateTag(config)}
 </pre>
+{/if}
 
 
 <script>
