@@ -2,17 +2,18 @@
 <p class="page-subtext">
     This is where the sparks fly—upload your data, shape your config, and temper your model in the fires of fine-tuning.
 </p>
-<script>
-  let selectedTab = 'Fine-Tuning';
-</script>
 
 <nav class="tab-nav" style="margin-bottom: 1.25rem;">
-  <button class:selected={selectedTab === 'Fine-Tuning'} on:click={() => selectedTab = 'Fine-Tuning'}>🎯 Fine-Tuning</button>
-  <button class:selected={selectedTab === 'Full Training'} on:click={() => selectedTab = 'Full Training'}>🧱 Full Training</button>
+    <button class:selected={selectedTab === 'Fine-Tuning'} on:click={() => selectedTab = 'Fine-Tuning'}>🎯 Fine-Tuning
+    </button>
+    <button class:selected={selectedTab === 'Full Training'} on:click={() => selectedTab = 'Full Training'}>🧱 Full
+        Training
+    </button>
 </nav>
 
 <p class="page-subtext">
-  Switch between fine-tuning an existing model and training a new one from scratch. Each path has different requirements, strategies, and rewards.
+    Switch between fine-tuning an existing model and training a new one from scratch. Each path has different
+    requirements, strategies, and rewards.
 </p>
 <p class="page-subtext">
     The dashboard below guides you through training a language model on your own data. Whether you're starting from a
@@ -23,76 +24,95 @@
 
 
 {#if selectedTab === 'Fine-Tuning'}
-<div class="dashboard-container">
-    <div class="param-grid">
-        {#each [...parameters]
-            .filter(p =>
-                !['Advanced', 'Output Format', 'Tool Use'].includes(paramCategory(p.key))
-            )
-            .sort((a, b) => {
-                const ca = paramCategory(a.key);
-                const cb = paramCategory(b.key);
-                return ca === cb ? a.key.localeCompare(b.key) : ca.localeCompare(cb);
-            }) as param}
-            {#if param.key === 'use_public_model'}
-                <div class="param-tile" data-category={paramCategory(param.key)}>
-                    <div class="param-header">
-                        <strong>{param.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>
-                        <span class="help-icon-wrapper">
+    <div class="dashboard-container">
+
+        <h3 style="margin-top: 2rem;">📂 Upload Training File</h3>
+        <label style="display:block;margin-top:0.5rem;">
+            <input type="file" accept=".jsonl"/>
+        </label>
+        <p class="page-subtext" style="margin-top:0.5rem;">Expected format: JSONL file with “prompt” and “completion”
+            fields.</p>
+
+        <h3 style="margin-top: 2rem;">📏 Token & Cost Estimate</h3>
+        <ul>
+            <li>Tokens: —</li>
+            <li>Estimated Cost: —</li>
+        </ul>
+
+        <h3 style="margin-top: 2rem;">📄 Config Preview</h3>
+        <pre class="config-preview" style="background:#f7f7f7;color:#333;padding:1rem;border-radius:6px;">
+# YAML config preview will appear here after upload
+    </pre>
+
+        <div class="param-grid">
+            {#each [...parameters]
+                .filter(p =>
+                    !['Advanced', 'Output Format', 'Tool Use'].includes(paramCategory(p.key))
+                )
+                .sort((a, b) => {
+                    const ca = paramCategory(a.key);
+                    const cb = paramCategory(b.key);
+                    return ca === cb ? a.key.localeCompare(b.key) : ca.localeCompare(cb);
+                }) as param}
+                {#if param.key === 'use_public_model'}
+                    <div class="param-tile" data-category={paramCategory(param.key)}>
+                        <div class="param-header">
+                            <strong>{param.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>
+                            <span class="help-icon-wrapper">
                             <span class="help-icon">❓</span>
                             <div class="tooltip-card">{param.eli5}</div>
                         </span>
-                    </div>
-                    <p class="param-category">{paramCategory(param.key)}</p>
-                    <p class="param-description">{param.definition}</p>
-                    <div class="param-control">
-                        <label class="toggle-switch">
-                            <input type="checkbox"
-                                   checked={config.use_public_model === 'true'}
-                                   on:change={(e) => updateConfig('use_public_model', e.target.checked ? 'true' : 'false')}/>
-                            <span class="slider"></span>
-                        </label>
-                        {#if config.use_public_model === 'true'}
-                            <label style="margin-top: 0.75rem;">
-                                <span style="font-weight: 500; font-size: 0.85rem;">Select Public Model</span>
-                                <select bind:value={config.public_model_name}
-                                        on:change={(e) => updateConfig('public_model_name', e.target.value)}
-                                        style="margin-top: 0.25rem;">
-                                    <option value="gpt-4">GPT-4</option>
-                                    <option value="gpt-3.5">GPT-3.5</option>
-                                    <option value="ollama:llama2">Ollama: LLaMA 2</option>
-                                    <option value="ollama:mistral">Ollama: Mistral</option>
-                                    <option value="mixtral">Mixtral</option>
-                                </select>
+                        </div>
+                        <p class="param-category">{paramCategory(param.key)}</p>
+                        <p class="param-description">{param.definition}</p>
+                        <div class="param-control">
+                            <label class="toggle-switch">
+                                <input type="checkbox"
+                                       checked={config.use_public_model === 'true'}
+                                       on:change={(e) => updateConfig('use_public_model', e.target.checked ? 'true' : 'false')}/>
+                                <span class="slider"></span>
                             </label>
-                        {/if}
-                        <button class="reset-btn" on:click={() => {
+                            {#if config.use_public_model === 'true'}
+                                <label style="margin-top: 0.75rem;">
+                                    <span style="font-weight: 500; font-size: 0.85rem;">Select Public Model</span>
+                                    <select bind:value={config.public_model_name}
+                                            on:change={(e) => updateConfig('public_model_name', e.target.value)}
+                                            style="margin-top: 0.25rem;">
+                                        <option value="gpt-4">GPT-4</option>
+                                        <option value="gpt-3.5">GPT-3.5</option>
+                                        <option value="ollama:llama2">Ollama: LLaMA 2</option>
+                                        <option value="ollama:mistral">Ollama: Mistral</option>
+                                        <option value="mixtral">Mixtral</option>
+                                    </select>
+                                </label>
+                            {/if}
+                            <button class="reset-btn" on:click={() => {
                             updateConfig('use_public_model', getDefault('use_public_model'));
                             updateConfig('public_model_name', getDefault('public_model_name'));
                         }}>
-                            Reset
-                        </button>
-                        <p class="dynamic-desc">{config.use_public_model === 'true'
-                            ? `Using ${config.public_model_name}`
-                            : 'Local model active'}
-                        </p>
+                                Reset
+                            </button>
+                            <p class="dynamic-desc">{config.use_public_model === 'true'
+                                ? `Using ${config.public_model_name}`
+                                : 'Local model active'}
+                            </p>
+                        </div>
                     </div>
-                </div>
-            {:else if param.key !== 'public_model_name'}
-                <div class="param-tile" data-category={paramCategory(param.key)}>
-                    <div class="param-header">
-                        <strong>{param.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>
-                        <span class="help-icon-wrapper">
+                {:else if param.key !== 'public_model_name'}
+                    <div class="param-tile" data-category={paramCategory(param.key)}>
+                        <div class="param-header">
+                            <strong>{param.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>
+                            <span class="help-icon-wrapper">
                             <span class="help-icon">❓</span>
                             <div class="tooltip-card">
                                 {param.eli5}
                             </div>
                         </span>
-                    </div>
-                    <p class="param-category">{paramCategory(param.key)}</p>
-                    <p class="param-description">{param.definition}</p>
-                    <div class="param-control">
-                        <label>
+                        </div>
+                        <p class="param-category">{paramCategory(param.key)}</p>
+                        <p class="param-description">{param.definition}</p>
+                        <div class="param-control">
+                            <label>
                             <span class="param-value">
                                 {#if param.type === 'slider'}
                                     {config[param.key].toFixed(2)} ({fuzzyLabel(param, config[param.key])})
@@ -102,65 +122,65 @@
                                     {config[param.key]}
                                 {/if}
                             </span>
-                        </label>
-                        {#if param.type === 'slider'}
-                            <div class="slider-labels">
-                                <span>{param.lowLabel || 'Low'}</span>
-                                <span>{param.highLabel || 'High'}</span>
-                            </div>
-                            <input type="range" min={param.min} max={param.max} step={param.step}
-                                   bind:value={config[param.key]}
-                                   on:input={(e) => updateConfig(param.key, +e.target.value)}
-                                   style="background: {sliderGradient(param.key)}"/>
-                        {:else if param.type === 'number'}
-                            <input type="number" min={param.min} max={param.max}
-                                   bind:value={config[param.key]}
-                                   on:input={(e) => updateConfig(param.key, +e.target.value)}/>
-                        {:else if param.type === 'text'}
-                            <input type="text"
-                                   bind:value={config[param.key]}
-                                   on:input={(e) => updateConfig(param.key, e.target.value)}/>
-                        {:else if param.type === 'select'}
-                            <select bind:value={config[param.key]}
-                                    on:change={(e) => updateConfig(param.key, e.target.value)}>
-                                {#each param.options as option}
-                                    <option value={option}>{option}</option>
-                                {/each}
-                            </select>
-                        {/if}
-                        <button class="reset-btn" on:click={() => updateConfig(param.key, getDefault(param.key))}>
-                            Reset
-                        </button>
-                        <p class="dynamic-desc">{fuzzyLabel(param, config[param.key])} level selected</p>
+                            </label>
+                            {#if param.type === 'slider'}
+                                <div class="slider-labels">
+                                    <span>{param.lowLabel || 'Low'}</span>
+                                    <span>{param.highLabel || 'High'}</span>
+                                </div>
+                                <input type="range" min={param.min} max={param.max} step={param.step}
+                                       bind:value={config[param.key]}
+                                       on:input={(e) => updateConfig(param.key, +e.target.value)}
+                                       style="background: {sliderGradient(param.key)}"/>
+                            {:else if param.type === 'number'}
+                                <input type="number" min={param.min} max={param.max}
+                                       bind:value={config[param.key]}
+                                       on:input={(e) => updateConfig(param.key, +e.target.value)}/>
+                            {:else if param.type === 'text'}
+                                <input type="text"
+                                       bind:value={config[param.key]}
+                                       on:input={(e) => updateConfig(param.key, e.target.value)}/>
+                            {:else if param.type === 'select'}
+                                <select bind:value={config[param.key]}
+                                        on:change={(e) => updateConfig(param.key, e.target.value)}>
+                                    {#each param.options as option}
+                                        <option value={option}>{option}</option>
+                                    {/each}
+                                </select>
+                            {/if}
+                            <button class="reset-btn" on:click={() => updateConfig(param.key, getDefault(param.key))}>
+                                Reset
+                            </button>
+                            <p class="dynamic-desc">{fuzzyLabel(param, config[param.key])} level selected</p>
+                        </div>
                     </div>
-                </div>
-            {/if}
-        {/each}
-    </div>
+                {/if}
+            {/each}
+        </div>
 
-    <details style="margin-top: 2rem;">
-        <summary style="cursor: pointer; font-weight: 600; font-size: 1rem;">
-            ⚙️ Advanced Settings
-        </summary>
+        <details style="margin-top: 2rem;">
+            <summary style="cursor: pointer; font-weight: 600; font-size: 1rem;">
+                ⚙️ Advanced Settings
+            </summary>
 
-        <div class="param-grid" style="margin-top: 1rem;">
-            {#each [...parameters].filter(p =>
-                ['Advanced', 'Output Format', 'Tool Use'].includes(paramCategory(p.key))
-            ).sort((a, b) => a.key.localeCompare(b.key)) as param}
-                <div class="param-tile" data-category={paramCategory(param.key)}>
-                    <div class="param-header">
-                        <strong>{param.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>
-                        <span class="help-icon-wrapper">
+            <div class="param-grid" style="margin-top: 1rem;">
+                {#each [...parameters].filter(p =>
+                    ['Advanced', 'Output Format', 'Tool Use'].includes(paramCategory(p.key))
+                ).sort((a, b) => a.key.localeCompare(b.key)) as param}
+                    <div class="param-tile" data-category={paramCategory(param.key)}>
+                        <div class="param-header">
+                            <strong>{param.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>
+                            <span class="help-icon-wrapper">
               <span class="help-icon">❓</span>
               <div class="tooltip-card">
                 {param.eli5}
               </div>
             </span>
-                    </div>
-                    <p class="param-category">{paramCategory(param.key)}</p>
-                    <p class="param-description">{param.definition}</p>
-                    <div class="param-control">
-                        <label>
+                        </div>
+                        <p class="param-category">{paramCategory(param.key)}</p>
+                        <p class="param-description">{param.definition}</p>
+                        <div class="param-control">
+                            <label>
               <span class="param-value">
                 {#if param.type === 'slider'}
                   {config[param.key].toFixed(2)} ({fuzzyLabel(param, config[param.key])})
@@ -170,161 +190,171 @@
                   {config[param.key]}
                 {/if}
               </span>
-                        </label>
-                        {#if param.type === 'slider'}
-                            <div class="slider-labels">
-                                <span>{param.lowLabel || 'Low'}</span>
-                                <span>{param.highLabel || 'High'}</span>
-                            </div>
-                            <input type="range" min={param.min} max={param.max} step={param.step}
-                                   bind:value={config[param.key]}
-                                   on:input={(e) => updateConfig(param.key, +e.target.value)}
-                                   style="background: {sliderGradient(param.key)}"/>
-                        {:else if param.type === 'number'}
-                            <input type="number" min={param.min} max={param.max}
-                                   bind:value={config[param.key]}
-                                   on:input={(e) => updateConfig(param.key, +e.target.value)}/>
-                        {:else if param.type === 'text'}
-                            <input type="text"
-                                   bind:value={config[param.key]}
-                                   on:input={(e) => updateConfig(param.key, e.target.value)}/>
-                        {:else if param.type === 'select'}
-                            <select bind:value={config[param.key]}
-                                    on:change={(e) => updateConfig(param.key, e.target.value)}>
-                                {#each param.options as option}
-                                    <option value={option}>{option}</option>
-                                {/each}
-                            </select>
-                        {/if}
-                        <button class="reset-btn" on:click={() => updateConfig(param.key, getDefault(param.key))}>
-                            Reset
-                        </button>
-                        <p class="dynamic-desc">{fuzzyLabel(param, config[param.key])} level selected</p>
+                            </label>
+                            {#if param.type === 'slider'}
+                                <div class="slider-labels">
+                                    <span>{param.lowLabel || 'Low'}</span>
+                                    <span>{param.highLabel || 'High'}</span>
+                                </div>
+                                <input type="range" min={param.min} max={param.max} step={param.step}
+                                       bind:value={config[param.key]}
+                                       on:input={(e) => updateConfig(param.key, +e.target.value)}
+                                       style="background: {sliderGradient(param.key)}"/>
+                            {:else if param.type === 'number'}
+                                <input type="number" min={param.min} max={param.max}
+                                       bind:value={config[param.key]}
+                                       on:input={(e) => updateConfig(param.key, +e.target.value)}/>
+                            {:else if param.type === 'text'}
+                                <input type="text"
+                                       bind:value={config[param.key]}
+                                       on:input={(e) => updateConfig(param.key, e.target.value)}/>
+                            {:else if param.type === 'select'}
+                                <select bind:value={config[param.key]}
+                                        on:change={(e) => updateConfig(param.key, e.target.value)}>
+                                    {#each param.options as option}
+                                        <option value={option}>{option}</option>
+                                    {/each}
+                                </select>
+                            {/if}
+                            <button class="reset-btn" on:click={() => updateConfig(param.key, getDefault(param.key))}>
+                                Reset
+                            </button>
+                            <p class="dynamic-desc">{fuzzyLabel(param, config[param.key])} level selected</p>
+                        </div>
                     </div>
-                </div>
-            {/each}
-        </div>
-    </details>
-</div>
+                {/each}
+            </div>
+        </details>
+    </div>
 {/if}
 
 {#if selectedTab === 'Full Training'}
-  <div class="training-placeholder" style="margin-top: 2rem;">
-    <h2>🧱 Full Training</h2>
-    <p>Train a model from scratch or from a minimal checkpoint using raw text data.</p>
-    <label style="display: block; margin-top: 1.5rem; margin-bottom: 1rem;">
-      Upload training corpus (.txt or .jsonl):<br>
-      <input type="file" />
-    </label>
-    <pre class="config-preview" style="margin-top: 1.5rem; background: #f7f7f7; color: #444; padding: 1rem; border-radius: 6px;"># Training config preview will appear here...</pre>
-    <div style="margin-top: 1.25rem;">
-      <strong>Instructions:</strong>
-      <ul>
-        <li>Upload your dataset in .txt or .jsonl format.</li>
-        <li>Review the generated YAML config preview.</li>
-        <li>Adjust training parameters (coming soon) and launch your run.</li>
-      </ul>
+    <div class="training-placeholder" style="margin-top: 2rem;">
+        <h2>🧱 Full Training</h2>
+        <p>Train a model from scratch or from a minimal checkpoint using raw text data.</p>
+        <label style="display: block; margin-top: 1.5rem; margin-bottom: 1rem;">
+            Upload training corpus (.txt or .jsonl):<br>
+            <input type="file"/>
+        </label>
+        <pre class="config-preview"
+             style="margin-top: 1.5rem; background: #f7f7f7; color: #444; padding: 1rem; border-radius: 6px;"># Training config preview will appear here...</pre>
+        <div style="margin-top: 1.25rem;">
+            <strong>Instructions:</strong>
+            <ul>
+                <li>Upload your dataset in .txt or .jsonl format.</li>
+                <li>Review the generated YAML config preview.</li>
+                <li>Adjust training parameters (coming soon) and launch your run.</li>
+            </ul>
+        </div>
+        <h3 style="margin-top: 2rem;">📜 Training Output Log</h3>
+        <pre class="log-output"
+             style="background:#111;color:#9f9f9f;padding:1rem;border-radius:4px;max-height:200px;overflow:auto;">
+# Logs will appear here as training progresses...
+    </pre>
     </div>
-  </div>
 {/if}
 
 {#if selectedTab === 'Fine-Tuning'}
-<h2 style="margin-top: 2rem;">🧠 Predicted Model Behavior</h2>
-<table class="performance-table">
-    <thead>
-    <tr>
-        <th>Metric</th>
-        <th>Impact</th>
-        <th>Description</th>
-    </tr>
-    </thead>
-    <tbody>
-    {#each Object.entries(computeMetrics(config)) as [key, value]}
+    <h2 style="margin-top: 2rem;">🧠 Predicted Model Behavior</h2>
+    <table class="performance-table">
+        <thead>
         <tr>
-            <td>{key[0].toUpperCase() + key.slice(1)}</td>
-            <td>
-                <div class="bar-bg">
-                    <div class="bar-fill" style="width: {barWidth(value)}; background: {barColor(key, value)}"></div>
-                </div>
-            </td>
-            <td>
-                {#if key === 'creativity'}Too low = boring output; too high = chaotic, off-topic, or hallucinated
-                    content.
-                {/if}
-                {#if key === 'coherence'}Too low = disjointed or nonsensical replies; higher values improve logical
-                    flow.
-                {/if}
-                {#if key === 'repetition'}Higher values increase the chance of word or idea loops; lower is usually
-                    better.
-                {/if}
-                {#if key === 'length'}Lower values may feel abrupt; higher values allow more explanation (at a cost).
-                {/if}
-                {#if key === 'latency'}Higher values mean slower response time; may frustrate users or delay feedback.
-                {/if}
-                {#if key === 'cost'}Higher values increase token usage and compute load; affects scalability and
-                    billing.
-                {/if}
-            </td>
+            <th>Metric</th>
+            <th>Impact</th>
+            <th>Description</th>
         </tr>
-    {/each}
-    </tbody>
-</table>
-
-<h2 style="margin-top: 2rem;">📤 Export & Import Config</h2>
-<div style="margin-bottom: 1rem;">
-    <button on:click={exportConfig}>Download Config</button>
-    <input type="file" accept=".json" on:change={importConfig}/>
-</div>
-
-
-<div style="margin-bottom: 1rem;">
-    <input type="text" bind:value={presetName} placeholder="Save current config as..."/>
-    <button on:click={savePreset}>💾 Save Preset</button>
-</div>
-
-<div style="margin-bottom: 1rem;">
-    <select bind:value={selectedPreset}>
-        <option value="">Load saved preset...</option>
-        {#each savedPresets as preset}
-            <option value={preset.name}>{preset.name}</option>
+        </thead>
+        <tbody>
+        {#each Object.entries(computeMetrics(config)) as [key, value]}
+            <tr>
+                <td>{key[0].toUpperCase() + key.slice(1)}</td>
+                <td>
+                    <div class="bar-bg">
+                        <div class="bar-fill"
+                             style="width: {barWidth(value)}; background: {barColor(key, value)}"></div>
+                    </div>
+                </td>
+                <td>
+                    {#if key === 'creativity'}Too low = boring output; too high = chaotic, off-topic, or hallucinated
+                        content.
+                    {/if}
+                    {#if key === 'coherence'}Too low = disjointed or nonsensical replies; higher values improve logical
+                        flow.
+                    {/if}
+                    {#if key === 'repetition'}Higher values increase the chance of word or idea loops; lower is usually
+                        better.
+                    {/if}
+                    {#if key === 'length'}Lower values may feel abrupt; higher values allow more explanation (at a
+                        cost).
+                    {/if}
+                    {#if key === 'latency'}Higher values mean slower response time; may frustrate users or delay
+                        feedback.
+                    {/if}
+                    {#if key === 'cost'}Higher values increase token usage and compute load; affects scalability and
+                        billing.
+                    {/if}
+                </td>
+            </tr>
         {/each}
-    </select>
-    <button on:click={loadPreset} disabled={!selectedPreset}>📥 Load Preset</button>
-</div>
+        </tbody>
+    </table>
 
-<h2 style="margin-top: 2rem;">🔐 API Key Configuration</h2>
-
-<div style="margin-bottom: 1rem;">
-    <label style="display: flex; flex-direction: column; gap: 0.25rem;">
-        <span>OpenAI API Key (optional):</span>
-        <input bind:value={apiKey} placeholder="sk-..." type={showApi ? 'text' : 'password'} />
-        <label style="font-size: 0.9rem; margin-top: 0.25rem;">
-            <input type="checkbox" bind:checked={showApi} /> Show API key
-        </label>
-    </label>
-    <label style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-        <input type="checkbox" bind:checked={persistApiKey}/>
-        Remember this key (stored locally, not sent to backend)
-    </label>
-    <div style="margin-top: 0.5rem;">
-        <button on:click={testApiKey}>🔍 Test API Key</button>
-        {#if testingKey}
-          <span style="margin-left: 1rem; font-weight: 500; color: #888;">⏳ Testing...</span>
-        {:else if testStatus}
-          <span style="margin-left: 1rem; font-weight: 500;">{testStatus}</span>
-        {/if}
+    <h2 style="margin-top: 2rem;">📤 Export & Import Config</h2>
+    <div style="margin-bottom: 1rem;">
+        <button on:click={exportConfig}>Download Config</button>
+        <input type="file" accept=".json" on:change={importConfig}/>
     </div>
-</div>
 
-<h2 style="margin-top: 2rem;">🏷️ Config Summary Tag</h2>
-<p>This tag helps identify your current config in exports or comparisons:</p>
-<pre style="padding: 0.5rem; background: #eee; border-radius: 4px; margin-bottom: 1rem;">
+
+    <div style="margin-bottom: 1rem;">
+        <input type="text" bind:value={presetName} placeholder="Save current config as..."/>
+        <button on:click={savePreset}>💾 Save Preset</button>
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+        <select bind:value={selectedPreset}>
+            <option value="">Load saved preset...</option>
+            {#each savedPresets as preset}
+                <option value={preset.name}>{preset.name}</option>
+            {/each}
+        </select>
+        <button on:click={loadPreset} disabled={!selectedPreset}>📥 Load Preset</button>
+    </div>
+
+    <h2 style="margin-top: 2rem;">🔐 API Key Configuration</h2>
+
+    <div style="margin-bottom: 1rem;">
+        <label style="display: flex; flex-direction: column; gap: 0.25rem;">
+            <span>OpenAI API Key (optional):</span>
+            <input bind:value={apiKey} placeholder="sk-..." type={showApi ? 'text' : 'password'}/>
+            <label style="font-size: 0.9rem; margin-top: 0.25rem;">
+                <input type="checkbox" bind:checked={showApi}/> Show API key
+            </label>
+        </label>
+        <label style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <input type="checkbox" bind:checked={persistApiKey}/>
+            Remember this key (stored locally, not sent to backend)
+        </label>
+        <div style="margin-top: 0.5rem;">
+            <button on:click={testApiKey}>🔍 Test API Key</button>
+            {#if testingKey}
+                <span style="margin-left: 1rem; font-weight: 500; color: #888;">⏳ Testing...</span>
+            {:else if testStatus}
+                <span style="margin-left: 1rem; font-weight: 500;">{testStatus}</span>
+            {/if}
+        </div>
+    </div>
+
+    <h2 style="margin-top: 2rem;">🏷️ Config Summary Tag</h2>
+    <p>This tag helps identify your current config in exports or comparisons:</p>
+    <pre style="padding: 0.5rem; background: #eee; border-radius: 4px; margin-bottom: 1rem;">
 {generateTag(config)}
 </pre>
 {/if}
 
 
 <script>
+    let selectedTab = 'Fine-Tuning';
     let apiKey = '';
     let persistApiKey = false;
     let testStatus = '';

@@ -2,10 +2,6 @@ export const roadmapMarkdown = `
 | Phase | Priority | Impact | Complexity | Task Description                                      | Filename / Location                                  |
 |-------|----------|--------|------------|------------------------------------------------------|------------------------------------------------------|
 | 2 – Full Training  | 🧪 P2    | ✅      | 🟡 Medium    | Launch full training via train_runner.py           | backend/train_runner.py                              |
-| 2 – Full Training  | 🧪 P2    | ✅      | 🟡 Medium    | Show training output log                             | frontend/routes/forge/+page.svelte                     |
-| 3 – Fine-Tune UX   | ⚠️ P1    | 🔥      | 🟡 Medium    | Validate JSONL/Chat format + field structure         | frontend/routes/forge/+page.svelte                     |
-| 3 – Fine-Tune UX   | ⚠️ P1    | 🔥      | 🟡 Medium    | Token + cost estimate                                | frontend/routes/forge/+page.svelte                     |
-| 3 – Fine-Tune UX   | ⚠️ P1    | 🔥      | 🟢 Easy      | Generate + preview training YAML                     | frontend/routes/forge/+page.svelte                     |
 | 3 – Fine-Tune UX   | ⚠️ P1    | 🔥      | 🟡 Medium    | Launch job and save config to runs/                | backend/train_runner.py                              |
 | 4 – Evaluation     | 🧪 P3    | ✅      | 🟡 Medium    | Add Eval tab: run test prompts vs checkpoints        | frontend/routes/forge/+page.svelte                     |
 | 4 – Evaluation     | 🧪 P3    | ✅      | 🟡 Medium    | Show metrics (diversity, task accuracy, etc.)        | backend/eval.py, frontend/routes/forge/+page.svelte    |
