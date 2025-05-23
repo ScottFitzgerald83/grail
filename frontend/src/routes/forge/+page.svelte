@@ -9,6 +9,7 @@
     <button class:selected={selectedTab === 'Full Training'} on:click={() => selectedTab = 'Full Training'}>🧱 Full
         Training
     </button>
+    <button class:selected={selectedTab === 'Evaluation'} on:click={() => selectedTab = 'Evaluation'}>🧪 Evaluation</button>
 </nav>
 
 <p class="page-subtext">
@@ -226,6 +227,44 @@
             </div>
         </details>
     </div>
+{/if}
+
+{#if selectedTab === 'Evaluation'}
+  <div class="evaluation-tab" style="margin-top: 2rem;">
+    <h2>🧪 Evaluation</h2>
+    <p class="page-subtext">Test your model’s response to a known prompt and compare behavior across runs or models.</p>
+    <label style="margin-top: 1rem;">Enter test prompt:</label>
+    <textarea style="width: 100%; height: 6rem; margin-top: 0.5rem;"></textarea>
+
+    <h3 style="margin-top: 2rem;">🧠 Output Analysis</h3>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+      <thead><tr><th>Metric</th><th>Value</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Diversity</td><td>—</td><td>How unique and varied the response is.</td></tr>
+        <tr><td>Accuracy</td><td>—</td><td>How well the output matches expected facts.</td></tr>
+        <tr><td>Style Match</td><td>—</td><td>Does the output align with your desired tone?</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top: 2rem;">🔁 Fork This Config</h3>
+    <button style="margin-top: 0.5rem;">Create Variant</button>
+  </div>
+{/if}
+
+{#if selectedTab !== 'Evaluation'}
+  <details style="margin-top: 2rem;">
+    <summary style="cursor: pointer;">📘 What does this setting do?</summary>
+    <p class="page-subtext">Each slider or control here affects the model’s behavior in different ways. Hover any ❓ icon to learn more.</p>
+  </details>
+
+  <div class="llm-tips" style="margin-top: 2rem;">
+    <h3>🧙 LLM Tuning Tips</h3>
+    <ul>
+      <li>Use high temperature for variety, low for precision.</li>
+      <li>Prompt length affects coherence — trim where possible.</li>
+      <li>Sampling params can make or break structured outputs.</li>
+    </ul>
+  </div>
 {/if}
 
 {#if selectedTab === 'Full Training'}
